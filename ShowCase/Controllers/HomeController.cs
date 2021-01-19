@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ShowCase.Data;
 using ShowCase.Models;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,19 @@ namespace ShowCase.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly AppDbContext _dbContext;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, AppDbContext dbContext)
         {
             _logger = logger;
+            _dbContext = dbContext;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var modelList = _dbContext.Products;
+
+            return View(modelList);
         }
 
         public IActionResult Privacy()
