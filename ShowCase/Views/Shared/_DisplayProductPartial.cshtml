@@ -1,0 +1,30 @@
+﻿@model ShowCase.Models.Product
+@{ 
+    var imagePath = "~/images/no_image.png";
+}
+
+<div class="card border border-bottom-0 border-left-0 border-right-0 bg-white shadow-sm">
+
+    <img src="@imagePath" asp-append-version="true"
+         class="img-fluid" />
+
+    <div class="card-body">
+
+        <div class="text-center">
+            <h4 class="card-title text-primary">@Model.Name</h4>
+            <p class="text-secondary">@Model.Description</p>
+        </div>
+
+        <div class="row d-flex w-100 p-0 m-0">
+
+            <button name="AddToCart"
+                    id="btnAddToCart" itemid="@Model.Id"
+                    onclick="AddToCart(this)"
+                    class="btn btn-danger mr-auto px-2 py-0">
+                <i class="fas fa-shopping-cart text-white"></i>
+            </button>
+
+            <h6 class="text-warning ml-auto"><strong>@Model.Price SAR</strong></h6>
+        </div>
+    </div>
+</div>

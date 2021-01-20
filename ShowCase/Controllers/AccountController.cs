@@ -44,6 +44,7 @@ namespace ShowCase.Controllers
                 if (registerationResult.Succeeded)
                 {
                     //await userManager.AddToRoleAsync(user, "Admin");
+                    await userManager.AddToRoleAsync(user, "Customer");
 
                     await signInManager.SignInAsync(user, isPersistent: false);
 

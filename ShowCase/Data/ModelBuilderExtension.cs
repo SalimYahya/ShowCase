@@ -11,6 +11,7 @@ namespace ShowCase.Data
     {
         public static void Seed(this ModelBuilder modelBuilder)
         {
+
             Random random = new Random();
 
             modelBuilder.Entity<Product>().HasData(

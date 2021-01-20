@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShowCase.Data;
 using ShowCase.Models;
 using ShowCase.ViewModel.Product;
@@ -9,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Controllers
 {
+    [Authorize]
     public class ProductController : Controller
     {
         private readonly AppDbContext _dbContext;
@@ -54,6 +56,7 @@ namespace ShowCase.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Details(int? id)
         {
             var model = _dbContext.Products.Find(id);

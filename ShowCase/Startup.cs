@@ -43,6 +43,7 @@ namespace ShowCase
                     options.Password.RequireLowercase = false;
             });
 
+
             services.AddControllersWithViews();
         }
 
