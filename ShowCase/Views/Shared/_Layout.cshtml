@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> signInManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -25,15 +28,56 @@
                     </ul>
 
                     <ul class="navbar-nav ml-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="register">Register</a>
-                        </li>
+                        @if (signInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item dropdown" py-1>
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    <i class="fas fa-user fa-lg px-1 text-dark"></i>
+                                    @User.Identity.Name
+                                </a>
 
-                        <li class="nav-item nav-link">|</li>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="login">Login</a>
-                        </li>
+                                    <a class="dorpdown-item nav-link" asp-area="" asp-controller="Profile" asp-action="Index">
+                                        <i class="fas fa-file-alt px-1"></i>
+                                        Profile
+                                    </a>
+
+                                    <a class="dorpdown-item nav-link" asp-area="" asp-controller="Invoice" asp-action="Index">
+                                        <i class="fas fa-list px-1"></i>
+                                        Invoices
+                                    </a>
+
+                                    <hr />
+
+                                    <form method="post" asp-controller="account" asp-action="logout">
+                                        <button type="submit" class="nav-link btn btn-link py-0">
+                                            <i class="fas fa-sign-out-alt px-1"></i>
+                                            Logout
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+
+                            <a class="nav-link" asp-area="" asp-controller="Shopping" asp-action="Index">
+                                <i class="fas fa-shopping-cart px-0" style="padding-left: 0; padding-right: 1.2rem;"></i>
+                                <span id="itemsInShoppingCart" class="test rounded-circle">
+                                    5
+                                </span>
+                            </a>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="register">Register</a>
+                            </li>
+
+                            <li class="nav-item nav-link">|</li>
+
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="login">Login</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

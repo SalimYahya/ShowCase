@@ -14,9 +14,4 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="ViewModel\Account\" />
-    <Folder Include="Views\Account\" />
-  </ItemGroup>
-
 </Project>

@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShowCase.Data;
+using ShowCase.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +32,17 @@ namespace ShowCase
                     Configuration.GetConnectionString("DBConnection")).EnableSensitiveDataLogging()
             );
 
-            services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
-            
+            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+
+            services.Configure<IdentityOptions>(
+                options => {
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequiredUniqueChars = 3;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequireLowercase = false;
+            });
+
             services.AddControllersWithViews();
         }
 
@@ -54,6 +64,7 @@ namespace ShowCase
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

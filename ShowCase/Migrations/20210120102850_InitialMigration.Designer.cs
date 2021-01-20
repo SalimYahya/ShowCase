@@ -10,7 +10,7 @@ using ShowCase.Data;
 namespace ShowCase.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210119212319_InitialMigration")]
+    [Migration("20210120102850_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,71 +70,6 @@ namespace ShowCase.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -217,6 +152,82 @@ namespace ShowCase.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ShowCase.Models.ApplicationUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers");
+                });
+
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -246,175 +257,175 @@ namespace ShowCase.Migrations
                             Id = 1,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 1",
-                            Price = 367.73000000000002
+                            Price = 531.73000000000002
                         },
                         new
                         {
                             Id = 2,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 511.19
+                            Price = 688.15999999999997
                         },
                         new
                         {
                             Id = 3,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 3",
-                            Price = 713.23000000000002
+                            Price = 249.47
                         },
                         new
                         {
                             Id = 4,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 4",
-                            Price = 57.0
+                            Price = 246.88999999999999
                         },
                         new
                         {
                             Id = 5,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 5",
-                            Price = 68.230000000000004
+                            Price = 484.00999999999999
                         },
                         new
                         {
                             Id = 6,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 6",
-                            Price = 276.57999999999998
+                            Price = 228.46000000000001
                         },
                         new
                         {
                             Id = 7,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 7",
-                            Price = 312.24000000000001
+                            Price = 361.75
                         },
                         new
                         {
                             Id = 8,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 8",
-                            Price = 855.63999999999999
+                            Price = 670.92999999999995
                         },
                         new
                         {
                             Id = 9,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 9",
-                            Price = 225.63999999999999
+                            Price = 369.36000000000001
                         },
                         new
                         {
                             Id = 10,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 10",
-                            Price = 537.63999999999999
+                            Price = 739.28999999999996
                         },
                         new
                         {
                             Id = 11,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 11",
-                            Price = 972.40999999999997
+                            Price = 125.2
                         },
                         new
                         {
                             Id = 12,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 360.19999999999999
+                            Price = 882.62
                         },
                         new
                         {
                             Id = 13,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 13",
-                            Price = 258.62
+                            Price = 520.05999999999995
                         },
                         new
                         {
                             Id = 14,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 14",
-                            Price = 366.0
+                            Price = 922.40999999999997
                         },
                         new
                         {
                             Id = 15,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 15",
-                            Price = 105.40000000000001
+                            Price = 542.05999999999995
                         },
                         new
                         {
                             Id = 16,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 16",
-                            Price = 243.91
+                            Price = 472.39999999999998
                         },
                         new
                         {
                             Id = 17,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 17",
-                            Price = 237.65000000000001
+                            Price = 836.72000000000003
                         },
                         new
                         {
                             Id = 18,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 18",
-                            Price = 535.57000000000005
+                            Price = 584.13999999999999
                         },
                         new
                         {
                             Id = 19,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 19",
-                            Price = 606.20000000000005
+                            Price = 825.86000000000001
                         },
                         new
                         {
                             Id = 20,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 20",
-                            Price = 618.88
+                            Price = 946.91999999999996
                         },
                         new
                         {
                             Id = 21,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 21",
-                            Price = 720.05999999999995
+                            Price = 460.85000000000002
                         },
                         new
                         {
                             Id = 22,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 22",
-                            Price = 999.05999999999995
+                            Price = 657.52999999999997
                         },
                         new
                         {
                             Id = 23,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 23",
-                            Price = 479.27999999999997
+                            Price = 324.12
                         },
                         new
                         {
                             Id = 24,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 24",
-                            Price = 462.43000000000001
+                            Price = 126.92
                         },
                         new
                         {
                             Id = 25,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 25",
-                            Price = 160.00999999999999
+                            Price = 248.06999999999999
                         });
                 });
 
@@ -429,7 +440,7 @@ namespace ShowCase.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ShowCase.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -438,7 +449,7 @@ namespace ShowCase.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ShowCase.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -453,7 +464,7 @@ namespace ShowCase.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ShowCase.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -462,7 +473,7 @@ namespace ShowCase.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("ShowCase.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
