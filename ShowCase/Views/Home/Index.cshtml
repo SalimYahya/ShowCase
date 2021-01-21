@@ -14,40 +14,9 @@
 
                 @foreach (var product in Model)
                 {
-            <div class="col-lg-3 col-md-4 mb-2">
-                <partial name="_DisplayProductPartial" model="product">
-        
-     
-                <!--
-    <div class="card border border-bottom-0 border-left-0 border-right-0 bg-white shadow-sm">
-
-        <img src="@imagePath" asp-append-version="true"
-                class="img-fluid"/>
-
-        <div class="card-body">
-
-            <div class="text-center">
-                <h4 class="card-title text-primary">@product.Name</h4>
-                <p class="text-secondary">@product.Description</p>
-            </div>
-
-            <div class="row d-flex w-100 p-0 m-0">
-
-                <button name="AddToCart"
-                        id="btnAddToCart" itemid="@product.Id"
-                        onclick="AddToCart(this)"
-                        class="btn btn-danger mr-auto px-2 py-0">
-                    <i class="fas fa-shopping-cart text-white"></i>
-                </button>
-
-                <h6 class="text-warning ml-auto"><strong>@product.Price SAR</strong></h6>
-            </div>
-        </div>
-
-    </div>
-                -->
-    
-            </div>
+                    <div class="col-lg-3 col-md-4 mb-2">
+                        <partial name="_DisplayProductPartial" model="product">
+                    </div>
                 }
             }
             else
@@ -59,39 +28,3 @@
         </div>
     </div>
 </div>
-
-
-@section Scripts{
-    <script type="text/javascript">
-
-        function AddToCart(item) {
-
-            var itemId = $(item).attr("itemid");
-            var formData = new FormData();
-            formData.append("ItemId", itemId);
-
-            $.ajax({
-                async: true,
-                type: 'Post',
-                contentType: false,
-                processData: false,
-                data: formData,
-                url: '/Shopping/AddToCart',
-                success: function (response) {
-                    console.log(formData.get("ItemId"));
-                    console.log(itemId);
-                    console.log(response);
-
-                    if (response.success) {
-                        console.log("Yes" + response);
-                    }
-                },
-                error: function (response) {
-                    console.log("There is some problem")
-                    console.log(response);
-                }
-            });
-        }
-
-    </script>
-}

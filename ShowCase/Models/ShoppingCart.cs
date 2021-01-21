@@ -12,5 +12,7 @@ namespace ShowCase.Models
 
         public ApplicationUser ApplicationUser { get; set; }
         public Product Product { get; set; }
+
+        public int Qty { get; set; }
     }
 }
