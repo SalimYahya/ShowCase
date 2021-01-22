@@ -69,7 +69,9 @@ namespace ShowCase.Controllers
                 _dbContext.SaveChanges();
             }
 
-            var cartCount = _dbContext.ShoppingCart.Count();
+            var cartCount = _dbContext.ShoppingCart
+                                        .Where(u => u.ApplicationUserID == userId)
+                                        .Count();
 
             /*-------------------------*/
             /* Try to Add Session here */

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShowCase.Models;
 using ShowCase.ViewModel.Account;
@@ -102,6 +103,11 @@ namespace ShowCase.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            if ( HttpContext.Session.GetString("CartCount") != null)
+            {
+                HttpContext.Session.Remove("CartCount");
+            }
+
             await signInManager.SignOutAsync();
             return RedirectToAction("index", "home");
         }
