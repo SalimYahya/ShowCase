@@ -20,12 +20,34 @@ function AddToCart(item) {
         data: formData,
         url: '/Shopping/AddToCart',
         success: function (response) {
-            
-            if (response.success) {
-                response.success
-                console.log("Yes" + response.success);
-                console.log("Yes" + response.Message);
-            }
+
+            /*
+             * Important Note: 
+             * ---------------
+             * To retreive responsed data from controller 
+             * the corresponding data name should start
+             * with small letter.
+             * 
+             * Example:
+             * --------------
+             * 
+             * Backend Controller:
+             * new {
+             *  Success = true,
+             *  Message = "Item Added Succesfully",
+             *  Product = product,
+             *  CartCount = _dbContext.ShoppingCart.Count()
+             * };
+             * 
+             *
+             */
+            console.log(response.success);
+            console.log(response.message);
+            console.log(response.product);
+            console.log(response.cartCount);
+
+            // Set Cart Count in main _Layout
+            document.getElementById("itemsInShoppingCart").innerHTML = response.cartCount;
         },
         error: function (response) {
             console.log("There is some problem")

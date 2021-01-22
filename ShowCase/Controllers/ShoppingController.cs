@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ShowCase.Data;
 using ShowCase.Models;
 using System;
@@ -67,27 +69,46 @@ namespace ShowCase.Controllers
                 _dbContext.SaveChanges();
             }
 
+            var cartCount = _dbContext.ShoppingCart.Count();
+
             /*-------------------------*/
             /* Try to Add Session here */
             /*-------------------------*/
+
+            HttpContext.Session.SetString("CartCount", cartCount.ToString());
+            /*-------------------------*/
+
+
+            var response = new { 
+                Success = true, 
+                Message = "Item Added Succesfully", 
+                Product = new { 
+                    product.Name,
+                    product.Description,
+                    product.Price
+                },  
+                CartCount = cartCount
+            };
+
+            var jsonResult = Json(response);
             
-
-            if (!string.IsNullOrEmpty(ItemId))
-            {
-                return Json(new { 
-                    Success = true, 
-                    Message = "recieved", 
-                    Product_id = product.Id, 
-                    item_id = ItemId,
-                    item_qty = ItemQty,
-                    CartCounter = _dbContext.ShoppingCart.Count()
-                });
-            }
-            else
-            {
-
-                return Json(new { Success = false, Message = "Not recieved"});
-            }
+            return jsonResult;
+            
         }
     }
+
+    /*
+     *   Anothor Example to show Data
+     * ------------------------------------------
+     *   var response = new { 
+     *       Success = true, 
+     *       Message = "Item Added Succesfully", 
+     *       Product = new { 
+     *            product.Name,
+     *            product.Description,
+     *            product.Price
+     *         },  
+     *       CartCount = _dbContext.ShoppingCart.Count()
+     *    };
+     */
 }

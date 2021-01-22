@@ -1,5 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http;
+
 @inject SignInManager<ApplicationUser> signInManager
+@inject IHttpContextAccessor HttpContextAccessor
 
 <!DOCTYPE html>
 <html lang="en">
@@ -65,7 +68,7 @@
                             <a class="nav-link" asp-area="" asp-controller="Shopping" asp-action="Index">
                                 <i class="fas fa-shopping-cart px-0" style="padding-left: 0; padding-right: 1.2rem;"></i>
                                 <span id="itemsInShoppingCart" value="" class="test rounded-circle">
-                                    0
+                                    @HttpContextAccessor.HttpContext.Session.GetString("CartCount")
                                 </span>
                             </a>
                         }
