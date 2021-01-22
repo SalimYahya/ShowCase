@@ -1,0 +1,110 @@
+﻿@model ShowCase.ViewModel.ShoppingCart.SHPViewModel
+@{
+    var product_qty = 0;
+    var total_payment = 0.00;
+
+}
+<!--
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>QTY</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+
+    @if (Model != null)
+    {
+
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                <td>@product.Name</td>
+                <td>@product.Price</td>
+
+                <td>
+                    @foreach (var shoppingCart in Model.ShoppingCarts)
+                    {
+                        if (shoppingCart.ProductId == product.Id)
+                        {
+                            product_qty = shoppingCart.Qty;
+                        }
+                    }
+
+                    @product_qty
+                </td>
+
+                <td>
+                    @{ var total = product.Price * product_qty;
+                        total_payment += total;
+                    }
+                    @total
+                </td>
+
+            </tr>
+        }
+
+    }
+    else
+    {
+        <p>Shopping Cart is Null</p>
+    }
+
+</table>
+-->
+
+@if (Model != null)
+{
+    <div class="container p-0">
+
+        <div class="row p-0">
+            <!-- First Column: Listing Products in cart -->
+            <div class="col-lg-7 border mr-auto">
+                <div class="row">
+                    <p class="h5"><strong>Products in Cart</strong></p>
+                </div>
+
+                @foreach (var product in Model.Products)
+                {
+                    <div class="row mb-2">
+                        <div class="card-body shadow-sm p-0">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-3 border">
+                                        Image
+                                    </div>
+                                    <div class="col-6 border">
+                                        Details
+                                    </div>
+                                    <div class="col-3 border">
+                                        Actions
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Second Column: Order Summary -->
+            <div class="col-lg-4 w-100 border ml-auto">
+                <div class="row h-100">
+                    <p class="h5"><strong>Order Summary</strong></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <p class="h3">
+        Total Price = @Math.Round(total_payment, 2)
+    </p>
+}
+else
+{
+    <p>Shopping Cart is Null</p>
+}
+
+

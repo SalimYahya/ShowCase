@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.ViewModel.ShoppingCart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +23,30 @@ namespace ShowCase.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
-            return View();
+            /*IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
+                                                            .Where(user => user.ApplicationUserID.Contains(userId));*/
+
+            string userId = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+
+            var productList = _dbContext.ShoppingCart
+                          .Where(u => u.ApplicationUserID.Contains(userId))
+                          .Select(p => p.Product);
+
+            var shoppingCartList = _dbContext.ShoppingCart
+                                             .Where(u => u.ApplicationUserID.Contains(userId))
+                                             .Select(up => up);
+
+            SHPViewModel viewModel = new SHPViewModel
+            {
+                ApplicationUser = user,
+                Products = productList.ToList(),
+                ShoppingCarts = shoppingCartList.ToList()
+            };
+
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -113,4 +135,23 @@ namespace ShowCase.Controllers
      *       CartCount = _dbContext.ShoppingCart.Count()
      *    };
      */
+
+
+    /*   Way# 1: EF Conding Related 
+     * -------------------------------------------
+     * IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
+     *                                           .Where(user => user.ApplicationUserID == userId)
+     *                                           .Select(product => product.Product);
+     */
+
+
+    /*
+     *   Way# 2: Similar to SQL 
+     * -------------------------------------------- 
+     * var modelList = ( from product in _dbContext.Products
+     *                   where product.ShoppingCarts.Any(user => user.ApplicationUserID == userId)
+     *                   select product ).ToList();
+     */
+
+
 }
