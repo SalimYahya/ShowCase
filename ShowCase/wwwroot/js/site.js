@@ -6,9 +6,11 @@
 
 function AddToCart(item) {
 
-    var itemId = $(item).attr("itemid");
+    var itemId = $(item).attr("item_id");
     var itemQty = Math.floor(Math.random() * 10) + 1;
+
     var formData = new FormData();
+
     formData.append("ItemId", itemId);
     formData.append("ItemQty", itemQty);
 

@@ -49,6 +49,23 @@ namespace ShowCase.Controllers
             return View(viewModel);
         }
 
+
+        /*test*/
+        [HttpPost]
+        public JsonResult Order( string test)
+        {
+            var response = new
+            {
+                Success = true,
+                Message = "Item Added Succesfully",
+                Data = test
+            };
+
+            var jsonResult = Json(response);
+
+            return jsonResult;
+        }
+
         [HttpPost]
         public async Task<JsonResult> AddToCartAsync(string ItemId, string ItemQty)
         {
