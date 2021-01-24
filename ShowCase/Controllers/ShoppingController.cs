@@ -52,13 +52,16 @@ namespace ShowCase.Controllers
 
         /*test*/
         [HttpPost]
-        public JsonResult Order( string test)
+        public JsonResult Order([FromBody] Object[] shoppingCart)
         {
+            string test = shoppingCart[0].ToString();
+            
             var response = new
             {
                 Success = true,
                 Message = "Item Added Succesfully",
-                Data = test
+                Data = shoppingCart.Length,
+                Details = test
             };
 
             var jsonResult = Json(response);

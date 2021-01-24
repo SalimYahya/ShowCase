@@ -21,8 +21,6 @@ var shoppingCart = (function () {
     // Save cart
     function saveCart() {
         sessionStorage.setItem('shoppingCart', JSON.stringify(cart));
-        sessionStorage.setItem('cart');
-
     }
 
     // Load cart
@@ -225,9 +223,8 @@ displayCart();
 
 
 function OrderNow() {
-    //var cart = JSON.stringify(sessionStorage.getItem('shoppingCart'));
-    var data1 = {};
-    data1.ItmeList = sessionStorage.getItem('shoppingCart');
+    var stringify_cart = JSON.stringify(sessionStorage.getItem('shoppingCart'));
+    var cart = sessionStorage.getItem('shoppingCart');
 
     var data = {
         companyId: 5,
@@ -236,23 +233,41 @@ function OrderNow() {
             { name: 'Some Girl', age: 25, location: 'Seattle, WA 98145' }
         ]
     };
+
+    var myData = {
+        ShoppingCart: sessionStorage.getItem('shoppingCart')
+    };
     
     if (cart != null) {
-        console.log("Session: " + sessionStorage.getItem('shoppingCart'));
-        console.log("data1: " + JSON.stringify(data1));
+        
+        console.log("SessionStorage: " + sessionStorage.getItem('shoppingCart'));
+        console.log("");
+        console.log("Storage length: " + sessionStorage.length);
+        console.log("");
+        console.log("cart: " + cart);
+        console.log("");
+        console.log("myData: " + myData);
+        console.log("");
         console.log("data: " + JSON.stringify(data));
+        console.log("");
+        console.log("stringify_cart: " + stringify_cart);
+        console.log
+
 
         $.ajax({
             async: true,
             type: 'Post',
-            contentType: false,
+            contentType: 'application/json',
+            dataType: 'json',
+            traditional: true,
             processData: false,
-            data: test,
+            data: sessionStorage.getItem('shoppingCart'),
             url: '/Shopping/Order',
             success: function (response) {
                 console.log("response.sussces: " + response.success);
                 console.log("response.message: " + response.message);
                 console.log("response.data: " + response.data);
+                console.log("response.details: " + response.details);
             },
             error: function (response) {
                 console.log("There is some problem")
