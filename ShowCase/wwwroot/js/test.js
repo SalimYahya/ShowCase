@@ -239,7 +239,8 @@ function OrderNow() {
     };
     
     if (cart != null) {
-        
+
+        /*
         console.log("SessionStorage: " + sessionStorage.getItem('shoppingCart'));
         console.log("");
         console.log("Storage length: " + sessionStorage.length);
@@ -252,7 +253,7 @@ function OrderNow() {
         console.log("");
         console.log("stringify_cart: " + stringify_cart);
         console.log
-
+        */
 
         $.ajax({
             async: true,

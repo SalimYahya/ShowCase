@@ -52,16 +52,15 @@ namespace ShowCase.Controllers
 
         /*test*/
         [HttpPost]
-        public JsonResult Order([FromBody] Object[] shoppingCart)
+        public JsonResult Order([FromBody] List<Item> shoppingCart)
         {
-            string test = shoppingCart[0].ToString();
-            
+            //string test = shoppingCart[0].ToString();
+
             var response = new
             {
                 Success = true,
                 Message = "Item Added Succesfully",
-                Data = shoppingCart.Length,
-                Details = test
+                Data = shoppingCart.Count
             };
 
             var jsonResult = Json(response);
@@ -173,5 +172,16 @@ namespace ShowCase.Controllers
      *                   select product ).ToList();
      */
 
+    public class Item
+    {
+        public int id { get; set; }
+        public string  name { get; set; }
 
+        public string desc { get; set; }
+        public double price { get; set; }
+        public string image { get; set; }
+
+        public int count { get; set; }
+    }
+    
 }
