@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ShowCase.Data;
 using ShowCase.Models;
-using ShowCase.ViewModel.ShoppingCart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +22,11 @@ namespace ShowCase.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> IndexAsync()
+        
+        /*public async Task<IActionResult> IndexAsync()
         {
-            /*IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
-                                                            .Where(user => user.ApplicationUserID.Contains(userId));*/
+            IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
+                                                            .Where(user => user.ApplicationUserID.Contains(userId));
 
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
@@ -47,21 +47,38 @@ namespace ShowCase.Controllers
             };
 
             return View(viewModel);
-        }
+        }*/
 
 
-        /*test*/
         [HttpPost]
-        public JsonResult Order([FromBody] Object[] shoppingCart)
+        public async Task<JsonResult> Order([FromBody] List<CartItem> shoppingCart)
         {
-            string test = shoppingCart[0].ToString();
-            
+
+            string userId = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+
+
+            // 1- Create New Invoice & save it to the database
+            Invoice newInvoice = new Invoice { ApplicationUserId = user.Id};
+            _dbContext.Invoices.Add(newInvoice);
+
+            // 2- Create Multiple InvoiceProduct objects 
+            foreach (var item in shoppingCart)
+            {
+                _dbContext.InvoiceProduct.Add(
+                    new InvoiceProduct { 
+                        InvoiceId = newInvoice.Id,
+                        ProductId = item.id,
+                        Qty = item.id
+                    });
+            }
+
+            _dbContext.SaveChanges();
+
             var response = new
             {
                 Success = true,
                 Message = "Item Added Succesfully",
-                Data = shoppingCart.Length,
-                Details = test
             };
 
             var jsonResult = Json(response);
@@ -69,17 +86,16 @@ namespace ShowCase.Controllers
             return jsonResult;
         }
 
-        [HttpPost]
+        /*[HttpPost]
         public async Task<JsonResult> AddToCartAsync(string ItemId, string ItemQty)
         {
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
-            //Product product = _dbContext.Products.SingleOrDefault(model => model.Id.ToString() == ItemId);
+            Product product = _dbContext.Products.SingleOrDefault(model => model.Id.ToString() == ItemId);
             Product product = _dbContext.Products.Find(int.Parse(ItemId));
 
-            // To Be Used: To Create new || To Update exsiting
-            /************************************************/
+
             ShoppingCart shoppingCart;
 
             
@@ -89,7 +105,6 @@ namespace ShowCase.Controllers
 
             if ( isExists )
             {
-                /* Update Qty */
                 shoppingCart = _dbContext.ShoppingCart
                                     .Single(model => (model.ApplicationUserID == user.Id)
                                                && (model.ProductId == product.Id));
@@ -99,7 +114,6 @@ namespace ShowCase.Controllers
             }
             else
             {
-                /* Create new */
                 shoppingCart = new ShoppingCart
                 {
                     ApplicationUserID = userId,
@@ -115,12 +129,10 @@ namespace ShowCase.Controllers
                                         .Where(u => u.ApplicationUserID == userId)
                                         .Count();
 
-            /*-------------------------*/
-            /* Try to Add Session here */
-            /*-------------------------*/
+
 
             HttpContext.Session.SetString("CartCount", cartCount.ToString());
-            /*-------------------------*/
+            
 
 
             var response = new { 
@@ -138,8 +150,9 @@ namespace ShowCase.Controllers
             
             return jsonResult;
             
-        }
+        }*/
     }
+
 
     /*
      *   Anothor Example to show Data
