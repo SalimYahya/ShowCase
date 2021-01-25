@@ -16,7 +16,10 @@ namespace ShowCase.Data
         }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<ShoppingCart> ShoppingCart { get; set; }
+
+        public DbSet<Invoice> Invoices { get; set; }
+
+        public DbSet<InvoiceProduct> InvoiceProduct { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,14 +27,10 @@ namespace ShowCase.Data
             modelBuilder.Seed();
 
             modelBuilder
-                .Entity<ShoppingCart>()
-                .HasKey(up => new {up.ApplicationUserID, up.ProductId });
+                .Entity<InvoiceProduct>()
+                .HasKey(up => new {up.InvoiceId, up.ProductId });
 
         }
 
-        public double RandomPriceGenerator(Random random, double minValue, double maxValue)
-        {
-            return random.NextDouble() * (maxValue - minValue) + minValue;
-        }
     }
 }

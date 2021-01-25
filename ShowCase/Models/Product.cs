@@ -21,11 +21,12 @@ namespace ShowCase.Models
         [Range(0.1, 100000.00, ErrorMessage = "Price Must be Greater than 0")]
         public double Price { get; set; }
 
-        /* 
+
+        /*  
          *  Navaigation Property:
          *  -   Relation Type: Many-to-Many
-         *  -   Pivot Table (Middle Table): ShoppingCart Table
+         *  -   Pivot Table (Middle Table): InvoiceProduct Table
          */
-        public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; }
+        public virtual ICollection<InvoiceProduct> InvoiceProducts { get; set; }
     }
 }

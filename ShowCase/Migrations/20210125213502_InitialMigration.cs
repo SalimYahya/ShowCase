@@ -170,36 +170,80 @@ namespace ShowCase.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Invoices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Invoices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Invoices_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "invoiceProduct",
+                columns: table => new
+                {
+                    InvoiceId = table.Column<int>(type: "int", nullable: false),
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    Qty = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_invoiceProduct", x => new { x.InvoiceId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_invoiceProduct_Invoices_InvoiceId",
+                        column: x => x.InvoiceId,
+                        principalTable: "Invoices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_invoiceProduct_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "Id", "Description", "Name", "Price" },
                 values: new object[,]
                 {
-                    { 1, "Lorem Ipsum is simply dummy text", "Item 1", 531.73000000000002 },
-                    { 23, "Lorem Ipsum is simply dummy text", "Item 23", 324.12 },
-                    { 22, "Lorem Ipsum is simply dummy text", "Item 22", 657.52999999999997 },
-                    { 21, "Lorem Ipsum is simply dummy text", "Item 21", 460.85000000000002 },
-                    { 20, "Lorem Ipsum is simply dummy text", "Item 20", 946.91999999999996 },
-                    { 19, "Lorem Ipsum is simply dummy text", "Item 19", 825.86000000000001 },
-                    { 18, "Lorem Ipsum is simply dummy text", "Item 18", 584.13999999999999 },
-                    { 17, "Lorem Ipsum is simply dummy text", "Item 17", 836.72000000000003 },
-                    { 16, "Lorem Ipsum is simply dummy text", "Item 16", 472.39999999999998 },
-                    { 15, "Lorem Ipsum is simply dummy text", "Item 15", 542.05999999999995 },
-                    { 14, "Lorem Ipsum is simply dummy text", "Item 14", 922.40999999999997 },
-                    { 24, "Lorem Ipsum is simply dummy text", "Item 24", 126.92 },
-                    { 13, "Lorem Ipsum is simply dummy text", "Item 13", 520.05999999999995 },
-                    { 11, "Lorem Ipsum is simply dummy text", "Item 11", 125.2 },
-                    { 10, "Lorem Ipsum is simply dummy text", "Item 10", 739.28999999999996 },
-                    { 9, "Lorem Ipsum is simply dummy text", "Item 9", 369.36000000000001 },
-                    { 8, "Lorem Ipsum is simply dummy text", "Item 8", 670.92999999999995 },
-                    { 7, "Lorem Ipsum is simply dummy text", "Item 7", 361.75 },
-                    { 6, "Lorem Ipsum is simply dummy text", "Item 6", 228.46000000000001 },
-                    { 5, "Lorem Ipsum is simply dummy text", "Item 5", 484.00999999999999 },
-                    { 4, "Lorem Ipsum is simply dummy text", "Item 4", 246.88999999999999 },
-                    { 3, "Lorem Ipsum is simply dummy text", "Item 3", 249.47 },
-                    { 2, "Lorem Ipsum is simply dummy text", "Item 2", 688.15999999999997 },
-                    { 12, "Lorem Ipsum is simply dummy text", "Item 2", 882.62 },
-                    { 25, "Lorem Ipsum is simply dummy text", "Item 25", 248.06999999999999 }
+                    { 1, "Lorem Ipsum is simply dummy text", "Item 1", 611.25 },
+                    { 23, "Lorem Ipsum is simply dummy text", "Item 23", 224.56999999999999 },
+                    { 22, "Lorem Ipsum is simply dummy text", "Item 22", 709.75 },
+                    { 21, "Lorem Ipsum is simply dummy text", "Item 21", 164.06 },
+                    { 20, "Lorem Ipsum is simply dummy text", "Item 20", 710.54999999999995 },
+                    { 19, "Lorem Ipsum is simply dummy text", "Item 19", 523.97000000000003 },
+                    { 18, "Lorem Ipsum is simply dummy text", "Item 18", 353.81999999999999 },
+                    { 17, "Lorem Ipsum is simply dummy text", "Item 17", 990.50999999999999 },
+                    { 16, "Lorem Ipsum is simply dummy text", "Item 16", 427.85000000000002 },
+                    { 15, "Lorem Ipsum is simply dummy text", "Item 15", 95.25 },
+                    { 14, "Lorem Ipsum is simply dummy text", "Item 14", 730.53999999999996 },
+                    { 24, "Lorem Ipsum is simply dummy text", "Item 24", 460.13999999999999 },
+                    { 13, "Lorem Ipsum is simply dummy text", "Item 13", 868.04999999999995 },
+                    { 11, "Lorem Ipsum is simply dummy text", "Item 11", 868.55999999999995 },
+                    { 10, "Lorem Ipsum is simply dummy text", "Item 10", 997.33000000000004 },
+                    { 9, "Lorem Ipsum is simply dummy text", "Item 9", 941.17999999999995 },
+                    { 8, "Lorem Ipsum is simply dummy text", "Item 8", 143.97999999999999 },
+                    { 7, "Lorem Ipsum is simply dummy text", "Item 7", 261.99000000000001 },
+                    { 6, "Lorem Ipsum is simply dummy text", "Item 6", 236.22 },
+                    { 5, "Lorem Ipsum is simply dummy text", "Item 5", 488.88 },
+                    { 4, "Lorem Ipsum is simply dummy text", "Item 4", 525.08000000000004 },
+                    { 3, "Lorem Ipsum is simply dummy text", "Item 3", 728.34000000000003 },
+                    { 2, "Lorem Ipsum is simply dummy text", "Item 2", 947.70000000000005 },
+                    { 12, "Lorem Ipsum is simply dummy text", "Item 2", 384.97000000000003 },
+                    { 25, "Lorem Ipsum is simply dummy text", "Item 25", 409.13 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -240,6 +284,16 @@ namespace ShowCase.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_invoiceProduct_ProductId",
+                table: "invoiceProduct",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Invoices_ApplicationUserId",
+                table: "Invoices",
+                column: "ApplicationUserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -260,10 +314,16 @@ namespace ShowCase.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "invoiceProduct");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Invoices");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

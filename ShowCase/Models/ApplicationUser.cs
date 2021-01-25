@@ -18,13 +18,6 @@ namespace ShowCase.Models
         public string City { get; set; }
 
         /* 
-         *  Navaigation Property:
-         *  -   Relation Type: Many-to-Many
-         *  -   Pivot Table (Middle Table): ShoppingCart Table
-         */
-        public virtual ICollection<ShoppingCart> ShoppingCarts { get; set; }
-
-        /* 
          *  Navaigation Property: Fully Defined Relationship
          *  -   Relation Type: One-to-Many
          *  
@@ -36,6 +29,6 @@ namespace ShowCase.Models
          *   -  Order Table, will have
          *      Many-To-Many relationship with products
          */
-        //public virtual ICollection<Invoice> Invoices { get; set; }
+        public virtual ICollection<Invoice> Invoices { get; set; }
     }
 }

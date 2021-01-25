@@ -226,6 +226,41 @@ namespace ShowCase.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("ShowCase.Models.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationUserId");
+
+                    b.ToTable("Invoices");
+                });
+
+            modelBuilder.Entity("ShowCase.Models.InvoiceProduct", b =>
+                {
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.HasKey("InvoiceId", "ProductId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("invoiceProduct");
+                });
+
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -255,194 +290,176 @@ namespace ShowCase.Migrations
                             Id = 1,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 1",
-                            Price = 126.29000000000001
+                            Price = 611.25
                         },
                         new
                         {
                             Id = 2,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 597.63999999999999
+                            Price = 947.70000000000005
                         },
                         new
                         {
                             Id = 3,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 3",
-                            Price = 361.05000000000001
+                            Price = 728.34000000000003
                         },
                         new
                         {
                             Id = 4,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 4",
-                            Price = 304.87
+                            Price = 525.08000000000004
                         },
                         new
                         {
                             Id = 5,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 5",
-                            Price = 311.93000000000001
+                            Price = 488.88
                         },
                         new
                         {
                             Id = 6,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 6",
-                            Price = 240.19
+                            Price = 236.22
                         },
                         new
                         {
                             Id = 7,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 7",
-                            Price = 431.11000000000001
+                            Price = 261.99000000000001
                         },
                         new
                         {
                             Id = 8,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 8",
-                            Price = 932.73000000000002
+                            Price = 143.97999999999999
                         },
                         new
                         {
                             Id = 9,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 9",
-                            Price = 866.86000000000001
+                            Price = 941.17999999999995
                         },
                         new
                         {
                             Id = 10,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 10",
-                            Price = 929.23000000000002
+                            Price = 997.33000000000004
                         },
                         new
                         {
                             Id = 11,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 11",
-                            Price = 977.44000000000005
+                            Price = 868.55999999999995
                         },
                         new
                         {
                             Id = 12,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 570.88
+                            Price = 384.97000000000003
                         },
                         new
                         {
                             Id = 13,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 13",
-                            Price = 74.480000000000004
+                            Price = 868.04999999999995
                         },
                         new
                         {
                             Id = 14,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 14",
-                            Price = 323.68000000000001
+                            Price = 730.53999999999996
                         },
                         new
                         {
                             Id = 15,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 15",
-                            Price = 103.22
+                            Price = 95.25
                         },
                         new
                         {
                             Id = 16,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 16",
-                            Price = 144.72
+                            Price = 427.85000000000002
                         },
                         new
                         {
                             Id = 17,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 17",
-                            Price = 382.97000000000003
+                            Price = 990.50999999999999
                         },
                         new
                         {
                             Id = 18,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 18",
-                            Price = 692.71000000000004
+                            Price = 353.81999999999999
                         },
                         new
                         {
                             Id = 19,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 19",
-                            Price = 997.29999999999995
+                            Price = 523.97000000000003
                         },
                         new
                         {
                             Id = 20,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 20",
-                            Price = 670.26999999999998
+                            Price = 710.54999999999995
                         },
                         new
                         {
                             Id = 21,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 21",
-                            Price = 771.0
+                            Price = 164.06
                         },
                         new
                         {
                             Id = 22,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 22",
-                            Price = 419.29000000000002
+                            Price = 709.75
                         },
                         new
                         {
                             Id = 23,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 23",
-                            Price = 454.25999999999999
+                            Price = 224.56999999999999
                         },
                         new
                         {
                             Id = 24,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 24",
-                            Price = 428.44999999999999
+                            Price = 460.13999999999999
                         },
                         new
                         {
                             Id = 25,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 25",
-                            Price = 565.10000000000002
+                            Price = 409.13
                         });
-                });
-
-            modelBuilder.Entity("ShowCase.Models.ShoppingCart", b =>
-                {
-                    b.Property<string>("ApplicationUserID")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Qty")
-                        .HasColumnType("int");
-
-                    b.HasKey("ApplicationUserID", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ShoppingCart");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -496,33 +513,47 @@ namespace ShowCase.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ShowCase.Models.ShoppingCart", b =>
+            modelBuilder.Entity("ShowCase.Models.Invoice", b =>
                 {
                     b.HasOne("ShowCase.Models.ApplicationUser", "ApplicationUser")
-                        .WithMany("ShoppingCarts")
-                        .HasForeignKey("ApplicationUserID")
+                        .WithMany("Invoices")
+                        .HasForeignKey("ApplicationUserId");
+
+                    b.Navigation("ApplicationUser");
+                });
+
+            modelBuilder.Entity("ShowCase.Models.InvoiceProduct", b =>
+                {
+                    b.HasOne("ShowCase.Models.Invoice", "Invoice")
+                        .WithMany("InvoiceProducts")
+                        .HasForeignKey("InvoiceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ShowCase.Models.Product", "Product")
-                        .WithMany("ShoppingCarts")
+                        .WithMany("InvoiceProducts")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("ApplicationUser");
+                    b.Navigation("Invoice");
 
                     b.Navigation("Product");
                 });
 
             modelBuilder.Entity("ShowCase.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("ShoppingCarts");
+                    b.Navigation("Invoices");
+                });
+
+            modelBuilder.Entity("ShowCase.Models.Invoice", b =>
+                {
+                    b.Navigation("InvoiceProducts");
                 });
 
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
-                    b.Navigation("ShoppingCarts");
+                    b.Navigation("InvoiceProducts");
                 });
 #pragma warning restore 612, 618
         }
