@@ -26,6 +26,14 @@ namespace ShowCase.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
 
+
+            // Invoice Entity
+            modelBuilder
+                .Entity<Invoice>()
+                .Property("IsConfirmed")
+                .HasDefaultValue(false);
+
+            // InvoiceProduct Entity
             modelBuilder
                 .Entity<InvoiceProduct>()
                 .HasKey(up => new {up.InvoiceId, up.ProductId });

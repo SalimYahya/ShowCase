@@ -235,13 +235,22 @@ function Order() {
             traditional: true,
             processData: false,
             data: cart,
-            url: '/Order/ConfirmOrder',
+            url: '/Order/OrderNow',
             success: function (response) {
                 console.log("response.sussces: " + response.success);
                 console.log("response.message: " + response.message);
                 console.log("response.redirect: " + response.redirect);
                 console.log("response.InvoiceId: " + response.invoiceId);
 
+                /*
+                 * Write code to clear:
+                 * 1- Shopping cart
+                 * 2- Total Count
+                 * */
+
+                /*
+                 * Redirect User to Order Details Page
+                 * */
                 window.location.href = response.redirect + "/" + response.invoiceId;
 
             },

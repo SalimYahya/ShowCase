@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Controllers
 {
+    [Authorize]
     public class OrderController : Controller
 
     {
@@ -85,7 +87,7 @@ namespace ShowCase.Controllers
 
 
         [HttpPost]
-        public JsonResult ConfirmOrder([FromBody] List<CartItem> shoppingCart)
+        public JsonResult OrderNow([FromBody] List<CartItem> shoppingCart)
         {
 
             string userId = _userManager.GetUserId(HttpContext.User);
@@ -93,7 +95,7 @@ namespace ShowCase.Controllers
 
 
             // 1- Create New Invoice & save it to the database
-            Invoice newInvoice = new Invoice { ApplicationUserId = userId};
+            Invoice newInvoice = new Invoice { ApplicationUserId = userId, CreateedAt = DateTime.Now};
             _dbContext.Invoices.Add(newInvoice);
             _dbContext.SaveChanges();
             

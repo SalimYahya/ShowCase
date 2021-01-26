@@ -33,5 +33,8 @@ namespace ShowCase.Models
          */
         public virtual ICollection<InvoiceProduct> InvoiceProducts { get; set; }
 
+        public DateTime CreateedAt { get; set; }
+        public bool IsConfirmed { get; set; }
+
     }
 }
