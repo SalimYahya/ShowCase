@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.ViewModel.Order;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +13,52 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Controllers
 {
-    public class ShoppingController : Controller
+    [Authorize]
+    public class OrderController : Controller
+
     {
         private readonly AppDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ShoppingController(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public OrderController(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
         }
 
-        
+        public async Task<IActionResult> Index()
+        {
+            string user_id = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(user_id);
+
+            var invoiceList = _dbContext.Invoices.Where(u => u.ApplicationUserId == user_id);
+            
+           
+            return View();
+        }
+
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            string user_id = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(user_id);
+
+            Invoice invoice = _dbContext.Invoices.Find(id);
+
+            var productList = _dbContext.InvoiceProduct
+                                        .Where(i => i.InvoiceId == invoice.Id)
+                                        .Select(p=>p.Product);
+
+            OrderDetailsViewModel odvModel = new OrderDetailsViewModel { 
+                ApplicationUser = user,
+                Products = productList.ToList(),
+                Invoice = invoice
+            };
+
+
+            return View(odvModel);
+        }
+
         /*public async Task<IActionResult> IndexAsync()
         {
             IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
@@ -51,35 +87,43 @@ namespace ShowCase.Controllers
 
 
         [HttpPost]
-        public async Task<JsonResult> Order([FromBody] List<CartItem> shoppingCart)
+        public JsonResult OrderNow([FromBody] List<CartItem> shoppingCart)
         {
 
             string userId = _userManager.GetUserId(HttpContext.User);
-            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            //ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
 
             // 1- Create New Invoice & save it to the database
-            Invoice newInvoice = new Invoice { ApplicationUserId = user.Id};
+            Invoice newInvoice = new Invoice { ApplicationUserId = userId, CreateedAt = DateTime.Now};
             _dbContext.Invoices.Add(newInvoice);
-
+            _dbContext.SaveChanges();
+            
             // 2- Create Multiple InvoiceProduct objects 
+           List<InvoiceProduct> invoiceProductsList = new List<InvoiceProduct>();
+
             foreach (var item in shoppingCart)
             {
-                _dbContext.InvoiceProduct.Add(
-                    new InvoiceProduct { 
-                        InvoiceId = newInvoice.Id,
-                        ProductId = item.id,
-                        Qty = item.id
-                    });
+                invoiceProductsList.Add(new InvoiceProduct
+                {
+                    InvoiceId = newInvoice.Id,
+                    ProductId = item.id,
+                    Qty = item.count
+                });
             }
 
+            _dbContext.InvoiceProduct.AddRange(invoiceProductsList);
             _dbContext.SaveChanges();
+
+            
 
             var response = new
             {
                 Success = true,
-                Message = "Item Added Succesfully",
-            };
+                Message = "Order confirmed succefully", 
+                Redirect = "/order/details",
+                InvoiceId = newInvoice.Id
+        };
 
             var jsonResult = Json(response);
 

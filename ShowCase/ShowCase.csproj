@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ViewModel\ShoppingCart\**" />
+    <Compile Remove="Views\Shopping\**" />
+    <Content Remove="ViewModel\ShoppingCart\**" />
+    <Content Remove="Views\Shopping\**" />
+    <EmbeddedResource Remove="ViewModel\ShoppingCart\**" />
+    <EmbeddedResource Remove="Views\Shopping\**" />
+    <None Remove="ViewModel\ShoppingCart\**" />
+    <None Remove="Views\Shopping\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="2.2.0" />
@@ -14,11 +25,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ViewModel\ShoppingCart\" />
-    <Folder Include="Views\Shopping\" />
   </ItemGroup>
 
 </Project>
