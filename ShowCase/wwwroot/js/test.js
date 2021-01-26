@@ -235,12 +235,14 @@ function Order() {
             traditional: true,
             processData: false,
             data: cart,
-            url: '/Shopping/Order',
+            url: '/Order/ConfirmOrder',
             success: function (response) {
                 console.log("response.sussces: " + response.success);
                 console.log("response.message: " + response.message);
-                console.log("response.data: " + response.data);
-                console.log("response.test: " + response.test);
+                console.log("response.redirect: " + response.redirect);
+                console.log("response.InvoiceId: " + response.invoiceId);
+
+                window.location.href = response.redirect + "/" + response.invoiceId;
 
             },
             error: function (response) {
