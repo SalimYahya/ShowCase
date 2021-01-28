@@ -15,6 +15,7 @@ namespace ShowCase.Data
                 
         }
 
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Product> Products { get; set; }
 
         public DbSet<Invoice> Invoices { get; set; }
@@ -30,8 +31,28 @@ namespace ShowCase.Data
             // Invoice Entity
             modelBuilder
                 .Entity<Invoice>()
-                .Property("IsConfirmed")
-                .HasDefaultValue(false);
+                .HasOne(u => u.ApplicationUser)
+                .WithMany(i => i.Invoices);
+
+            modelBuilder
+                .Entity<Invoice>()
+                .Property("IsConfirmed").HasDefaultValue(false);
+
+            modelBuilder
+                .Entity<Invoice>()
+                .Property("TotalItems").HasDefaultValue(0);
+
+            modelBuilder
+                .Entity<Invoice>()
+                .Property("Vat").HasDefaultValue(0);
+
+            modelBuilder
+                .Entity<Invoice>()
+                .Property("TotalExcludeVat").HasDefaultValue(0.00);
+
+            modelBuilder
+                .Entity<Invoice>()
+                .Property("TotalIncludeVat").HasDefaultValue(0.00);
 
             // InvoiceProduct Entity
             modelBuilder
