@@ -1,4 +1,5 @@
 ﻿using ShowCase.Models;
+using ShowCase.Models.Temp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,9 @@ namespace ShowCase.ViewModel.Order
     public class OrderDetailsViewModel
     {
         public ApplicationUser ApplicationUser { get; set; }
-        public List<ShowCase.Models.Product> Products { get; set; }
+        public List<InvoiceProductInfo> ProductInfo { get; set; }
         public Invoice Invoice { get; set; }
     }
+
 }
+

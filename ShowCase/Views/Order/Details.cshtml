@@ -12,21 +12,45 @@
     </div>
 
 
-    <div class="card bg-white shadow p-4">
-        <div class="title h4 text-warning">Purchase Reciept</div>
-        <hr class="mb-4" />
+    <div class="card bg-white shadow py-3">
+        <div class="container">
+            <div class="title h4 text-warning">Purchase Reciept</div>
+            <hr class="mb-4" />
 
-        <div class="row my-2">
-            <div class="col-6">
-                <span class="text-secondary">Date</span>
-                <br>
-                <span>10 October 2018</span>
+            <div class="row border my-2">
+                <div class="col-4">
+                    <div class="text-center">
+                        <span class="text-secondary">Date</span>
+                        <br>
+                        <span>@Model.Invoice.CreateedAt</span>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="text-center">
+                        <span class="text-secondary">Order No</span>
+                        <br>
+                        <span>@Model.Invoice.Id</span>
+                    </div>
+                </div>
+
+                <div class="col-4">
+                    <div class="text-center">
+                        <span class="text-secondary">Items Qty</span>
+                        <br>
+                        <span>@Model.Invoice.TotalItems</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-6">
-                <span class="text-secondary">Order No.</span>
-                <br>
-                <span>012j1gvs356c</span>
+            <!-- Items List-->
+            <div class="row bg-light my-2 py-2 px-5">
+                @foreach (var item in Model.ProductInfo)
+                {
+                <div class="row w-100">
+                    @item.Product.Name
+                </div>
+                }
             </div>
         </div>
 
@@ -44,11 +68,11 @@
             </div>
         </div>
 
-        @foreach (var product in Model.Products)
+        @foreach (var product in Model.ProductInfo)
         {
-            <div class="row my-2">
+            <div class="row my-2 mx-0">
                 <div class="col-9">
-                    <span>@product.Name | @product.Description | 2 Qty</span>
+                    <span>@product.Product.Name | @product.Product.Description | @product.Qty Qty</span>
                 </div>
                 <div class="col-3">
                     100.00 SAR

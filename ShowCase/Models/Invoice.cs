@@ -36,5 +36,10 @@ namespace ShowCase.Models
         public DateTime CreateedAt { get; set; }
         public bool IsConfirmed { get; set; }
 
+        public int TotalItems { get; set; }
+        public int Vat { get; set; }
+        public double TotalExcludeVat { get; set; }
+        public double TotalIncludeVat { get; set; }
+
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Models.Temp;
 using ShowCase.ViewModel.Order;
 using System;
 using System.Collections.Generic;
@@ -34,7 +35,7 @@ namespace ShowCase.Controllers
             var invoiceList = _dbContext.Invoices.Where(u => u.ApplicationUserId == user_id);
             
            
-            return View();
+            return View(invoiceList);
         }
 
 
@@ -45,13 +46,19 @@ namespace ShowCase.Controllers
 
             Invoice invoice = _dbContext.Invoices.Find(id);
 
+
             var productList = _dbContext.InvoiceProduct
                                         .Where(i => i.InvoiceId == invoice.Id)
-                                        .Select(p=>p.Product);
+                                        .Select(p => new InvoiceProductInfo { 
+                                            Product = p.Product,
+                                            Qty= p.Qty, 
+                                            Invoice = p.Invoice
+                                        });
+            
 
             OrderDetailsViewModel odvModel = new OrderDetailsViewModel { 
                 ApplicationUser = user,
-                Products = productList.ToList(),
+                ProductInfo = productList.ToList(),
                 Invoice = invoice
             };
 
@@ -95,15 +102,33 @@ namespace ShowCase.Controllers
 
 
             // 1- Create New Invoice & save it to the database
-            Invoice newInvoice = new Invoice { ApplicationUserId = userId, CreateedAt = DateTime.Now};
+            // Vat = 15%
+            int vat = 15;
+            Invoice newInvoice = new Invoice { 
+                ApplicationUserId = userId,
+                CreateedAt = DateTime.Now,
+                Vat = vat
+            };
+
             _dbContext.Invoices.Add(newInvoice);
             _dbContext.SaveChanges();
-            
+
+
             // 2- Create Multiple InvoiceProduct objects 
-           List<InvoiceProduct> invoiceProductsList = new List<InvoiceProduct>();
+            // & Update vat, totalItems, totalExclude & totalInclude
+            // values in invoice table
+
+            int totalItem = 0;
+            double totalExcludeVat = 0.00;
+            double totalIncludeVat = 0.00;
+
+            List<InvoiceProduct> invoiceProductsList = new List<InvoiceProduct>();
 
             foreach (var item in shoppingCart)
             {
+                totalItem += item.count;
+                totalExcludeVat += item.price;
+
                 invoiceProductsList.Add(new InvoiceProduct
                 {
                     InvoiceId = newInvoice.Id,
@@ -115,7 +140,18 @@ namespace ShowCase.Controllers
             _dbContext.InvoiceProduct.AddRange(invoiceProductsList);
             _dbContext.SaveChanges();
 
-            
+
+            // Update Invoice table
+            totalIncludeVat = (vat * totalExcludeVat / 100) + totalExcludeVat;
+
+            newInvoice.TotalItems = totalItem;
+            newInvoice.TotalExcludeVat = totalExcludeVat;
+            newInvoice.TotalIncludeVat = totalIncludeVat;
+
+            var updatedInvoice = _dbContext.Invoices.Attach(newInvoice);
+            updatedInvoice.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+
+            _dbContext.SaveChanges();
 
             var response = new
             {
@@ -230,5 +266,29 @@ namespace ShowCase.Controllers
      *                   select product ).ToList();
      */
 
+
+
+     //  Usefull Query functions for Details Controller
+     /*--------------------------------------------------*
+ 
+
+    /*  
+     *  Way# 2: Similar to SQL 
+     * -------------------------------------------- 
+     *  var productList = (from product in _dbContext.Products
+     *                     where product.InvoiceProducts.Any(i => i.InvoiceId ==  invoice.Id)
+     *                     select product).ToList();
+     *
+     */
+
+    /*
+     * var productList = (from product in _dbContext.Products
+     *                   where product.InvoiceProducts.Any(i => i.InvoiceId == invoice.Id)
+     *                  select new InvoiceProductInfo {
+     *                      Product = product,
+     *                      Qty = product.InvoiceProducts.Where(p => p.ProductId == product.Id).Select(q=>q.Qty),
+     *                      Invoice = invoice
+     *                  }).ToList();
+     */
 
 }
