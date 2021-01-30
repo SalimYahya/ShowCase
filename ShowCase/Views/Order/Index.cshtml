@@ -25,8 +25,14 @@
                 @Html.DisplayFor(modelItem => item.ApplicationUserId)
             </td>
             <td>
-                @Html.ActionLink("Details", "Details", new {  id=item.Id  })
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @if (item.IsConfirmed)
+                {
+                    <span>Purchased</span>
+                }
+                else
+                {
+                    @Html.ActionLink("Details", "Details", new { id = item.Id })
+                }
             </td>
         </tr>
 }

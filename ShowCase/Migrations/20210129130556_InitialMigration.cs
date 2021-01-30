@@ -176,7 +176,13 @@ namespace ShowCase.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreateedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsConfirmed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    TotalItems = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    Vat = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
+                    TotalExcludeVat = table.Column<double>(type: "float", nullable: false, defaultValue: 0.0),
+                    TotalIncludeVat = table.Column<double>(type: "float", nullable: false, defaultValue: 0.0)
                 },
                 constraints: table =>
                 {
@@ -190,7 +196,7 @@ namespace ShowCase.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "invoiceProduct",
+                name: "InvoiceProduct",
                 columns: table => new
                 {
                     InvoiceId = table.Column<int>(type: "int", nullable: false),
@@ -199,15 +205,15 @@ namespace ShowCase.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_invoiceProduct", x => new { x.InvoiceId, x.ProductId });
+                    table.PrimaryKey("PK_InvoiceProduct", x => new { x.InvoiceId, x.ProductId });
                     table.ForeignKey(
-                        name: "FK_invoiceProduct_Invoices_InvoiceId",
+                        name: "FK_InvoiceProduct_Invoices_InvoiceId",
                         column: x => x.InvoiceId,
                         principalTable: "Invoices",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_invoiceProduct_Products_ProductId",
+                        name: "FK_InvoiceProduct_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -215,35 +221,44 @@ namespace ShowCase.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
+                values: new object[,]
+                {
+                    { "06a1e12e-d84c-44bd-8769-b208726aa114", "f723bbd2-af4f-4a6d-976e-5040de455ecf", "Admin", "ADMIN" },
+                    { "2cd310ed-945d-4efb-98e4-b4c0a5c9a49c", "fbc1de8d-7af9-4cf9-b92e-de8df45d5f2f", "Customer", "CUSTOMER" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "Id", "Description", "Name", "Price" },
                 values: new object[,]
                 {
-                    { 1, "Lorem Ipsum is simply dummy text", "Item 1", 611.25 },
-                    { 23, "Lorem Ipsum is simply dummy text", "Item 23", 224.56999999999999 },
-                    { 22, "Lorem Ipsum is simply dummy text", "Item 22", 709.75 },
-                    { 21, "Lorem Ipsum is simply dummy text", "Item 21", 164.06 },
-                    { 20, "Lorem Ipsum is simply dummy text", "Item 20", 710.54999999999995 },
-                    { 19, "Lorem Ipsum is simply dummy text", "Item 19", 523.97000000000003 },
-                    { 18, "Lorem Ipsum is simply dummy text", "Item 18", 353.81999999999999 },
-                    { 17, "Lorem Ipsum is simply dummy text", "Item 17", 990.50999999999999 },
-                    { 16, "Lorem Ipsum is simply dummy text", "Item 16", 427.85000000000002 },
-                    { 15, "Lorem Ipsum is simply dummy text", "Item 15", 95.25 },
-                    { 14, "Lorem Ipsum is simply dummy text", "Item 14", 730.53999999999996 },
-                    { 24, "Lorem Ipsum is simply dummy text", "Item 24", 460.13999999999999 },
-                    { 13, "Lorem Ipsum is simply dummy text", "Item 13", 868.04999999999995 },
-                    { 11, "Lorem Ipsum is simply dummy text", "Item 11", 868.55999999999995 },
-                    { 10, "Lorem Ipsum is simply dummy text", "Item 10", 997.33000000000004 },
-                    { 9, "Lorem Ipsum is simply dummy text", "Item 9", 941.17999999999995 },
-                    { 8, "Lorem Ipsum is simply dummy text", "Item 8", 143.97999999999999 },
-                    { 7, "Lorem Ipsum is simply dummy text", "Item 7", 261.99000000000001 },
-                    { 6, "Lorem Ipsum is simply dummy text", "Item 6", 236.22 },
-                    { 5, "Lorem Ipsum is simply dummy text", "Item 5", 488.88 },
-                    { 4, "Lorem Ipsum is simply dummy text", "Item 4", 525.08000000000004 },
-                    { 3, "Lorem Ipsum is simply dummy text", "Item 3", 728.34000000000003 },
-                    { 2, "Lorem Ipsum is simply dummy text", "Item 2", 947.70000000000005 },
-                    { 12, "Lorem Ipsum is simply dummy text", "Item 2", 384.97000000000003 },
-                    { 25, "Lorem Ipsum is simply dummy text", "Item 25", 409.13 }
+                    { 23, "Lorem Ipsum is simply dummy text", "Item 23", 91.900000000000006 },
+                    { 22, "Lorem Ipsum is simply dummy text", "Item 22", 366.97000000000003 },
+                    { 21, "Lorem Ipsum is simply dummy text", "Item 21", 739.45000000000005 },
+                    { 20, "Lorem Ipsum is simply dummy text", "Item 20", 678.15999999999997 },
+                    { 19, "Lorem Ipsum is simply dummy text", "Item 19", 131.68000000000001 },
+                    { 18, "Lorem Ipsum is simply dummy text", "Item 18", 125.2 },
+                    { 17, "Lorem Ipsum is simply dummy text", "Item 17", 848.87 },
+                    { 16, "Lorem Ipsum is simply dummy text", "Item 16", 583.24000000000001 },
+                    { 15, "Lorem Ipsum is simply dummy text", "Item 15", 124.78 },
+                    { 14, "Lorem Ipsum is simply dummy text", "Item 14", 873.40999999999997 },
+                    { 13, "Lorem Ipsum is simply dummy text", "Item 13", 186.77000000000001 },
+                    { 12, "Lorem Ipsum is simply dummy text", "Item 2", 717.5 },
+                    { 11, "Lorem Ipsum is simply dummy text", "Item 11", 64.019999999999996 },
+                    { 10, "Lorem Ipsum is simply dummy text", "Item 10", 365.81999999999999 },
+                    { 9, "Lorem Ipsum is simply dummy text", "Item 9", 537.50999999999999 },
+                    { 8, "Lorem Ipsum is simply dummy text", "Item 8", 366.47000000000003 },
+                    { 7, "Lorem Ipsum is simply dummy text", "Item 7", 428.48000000000002 },
+                    { 6, "Lorem Ipsum is simply dummy text", "Item 6", 816.38 },
+                    { 5, "Lorem Ipsum is simply dummy text", "Item 5", 716.15999999999997 },
+                    { 4, "Lorem Ipsum is simply dummy text", "Item 4", 620.64999999999998 },
+                    { 3, "Lorem Ipsum is simply dummy text", "Item 3", 760.05999999999995 },
+                    { 2, "Lorem Ipsum is simply dummy text", "Item 2", 837.97000000000003 },
+                    { 1, "Lorem Ipsum is simply dummy text", "Item 1", 59.710000000000001 },
+                    { 24, "Lorem Ipsum is simply dummy text", "Item 24", 154.83000000000001 },
+                    { 25, "Lorem Ipsum is simply dummy text", "Item 25", 712.23000000000002 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -286,8 +301,8 @@ namespace ShowCase.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_invoiceProduct_ProductId",
-                table: "invoiceProduct",
+                name: "IX_InvoiceProduct_ProductId",
+                table: "InvoiceProduct",
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
@@ -314,7 +329,7 @@ namespace ShowCase.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "invoiceProduct");
+                name: "InvoiceProduct");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

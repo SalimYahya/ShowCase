@@ -159,78 +159,43 @@ namespace ShowCase.Controllers
                 Message = "Order confirmed succefully", 
                 Redirect = "/order/details",
                 InvoiceId = newInvoice.Id
-        };
+            };
 
             var jsonResult = Json(response);
 
             return jsonResult;
         }
 
-        /*[HttpPost]
-        public async Task<JsonResult> AddToCartAsync(string ItemId, string ItemQty)
+        
+        [HttpPost]
+        [Authorize]
+        public JsonResult ConfirmOrder(string Invoice_Id)
         {
+            int invoiceId = int.Parse(Invoice_Id);
             string userId = _userManager.GetUserId(HttpContext.User);
-            ApplicationUser user = await _userManager.FindByIdAsync(userId);
-
-            Product product = _dbContext.Products.SingleOrDefault(model => model.Id.ToString() == ItemId);
-            Product product = _dbContext.Products.Find(int.Parse(ItemId));
 
 
-            ShoppingCart shoppingCart;
-
+            // Get Invoice which invoiceId == id & belongs to the current user
+            Invoice invoice = _dbContext.Invoices.Single(i => i.ApplicationUserId == userId && i.Id == invoiceId);
+            invoice.IsConfirmed = true;
             
-            bool isExists = _dbContext.ShoppingCart
-                                    .Any(model => (model.ApplicationUserID == user.Id)
-                                               && (model.ProductId == product.Id));
+            var inv = _dbContext.Invoices.Attach(invoice);
+            inv.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
 
-            if ( isExists )
+            _dbContext.SaveChanges();
+
+
+            var response = new
             {
-                shoppingCart = _dbContext.ShoppingCart
-                                    .Single(model => (model.ApplicationUserID == user.Id)
-                                               && (model.ProductId == product.Id));
-                shoppingCart.Qty = shoppingCart.Qty + int.Parse(ItemQty);
-                _dbContext.ShoppingCart.Update(shoppingCart);
-                _dbContext.SaveChanges();
-            }
-            else
-            {
-                shoppingCart = new ShoppingCart
-                {
-                    ApplicationUserID = userId,
-                    ProductId = product.Id,
-                    Qty = int.Parse(ItemQty)
-                };
-
-                _dbContext.ShoppingCart.Add(shoppingCart);
-                _dbContext.SaveChanges();
-            }
-
-            var cartCount = _dbContext.ShoppingCart
-                                        .Where(u => u.ApplicationUserID == userId)
-                                        .Count();
-
-
-
-            HttpContext.Session.SetString("CartCount", cartCount.ToString());
-            
-
-
-            var response = new { 
-                Success = true, 
-                Message = "Item Added Succesfully", 
-                Product = new { 
-                    product.Name,
-                    product.Description,
-                    product.Price
-                },  
-                CartCount = cartCount
+                Success = true,
+                Message = "Order confirmed succefully",
+                Invoice = invoice.IsConfirmed
             };
 
             var jsonResult = Json(response);
-            
+
             return jsonResult;
-            
-        }*/
+        }
     }
 
 
@@ -268,18 +233,18 @@ namespace ShowCase.Controllers
 
 
 
-     //  Usefull Query functions for Details Controller
-     /*--------------------------------------------------*
- 
+    //  Usefull Query functions for Details Controller
+    /*--------------------------------------------------*
 
-    /*  
-     *  Way# 2: Similar to SQL 
-     * -------------------------------------------- 
-     *  var productList = (from product in _dbContext.Products
-     *                     where product.InvoiceProducts.Any(i => i.InvoiceId ==  invoice.Id)
-     *                     select product).ToList();
-     *
-     */
+
+   /*  
+    *  Way# 2: Similar to SQL 
+    * -------------------------------------------- 
+    *  var productList = (from product in _dbContext.Products
+    *                     where product.InvoiceProducts.Any(i => i.InvoiceId ==  invoice.Id)
+    *                     select product).ToList();
+    *
+    */
 
     /*
      * var productList = (from product in _dbContext.Products
@@ -289,6 +254,11 @@ namespace ShowCase.Controllers
      *                      Qty = product.InvoiceProducts.Where(p => p.ProductId == product.Id).Select(q=>q.Qty),
      *                      Invoice = invoice
      *                  }).ToList();
+     */
+
+
+    /*
+     * var invoice = _dbContext.Invoices.Where(i => i.ApplicationUserId == userId && i.Id == invoiceId);
      */
 
 }

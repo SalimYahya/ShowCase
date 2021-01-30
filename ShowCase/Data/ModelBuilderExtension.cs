@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using ShowCase.Models;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,30 @@ namespace ShowCase.Data
 {
     public static class ModelBuilderExtension
     {
+
         public static void Seed(this ModelBuilder modelBuilder)
         {
 
             Random random = new Random();
 
-            modelBuilder.Entity<Product>().HasData(
+            // Seed Role Table
+            var roles = new List<IdentityRole>
+            {
+                new IdentityRole
+                {
+                    Name="Admin",
+                    NormalizedName ="ADMIN"
+                },
+                new IdentityRole
+                {
+                    Name="Customer",
+                    NormalizedName="CUSTOMER"
+                }
+            };
+            modelBuilder.Entity<IdentityRole>().HasData(roles);
+
+            // Seed Product Table
+            var products = new List<Product> {
                 new Product
                 {
                     Id = 1,
@@ -22,6 +41,7 @@ namespace ShowCase.Data
                     Description = "Lorem Ipsum is simply dummy text",
                     Price = Math.Round(RandomPriceGenerator(random, 50, 1000), 2),
                 },
+
                 new Product
                 {
                     Id = 2,
@@ -210,7 +230,43 @@ namespace ShowCase.Data
                     Name = "Item " + Convert.ToString(25),
                     Description = "Lorem Ipsum is simply dummy text",
                     Price = Math.Round(RandomPriceGenerator(random, 50, 1000), 2),
-                });
+                }
+            };
+            modelBuilder.Entity<Product>().HasData(products);
+
+            // Seed User Table
+            /*var users = new List<ApplicationUser> { 
+                new ApplicationUser{
+                    FirstName = "Salim",
+                    LastName = "Yahya",
+                    Email = "salim@yahya.com",
+                    UserName = "salim@yahya.com",
+                    PasswordHash = "123456",
+                },
+                new ApplicationUser{
+                    FirstName = "Ali",
+                    LastName = "Yahya",
+                    Email = "ali@yahya.com",
+                    UserName = "ali@yahya.com",
+                    PasswordHash = "123456",
+                },
+                new ApplicationUser{
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Email = "john@doe.com",
+                    UserName = "john@doe.com",
+                    PasswordHash = "123456",
+                },
+                new ApplicationUser{
+                    FirstName = "Jane",
+                    LastName = "Doe",
+                    Email = "jane@doe.com",
+                    UserName = "jane@doe.com",
+                    PasswordHash = "123456",
+                }
+            };
+            modelBuilder.Entity<ApplicationUser>().HasData(users);*/
+
         }
 
         public static double RandomPriceGenerator(Random random, double minValue, double maxValue)
