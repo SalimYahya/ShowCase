@@ -221,7 +221,6 @@ displayCart();
 
 
 
-
 function Order() {
     var cart = sessionStorage.getItem('shoppingCart');
     
@@ -265,13 +264,39 @@ function Order() {
     }
 }
 
-/*
- *  var myData1 = {
- *           "employees": [
- *               { "firstName": "John", "lastName": "Doe" },
- *               { "firstName": "Anna", "lastName": "Smith" },
- *               { "firstName": "Peter", "lastName": "Jones " }
- *           ]
- *       }
- * 
- */
+
+// Confirm Order
+$('.confirm-order').click(function () {
+    event.preventDefault();
+
+    var invoice_id = $(this).data('id');
+
+    var formData = new FormData();
+    formData.append("Invoice_Id", invoice_id);
+
+
+    //console.log(invoice_id);
+
+    if (invoice_id != null || invoice_id != 0) {
+
+        $.ajax({
+            async: true,
+            type: 'Post',
+            contentType: false,
+            processData: false,
+            data: formData,
+            url: '/Order/ConfirmOrder',
+
+            success: function (response) {
+                console.log("response.sussces: " + response.success);
+                console.log("response.message: " + response.message);
+                console.log("response.Invoice: " + response.invoice);
+
+            },
+            error: function (response) {
+                console.log("There is some problem")
+                console.log(response);
+            }
+        });
+    }
+});

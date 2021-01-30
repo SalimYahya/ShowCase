@@ -3,57 +3,13 @@
 
 // Write your JavaScript code.
 
+/*
+$(document).ready(function () {
 
-function AddToCart(item) {
+    $('.confirm-order').click(function () {
+        event.preventDefault();
 
-    var itemId = $(item).attr("item_id");
-    var itemQty = Math.floor(Math.random() * 10) + 1;
-
-    var formData = new FormData();
-
-    formData.append("ItemId", itemId);
-    formData.append("ItemQty", itemQty);
-
-    $.ajax({
-        async: true,
-        type: 'Post',
-        contentType: false,
-        processData: false,
-        data: formData,
-        url: '/Shopping/AddToCart',
-        success: function (response) {
-
-            /*
-             * Important Note: 
-             * ---------------
-             * To retreive responsed data from controller 
-             * the corresponding data name should start
-             * with small letter.
-             * 
-             * Example:
-             * --------------
-             * 
-             * Backend Controller:
-             * new {
-             *  Success = true,
-             *  Message = "Item Added Succesfully",
-             *  Product = product,
-             *  CartCount = _dbContext.ShoppingCart.Count()
-             * };
-             * 
-             *
-             */
-            console.log(response.success);
-            console.log(response.message);
-            console.log(response.product);
-            console.log(response.cartCount);
-
-            // Set Cart Count in main _Layout
-            document.getElementById("itemsInShoppingCart").innerHTML = response.cartCount;
-        },
-        error: function (response) {
-            console.log("There is some problem")
-            console.log(response);
-        }
+        var invoice_id = $(this).data('id');
+        console.log(invoice_id);
     });
-}
+});*/
