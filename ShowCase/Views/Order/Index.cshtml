@@ -1,40 +1,43 @@
 ﻿@model IEnumerable<ShowCase.Models.Invoice>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ApplicationUserId)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ApplicationUserId)
-            </td>
-            <td>
-                @if (item.IsConfirmed)
-                {
-                    <span>Purchased</span>
-                }
-                else
-                {
-                    @Html.ActionLink("Details", "Details", new { id = item.Id })
-                }
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<div class="container">
+
+    @if (Model.Count() > 0)
+    {
+        @foreach (var item in Model)
+        {
+            <div class="row bg-white border border-left-0 border-right-0 border-warning my-3 p-4 shadow-sm">
+                <div class="mr-auto">
+                    <p class="m-0">
+                        <strong class="text-secondary">ID: </strong> @item.Id
+                        &nbsp;
+                        <strong class="text-secondary">Createed At: </strong> @item.CreateedAt
+                    </p>
+                    <p class="m-0">
+                        <strong class="text-secondary">Items: </strong> @item.TotalItems
+                        &nbsp;
+                        <strong class="text-secondary">Payment: </strong> @item.TotalIncludeVat SAR
+                    </p>
+                </div>
+                <div class="ml-auto">
+                    <a
+                       asp-controller="Order" asp-action="Details" asp-route-Id="@item.Id">
+                        @if (item.IsConfirmed)
+                        {
+                            <i class="far fa-check-circle text-success"></i>
+                        }
+                        else
+                        {
+                            <i class="fas fa-exclamation text-warning"></i>
+                        }
+                        Details
+                    </a>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="h3">OrderList is Empty</p>
+    }
+</div>
