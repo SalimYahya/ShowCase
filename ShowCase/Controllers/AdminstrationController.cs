@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using ShowCase.Models;
 using ShowCase.ViewModel.Role;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ namespace ShowCase.Controllers
     public class AdminstrationController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
-        private readonly UserManager<AppliactionUser> userManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
-        public AdminstrationController(RoleManager<IdentityRole> roleManager, UserManager<AppliactionUser> userManager)
+        public AdminstrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
@@ -58,15 +59,30 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditAsync(string id)
+        public async Task<IActionResult> Edit(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
 
-            return View();
+            var model = new EditViewModel
+            {
+                Id= role.Id,
+                RoleName = role.Name
+            };
+
+            foreach (var user in userManager.Users)
+            {
+                if(await userManager.IsInRoleAsync(user, role.Name))
+                {
+                    model.Users.Add(user.UserName);
+                }
+            }
+
+            return View(model);
         }
 
         [HttpPost]
         public IActionResult Edit(EditViewModel model)
+
         {
 
             return View();
