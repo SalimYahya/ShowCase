@@ -225,12 +225,18 @@ $('.show-cart').on("change", ".item-count", function (event) {
 displayCart();
 
 
+// Redirect function
+function redirecTo(url, id) {
+    window.location.href = url + "/" + id;
+}
 
 function Order() {
+    $('#confirmOrderSpinner').show();
+
     var cart = sessionStorage.getItem('shoppingCart');
-    
-    if (cart != null) {
-        
+    var token = $('#RequestVerificationToken').val();
+ 
+    if (cart != null) {     
         $.ajax({
             async: true,
             type: 'Post',
@@ -238,25 +244,29 @@ function Order() {
             dataType: 'json',
             traditional: true,
             processData: false,
-            data: cart,
+            headers: { 'RequestVerificationToken': token },
+            data: sessionStorage.getItem('shoppingCart'),
             url: '/Order/OrderNow',
             success: function (response) {
+                $('#confirmOrderSpinner').hide();
 
                 console.log("response.sussces: " + response.success);
                 console.log("response.message: " + response.message);
                 console.log("response.redirect: " + response.redirect);
                 console.log("response.InvoiceId: " + response.invoiceId);
-                
+                console.log("token: " + token);
                 /*
                  * Redirect User to Order Details Page
                  * */
-                window.location.href = response.redirect + "/" + response.invoiceId;
-
+                window.setTimeout(redirecTo(response.redirect, response.invoiceId), 10000);
             },
             error: function (response) {
                 console.log("There is some problem")
                 console.log(response);
-            }
+            }/*,
+            complete: function (response) {
+                $('#confirmOrderSpinner').hide();
+            }*/
         });
 
     } else {

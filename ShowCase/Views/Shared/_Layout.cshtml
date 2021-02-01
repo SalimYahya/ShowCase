@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Http;
 
 @inject SignInManager<ApplicationUser> signInManager
-
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 
 <!DOCTYPE html>
 <html lang="en">
@@ -112,7 +112,17 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary clear-cart" id="btnOrderNow" onclick="Order(this)" >Order now</button>
+
+                    <form>
+                        <input type="hidden" id="RequestVerificationToken" name="RequestVerificationToken"
+                               value="@Xsrf.GetAndStoreTokens(Context).RequestToken" />
+                        <button type="button" class="btn btn-primary clear-cart" id="btnOrderNow" onclick="Order(this)">
+                            <span id="confirmOrderSpinner" class="spinner-border spinner-border-sm"
+                                  role="status" aria-hidden="true" style="display:none"></span>
+                            Order now
+                        </button>
+                    </form>
+                    <!--<button type="button" class="btn btn-primary clear-cart" id="btnOrderNow" onclick="Order(this)" >Order now</button>-->
                 </div>
             </div>
         </div>

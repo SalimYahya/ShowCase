@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -47,22 +49,28 @@ namespace ShowCase
                     options.Password.RequireLowercase = false;
             });
 
-            
+            // Add Mvc to Apply Authorization Globally
+            services.AddMvc(options => {
+                var policy = new AuthorizationPolicyBuilder()
+                                 .RequireAuthenticatedUser()
+                                 .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            });
+
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
 
-            /* Add Session */
 
             services.AddHttpContextAccessor();
-
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromSeconds(3600);
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, 
+            AppDbContext appDbContext, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -89,6 +97,8 @@ namespace ShowCase
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            UsersRolesDummyData.Initilize(appDbContext, userManager, roleManager).Wait();
         }
     }
 }

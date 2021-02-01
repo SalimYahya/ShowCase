@@ -11,15 +11,18 @@ namespace ShowCase.Controllers
     public class AdminstrationController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
+        private readonly UserManager<AppliactionUser> userManager;
 
-        public AdminstrationController(RoleManager<IdentityRole> roleManager)
+        public AdminstrationController(RoleManager<IdentityRole> roleManager, UserManager<AppliactionUser> userManager)
         {
             this.roleManager = roleManager;
+            this.userManager = userManager;
         }
 
         public IActionResult Index()
         {
-            return View();
+            IEnumerable<IdentityRole> roles = roleManager.Roles;
+            return View(roles);
         }
 
         [HttpGet]
@@ -52,6 +55,21 @@ namespace ShowCase.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditAsync(string id)
+        {
+            var role = await roleManager.FindByIdAsync(id);
+
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Edit(EditViewModel model)
+        {
+
+            return View();
         }
     }
 }

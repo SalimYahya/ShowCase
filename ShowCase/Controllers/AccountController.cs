@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShowCase.Models;
@@ -22,6 +23,7 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             return View();
@@ -29,6 +31,7 @@ namespace ShowCase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Register(Registeration model)
         {
             if (ModelState.IsValid)
@@ -64,6 +67,7 @@ namespace ShowCase.Controllers
 
 
         [HttpGet]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
@@ -71,6 +75,7 @@ namespace ShowCase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(Login model, string returnUrl)
         {
             if (ModelState.IsValid) {

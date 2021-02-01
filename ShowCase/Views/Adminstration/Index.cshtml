@@ -1,0 +1,36 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@model IEnumerable<IdentityRole>
+
+
+<a class="btn btn-primary" asp-controller="Adminstration" asp-action="Create">
+    Create New Role
+</a>
+<div class="container">
+
+    @if (Model.Any())
+    {
+        @foreach (var role in Model)
+        {
+            <div class="row bg-white border border-left-0 border-right-0 border-warning my-3 p-4 shadow-sm">
+                <div class="mr-auto">
+                    <p class="m-0">
+                        <strong class="text-secondary">ID: </strong> @role.Id
+                        &nbsp;
+                        <strong class="text-secondary">Name: </strong> @role.Name
+                    </p>
+                </div>
+                <div class="ml-auto">
+                    <div class="row">
+                        <a class="btn btn-warning mr-auto" asp-controller="Adminstration" asp-action="Edit">
+                            <i class="fas fa-pencil-alt text-white"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <p class="h3">RoleList is Empty</p>
+    }
+</div>

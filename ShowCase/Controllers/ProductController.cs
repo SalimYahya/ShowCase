@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Controllers
 {
-    [Authorize]
     public class ProductController : Controller
     {
         private readonly AppDbContext _dbContext;
