@@ -13,7 +13,7 @@
     <div class="form-group row">
         <label asp-for="RoleName" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
-            <input asp-for="RoleName" disabled class="form-control" />
+            <input asp-for="RoleName" class="form-control" />
             <span asp-validation-for="RoleName" class="text-danger"></span>
         </div>
     </div>
@@ -46,8 +46,10 @@
             }
         </div>
         <div class="card-footer">
-            <a href="#" class="btn btn-primary">Add Users</a>
-            <a href="#" class="btn btn-primary">Remove Users</a>
+            <a asp-controller="Adminstration" asp-action="EditUsersInRoles" 
+               asp-route-Id="@Model.Id" class="btn btn-primary">
+                Add or Remove Users
+            </a>
         </div>
     </div>
 </form>
