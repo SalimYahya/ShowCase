@@ -57,6 +57,13 @@ namespace ShowCase
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
 
+            services.AddAuthorization(options => {
+                options.AddPolicy("CreateRolePolicy", 
+                    policy => policy.RequireClaim("Create Role")
+                                    .RequireClaim("Edit Role")
+                                    .RequireClaim("Delete Role"));
+            });
+
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );

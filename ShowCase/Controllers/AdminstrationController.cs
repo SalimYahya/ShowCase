@@ -36,6 +36,7 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "CreateRolePolicy")]
         public IActionResult Create()
         {
             return View();
@@ -43,6 +44,7 @@ namespace ShowCase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "CreateRolePolicy")]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
             if (ModelState.IsValid) 
@@ -68,6 +70,7 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "CreateRolePolicy")]
         public async Task<IActionResult> Edit(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
@@ -90,6 +93,7 @@ namespace ShowCase.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "CreateRolePolicy")]
         public async Task<IActionResult> Edit(EditViewModel model)
         {
             var role = await roleManager.FindByIdAsync(model.Id);
