@@ -23,6 +23,10 @@ var shoppingCart = (function () {
         sessionStorage.setItem('shoppingCart', JSON.stringify(cart));
     }
 
+    function clearStorage() {
+        sessionStorage.removeItem('shoppingCart');
+    }
+
     // Load cart
     function loadCart() {
         cart = JSON.parse(sessionStorage.getItem('shoppingCart'));
@@ -89,7 +93,8 @@ var shoppingCart = (function () {
     // Clear cart
     obj.clearCart = function () {
         cart = [];
-        saveCart();
+        clearStorage();
+        //saveCart();
     }
 
     // Count cart 
@@ -220,12 +225,18 @@ $('.show-cart').on("change", ".item-count", function (event) {
 displayCart();
 
 
+// Redirect function
+function redirecTo(url, id) {
+    window.location.href = url + "/" + id;
+}
 
 function Order() {
+    $('#confirmOrderSpinner').show();
+
     var cart = sessionStorage.getItem('shoppingCart');
-    
-    if (cart != null) {
-        
+    var token = $('#RequestVerificationToken').val();
+ 
+    if (cart != null) {     
         $.ajax({
             async: true,
             type: 'Post',
@@ -233,30 +244,29 @@ function Order() {
             dataType: 'json',
             traditional: true,
             processData: false,
-            data: cart,
+            headers: { 'RequestVerificationToken': token },
+            data: sessionStorage.getItem('shoppingCart'),
             url: '/Order/OrderNow',
             success: function (response) {
+                $('#confirmOrderSpinner').hide();
+
                 console.log("response.sussces: " + response.success);
                 console.log("response.message: " + response.message);
                 console.log("response.redirect: " + response.redirect);
                 console.log("response.InvoiceId: " + response.invoiceId);
-
-                /*
-                 * Write code to clear:
-                 * 1- Shopping cart
-                 * 2- Total Count
-                 * */
-
+                console.log("token: " + token);
                 /*
                  * Redirect User to Order Details Page
                  * */
-                window.location.href = response.redirect + "/" + response.invoiceId;
-
+                window.setTimeout(redirecTo(response.redirect, response.invoiceId), 10000);
             },
             error: function (response) {
                 console.log("There is some problem")
                 console.log(response);
-            }
+            }/*,
+            complete: function (response) {
+                $('#confirmOrderSpinner').hide();
+            }*/
         });
 
     } else {
@@ -291,6 +301,17 @@ $('.confirm-order').click(function () {
                 console.log("response.sussces: " + response.success);
                 console.log("response.message: " + response.message);
                 console.log("response.Invoice: " + response.invoice);
+
+                var shippmentDetails = "";
+                shippmentDetails += "<div class='card bg-white border-left-0 border-right-0 border-warning shadow-sm my-4 py-3>'";
+                shippmentDetails += "<div class='container'>";
+                shippmentDetails += "<div class='text-center'><p class='h4'>Shippment details</p>";
+                shippmentDetails += "</div>";
+                shippmentDetails += "</div>";
+                shippmentDetails += "</div>";
+
+                $('#main-details-container').append(shippmentDetails);
+
 
             },
             error: function (response) {

@@ -94,6 +94,7 @@ namespace ShowCase.Controllers
 
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public JsonResult OrderNow([FromBody] List<CartItem> shoppingCart)
         {
 

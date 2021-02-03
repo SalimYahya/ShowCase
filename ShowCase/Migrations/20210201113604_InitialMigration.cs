@@ -221,44 +221,35 @@ namespace ShowCase.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "06a1e12e-d84c-44bd-8769-b208726aa114", "f723bbd2-af4f-4a6d-976e-5040de455ecf", "Admin", "ADMIN" },
-                    { "2cd310ed-945d-4efb-98e4-b4c0a5c9a49c", "fbc1de8d-7af9-4cf9-b92e-de8df45d5f2f", "Customer", "CUSTOMER" }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Products",
                 columns: new[] { "Id", "Description", "Name", "Price" },
                 values: new object[,]
                 {
-                    { 23, "Lorem Ipsum is simply dummy text", "Item 23", 91.900000000000006 },
-                    { 22, "Lorem Ipsum is simply dummy text", "Item 22", 366.97000000000003 },
-                    { 21, "Lorem Ipsum is simply dummy text", "Item 21", 739.45000000000005 },
-                    { 20, "Lorem Ipsum is simply dummy text", "Item 20", 678.15999999999997 },
-                    { 19, "Lorem Ipsum is simply dummy text", "Item 19", 131.68000000000001 },
-                    { 18, "Lorem Ipsum is simply dummy text", "Item 18", 125.2 },
-                    { 17, "Lorem Ipsum is simply dummy text", "Item 17", 848.87 },
-                    { 16, "Lorem Ipsum is simply dummy text", "Item 16", 583.24000000000001 },
-                    { 15, "Lorem Ipsum is simply dummy text", "Item 15", 124.78 },
-                    { 14, "Lorem Ipsum is simply dummy text", "Item 14", 873.40999999999997 },
-                    { 13, "Lorem Ipsum is simply dummy text", "Item 13", 186.77000000000001 },
-                    { 12, "Lorem Ipsum is simply dummy text", "Item 2", 717.5 },
-                    { 11, "Lorem Ipsum is simply dummy text", "Item 11", 64.019999999999996 },
-                    { 10, "Lorem Ipsum is simply dummy text", "Item 10", 365.81999999999999 },
-                    { 9, "Lorem Ipsum is simply dummy text", "Item 9", 537.50999999999999 },
-                    { 8, "Lorem Ipsum is simply dummy text", "Item 8", 366.47000000000003 },
-                    { 7, "Lorem Ipsum is simply dummy text", "Item 7", 428.48000000000002 },
-                    { 6, "Lorem Ipsum is simply dummy text", "Item 6", 816.38 },
-                    { 5, "Lorem Ipsum is simply dummy text", "Item 5", 716.15999999999997 },
-                    { 4, "Lorem Ipsum is simply dummy text", "Item 4", 620.64999999999998 },
-                    { 3, "Lorem Ipsum is simply dummy text", "Item 3", 760.05999999999995 },
-                    { 2, "Lorem Ipsum is simply dummy text", "Item 2", 837.97000000000003 },
-                    { 1, "Lorem Ipsum is simply dummy text", "Item 1", 59.710000000000001 },
-                    { 24, "Lorem Ipsum is simply dummy text", "Item 24", 154.83000000000001 },
-                    { 25, "Lorem Ipsum is simply dummy text", "Item 25", 712.23000000000002 }
+                    { 1, "Lorem Ipsum is simply dummy text", "Item 1", 822.02999999999997 },
+                    { 23, "Lorem Ipsum is simply dummy text", "Item 23", 208.5 },
+                    { 22, "Lorem Ipsum is simply dummy text", "Item 22", 304.33999999999997 },
+                    { 21, "Lorem Ipsum is simply dummy text", "Item 21", 270.75 },
+                    { 20, "Lorem Ipsum is simply dummy text", "Item 20", 980.89999999999998 },
+                    { 19, "Lorem Ipsum is simply dummy text", "Item 19", 310.89999999999998 },
+                    { 18, "Lorem Ipsum is simply dummy text", "Item 18", 79.519999999999996 },
+                    { 17, "Lorem Ipsum is simply dummy text", "Item 17", 175.16999999999999 },
+                    { 16, "Lorem Ipsum is simply dummy text", "Item 16", 951.53999999999996 },
+                    { 15, "Lorem Ipsum is simply dummy text", "Item 15", 146.63 },
+                    { 14, "Lorem Ipsum is simply dummy text", "Item 14", 718.40999999999997 },
+                    { 24, "Lorem Ipsum is simply dummy text", "Item 24", 564.39999999999998 },
+                    { 13, "Lorem Ipsum is simply dummy text", "Item 13", 276.0 },
+                    { 11, "Lorem Ipsum is simply dummy text", "Item 11", 73.780000000000001 },
+                    { 10, "Lorem Ipsum is simply dummy text", "Item 10", 661.04999999999995 },
+                    { 9, "Lorem Ipsum is simply dummy text", "Item 9", 445.69 },
+                    { 8, "Lorem Ipsum is simply dummy text", "Item 8", 425.26999999999998 },
+                    { 7, "Lorem Ipsum is simply dummy text", "Item 7", 501.56999999999999 },
+                    { 6, "Lorem Ipsum is simply dummy text", "Item 6", 661.54999999999995 },
+                    { 5, "Lorem Ipsum is simply dummy text", "Item 5", 595.13999999999999 },
+                    { 4, "Lorem Ipsum is simply dummy text", "Item 4", 187.09999999999999 },
+                    { 3, "Lorem Ipsum is simply dummy text", "Item 3", 200.88 },
+                    { 2, "Lorem Ipsum is simply dummy text", "Item 2", 123.2 },
+                    { 12, "Lorem Ipsum is simply dummy text", "Item 2", 263.08999999999997 },
+                    { 25, "Lorem Ipsum is simply dummy text", "Item 25", 843.22000000000003 }
                 });
 
             migrationBuilder.CreateIndex(
