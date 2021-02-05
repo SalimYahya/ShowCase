@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Security;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -57,12 +58,25 @@ namespace ShowCase
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
 
-            services.AddAuthorization(options => {
-                options.AddPolicy("CreateRolePolicy", 
-                    policy => policy.RequireClaim("Create Role")
-                                    .RequireClaim("Edit Role")
-                                    .RequireClaim("Delete Role"));
+            services.ConfigureApplicationCookie(options => {
+                options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Adminstration/AccessDenied");
             });
+
+            services.AddAuthorization(options => {
+
+                options.AddPolicy("EditRolePolicy",
+                    policy => policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement()));
+
+                options.AddPolicy("CreateRolePolicy", 
+                    policy => policy.RequireClaim("Create Role", "true"));
+
+                options.AddPolicy("AdminRolePolicy",
+                    policy => policy.RequireRole("Admin"));
+            });
+
+            services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+            services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+
 
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -73,6 +87,7 @@ namespace ShowCase
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromSeconds(3600);
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,10 +1,16 @@
 ﻿@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Authorization
+@inject IAuthorizationService authorizationService
+
 @model IEnumerable<IdentityRole>
 
+@if ((await authorizationService.AuthorizeAsync(User, "CreateRolePolicy")).Succeeded)
+{
+    <a class="btn btn-primary" asp-controller="Adminstration" asp-action="Create">
+        Create New Role
+    </a>
+}
 
-<a class="btn btn-primary" asp-controller="Adminstration" asp-action="Create">
-    Create New Role
-</a>
 <div class="container">
 
     @if (Model.Any())
@@ -14,9 +20,10 @@
             <div class="row bg-white border border-left-0 border-right-0 border-warning my-3 p-4 shadow-sm">
                 <div class="mr-auto">
                     <p class="m-0">
-                        <strong class="text-secondary">ID: </strong> @role.Id
-                        &nbsp;
                         <strong class="text-secondary">Name: </strong> @role.Name
+                    </p>
+                    <p class="m-0">
+                        <strong class="text-secondary">ID: </strong> @role.Id
                     </p>
                 </div>
                 <div class="ml-auto">
@@ -24,6 +31,12 @@
                         <a class="btn btn-warning mr-auto" asp-controller="Adminstration" asp-action="Edit" asp-route-Id="@role.Id">
                             <i class="fas fa-pencil-alt text-white"></i>
                         </a>
+
+                        <form method="post" asp-action="DeleteRole" asp-route-Id="@role.Id">
+                            <button class="btn btn-danger mx-2" type="submit">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
