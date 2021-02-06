@@ -70,16 +70,12 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "CreateRolePolicy")]
-        public async Task<IActionResult> Edit(string id)
+        [Authorize(Policy = "EditRolePolicy")]
+        public async Task<IActionResult> EditRole(string roleId)
         {
-            var role = await roleManager.FindByIdAsync(id);
+            var role = await roleManager.FindByIdAsync(roleId);
 
-            var model = new EditViewModel
-            {
-                Id= role.Id,
-                RoleName = role.Name
-            };
+            var model = new EditRoleViewModel { Id = role.Id, RoleName = role.Name };
 
             foreach (var user in userManager.Users)
             {
@@ -93,8 +89,8 @@ namespace ShowCase.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "CreateRolePolicy")]
-        public async Task<IActionResult> Edit(EditViewModel model)
+        [Authorize(Policy = "EditRolePolicy")]
+        public async Task<IActionResult> EditRole(EditRoleViewModel model)
         {
             var role = await roleManager.FindByIdAsync(model.Id);
 
@@ -115,6 +111,7 @@ namespace ShowCase.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "DeleteRolePolicy")]
         public async Task<IActionResult> DeleteRole(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
@@ -210,7 +207,7 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy = "EditRolePolicy")]
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
         public async Task<IActionResult> ManageUserRoles(string userId)
         {
             ViewBag.userId = userId;
@@ -243,7 +240,7 @@ namespace ShowCase.Controllers
         }
         
         [HttpPost]
-        [Authorize(Policy = "EditRolePolicy")]
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
         public async Task<IActionResult> ManageUserRoles(List<UserRolesViewModel> model, string userId)
         {
 
@@ -271,16 +268,17 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ManageUserClaims(string id)
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
+        public async Task<IActionResult> ManageUserClaims(string userId)
         {
-            ViewBag.userId = id;
-            ApplicationUser user = await userManager.FindByIdAsync(id);
+            ViewBag.userId = userId;
+            ApplicationUser user = await userManager.FindByIdAsync(userId);
 
             var existingUserClaims = await userManager.GetClaimsAsync(user);
 
             UserClaimsViewModel model = new UserClaimsViewModel
             {
-                UserId = id
+                UserId = userId
             };
 
             foreach (Claim claim in AdminClaims.AllClaims)
@@ -302,9 +300,10 @@ namespace ShowCase.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model, string id)
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
+        public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model, string userId)
         {
-            ApplicationUser user = await userManager.FindByIdAsync(id);
+            ApplicationUser user = await userManager.FindByIdAsync(userId);
 
             var claims = await userManager.GetClaimsAsync(user);
             var result = await userManager.RemoveClaimsAsync(user, claims);
@@ -324,7 +323,7 @@ namespace ShowCase.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("EditUser", new { Id = id});
+            return RedirectToAction("EditUser", new { Id = userId });
         }
 
         [HttpGet]

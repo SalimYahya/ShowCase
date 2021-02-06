@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Security
 {
-    public class ManageAdminRolesAndClaimsRequirement : IAuthorizationRequirement
+    public class ManageUserRolesAndClaimsRequirement : IAuthorizationRequirement
     {
     }
 }

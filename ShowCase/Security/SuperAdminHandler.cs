@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Security
 {
-    public class SuperAdminHandler : AuthorizationHandler<ManageAdminRolesAndClaimsRequirement>
+    public class SuperAdminHandler : AuthorizationHandler<ManageUserRolesAndClaimsRequirement>
     {
         private readonly IHttpContextAccessor httpContextAccessor;
 
@@ -15,7 +15,7 @@ namespace ShowCase.Security
         {
             this.httpContextAccessor = httpContextAccessor;
         }
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ManageAdminRolesAndClaimsRequirement requirement)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ManageUserRolesAndClaimsRequirement requirement)
         {
             if (context.User.IsInRole("Super Admin"))
             {

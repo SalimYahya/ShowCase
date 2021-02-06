@@ -13,6 +13,10 @@ using Microsoft.Extensions.Hosting;
 using ShowCase.Data;
 using ShowCase.Models;
 using ShowCase.Security;
+using ShowCase.Security.ManageRoles;
+using ShowCase.Security.ManageRoles.CreateRoles;
+using ShowCase.Security.ManageRoles.DeleteRoles;
+using ShowCase.Security.ManageRoles.EditRoles;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -64,18 +68,29 @@ namespace ShowCase
 
             services.AddAuthorization(options => {
 
+                options.AddPolicy("CreateRolePolicy",
+                    policy => policy.AddRequirements(new CreateRoleRequirement()));
+
                 options.AddPolicy("EditRolePolicy",
-                    policy => policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement()));
+                    policy => policy.AddRequirements(new EditRolesRequirement()));
 
-                options.AddPolicy("CreateRolePolicy", 
-                    policy => policy.RequireClaim("Create Role", "true"));
+                options.AddPolicy("DeleteRolePolicy",
+                    policy => policy.AddRequirements(new DeleteRolesRequirement()));
 
-                options.AddPolicy("AdminRolePolicy",
-                    policy => policy.RequireRole("Admin"));
+                options.AddPolicy("EditUserRolesAndPolicy",
+                    policy => policy.AddRequirements(new ManageUserRolesAndClaimsRequirement()));
+
             });
 
-            services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+            // Creart, Edit & Delete Roles
+            services.AddSingleton<IAuthorizationHandler, CanCreateRolesHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanEditRolesHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+            // End of: Creart, Edit & Delete Roles
+
+
+            services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
 
 
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
