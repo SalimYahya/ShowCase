@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace ShowCase.ViewModel.Role
 {
-    public class EditViewModel
+    public class EditRoleViewModel
     {
-        public EditViewModel()
+        public EditRoleViewModel()
         {
             Users = new List<string>();
         }

@@ -12,6 +12,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Security;
+using ShowCase.Security.ManageRoles;
+using ShowCase.Security.ManageRoles.CreateRoles;
+using ShowCase.Security.ManageRoles.DeleteRoles;
+using ShowCase.Security.ManageRoles.EditRoles;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -57,6 +62,37 @@ namespace ShowCase
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
 
+            services.ConfigureApplicationCookie(options => {
+                options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Adminstration/AccessDenied");
+            });
+
+            services.AddAuthorization(options => {
+
+                options.AddPolicy("CreateRolePolicy",
+                    policy => policy.AddRequirements(new CreateRoleRequirement()));
+
+                options.AddPolicy("EditRolePolicy",
+                    policy => policy.AddRequirements(new EditRolesRequirement()));
+
+                options.AddPolicy("DeleteRolePolicy",
+                    policy => policy.AddRequirements(new DeleteRolesRequirement()));
+
+                options.AddPolicy("EditUserRolesAndPolicy",
+                    policy => policy.AddRequirements(new ManageUserRolesAndClaimsRequirement()));
+
+            });
+
+            // Creart, Edit & Delete Roles
+            services.AddSingleton<IAuthorizationHandler, CanCreateRolesHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanEditRolesHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
+            services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+            // End of: Creart, Edit & Delete Roles
+
+
+            services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+
+
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
@@ -66,6 +102,7 @@ namespace ShowCase
             services.AddSession(options => {
                 options.IdleTimeout = TimeSpan.FromSeconds(3600);
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

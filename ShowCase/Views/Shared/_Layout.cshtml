@@ -32,7 +32,7 @@
                             </li>
                         }
 
-                        @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                        @if (signInManager.IsSignedIn(User) && (User.IsInRole("Super Admin")|| User.IsInRole("Admin") || User.IsInRole("Supervisor")) )
                         {
                             <li class="nav-item dropdown">
                                 <a id="adminDropDown" class="nav-link dropdown-toggle " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>

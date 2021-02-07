@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Controllers
 {
-    [Authorize(Roles = "Admin, User")]
+    [Authorize(Roles = "Super Admin, Admin, Supervisor")]
     public class AdminstrationController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
@@ -36,6 +36,7 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "CreateRolePolicy")]
         public IActionResult Create()
         {
             return View();
@@ -43,6 +44,7 @@ namespace ShowCase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy = "CreateRolePolicy")]
         public async Task<IActionResult> Create(CreateViewModel model)
         {
             if (ModelState.IsValid) 
@@ -55,7 +57,7 @@ namespace ShowCase.Controllers
                 IdentityResult result = await roleManager.CreateAsync(identityRole);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("index", "home");
+                    return RedirectToAction("index", "Adminstration");
                 }
 
                 foreach (IdentityError error in result.Errors)
@@ -68,15 +70,12 @@ namespace ShowCase.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        [Authorize(Policy = "EditRolePolicy")]
+        public async Task<IActionResult> EditRole(string roleId)
         {
-            var role = await roleManager.FindByIdAsync(id);
+            var role = await roleManager.FindByIdAsync(roleId);
 
-            var model = new EditViewModel
-            {
-                Id= role.Id,
-                RoleName = role.Name
-            };
+            var model = new EditRoleViewModel { Id = role.Id, RoleName = role.Name };
 
             foreach (var user in userManager.Users)
             {
@@ -90,7 +89,8 @@ namespace ShowCase.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(EditViewModel model)
+        [Authorize(Policy = "EditRolePolicy")]
+        public async Task<IActionResult> EditRole(EditRoleViewModel model)
         {
             var role = await roleManager.FindByIdAsync(model.Id);
 
@@ -108,6 +108,16 @@ namespace ShowCase.Controllers
             }
 
             return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "DeleteRolePolicy")]
+        public async Task<IActionResult> DeleteRole(string id)
+        {
+            var role = await roleManager.FindByIdAsync(id);
+            var result = await roleManager.DeleteAsync(role);
+
+            return RedirectToAction("index", "Adminstration");
         }
 
         [HttpGet]
@@ -181,35 +191,28 @@ namespace ShowCase.Controllers
         public async Task<IActionResult> EditUser(string id)
         {
             ApplicationUser user = await userManager.FindByIdAsync(id);
+
+            var userClaims = await userManager.GetClaimsAsync(user);
+            var userRoles = await userManager.GetRolesAsync(user);
+
             EditUserViewModel model = new EditUserViewModel
             {
-                User = user
+                User = user,
+                Claims = userClaims.Select(c => c.Type +" : "+ c.Value).ToList(),
+                Roles = userRoles.ToList()
             };
 
-            foreach (var role in roleManager.Roles)
-            {
-                if (await userManager.IsInRoleAsync(user, role.Name))
-                {
-                    model.Roles.Add(role.Name);
-                }
-            }
-
-            var claims = await userManager.GetClaimsAsync(user);
-
-            foreach (var claim in claims)
-            {
-                model.Claims.Add(claim.Type);
-            }
-
+            
             return View(model);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ManageUserRoles(string id)
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
+        public async Task<IActionResult> ManageUserRoles(string userId)
         {
-            ViewBag.userId = id;
+            ViewBag.userId = userId;
 
-            ApplicationUser user = await userManager.FindByIdAsync(id);
+            ApplicationUser user = await userManager.FindByIdAsync(userId);
 
             var model = new List<UserRolesViewModel>();
 
@@ -237,10 +240,11 @@ namespace ShowCase.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> ManageUserRoles(List<UserRolesViewModel> model, string id)
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
+        public async Task<IActionResult> ManageUserRoles(List<UserRolesViewModel> model, string userId)
         {
 
-            ApplicationUser user = await userManager.FindByIdAsync(id);
+            ApplicationUser user = await userManager.FindByIdAsync(userId);
 
             var roles = await userManager.GetRolesAsync(user);
             var result = await userManager.RemoveFromRolesAsync(user, roles);
@@ -260,30 +264,31 @@ namespace ShowCase.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("EditUser", new { Id = id});
+            return RedirectToAction("EditUser", new { Id = userId});
         }
 
         [HttpGet]
-        public async Task<IActionResult> ManageUserClaims(string id)
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
+        public async Task<IActionResult> ManageUserClaims(string userId)
         {
-            ViewBag.userId = id;
-            ApplicationUser user = await userManager.FindByIdAsync(id);
+            ViewBag.userId = userId;
+            ApplicationUser user = await userManager.FindByIdAsync(userId);
 
             var existingUserClaims = await userManager.GetClaimsAsync(user);
 
             UserClaimsViewModel model = new UserClaimsViewModel
             {
-                UserId = id
+                UserId = userId
             };
 
-            foreach (Claim claim in ClaimsStore.AllClaims)
+            foreach (Claim claim in AdminClaims.AllClaims)
             {
                 UserClaim userClaim = new UserClaim
                 {
                     ClaimType = claim.Type
                 };
 
-                if (existingUserClaims.Any(c => c.Type == claim.Type))
+                if (existingUserClaims.Any(c => c.Type == claim.Type && c.Value == "true"))
                 {
                     userClaim.IsSelected = true;
                 }
@@ -295,9 +300,10 @@ namespace ShowCase.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model, string id)
+        [Authorize(Policy = "EditUserRolesAndPolicy")]
+        public async Task<IActionResult> ManageUserClaims(UserClaimsViewModel model, string userId)
         {
-            ApplicationUser user = await userManager.FindByIdAsync(id);
+            ApplicationUser user = await userManager.FindByIdAsync(userId);
 
             var claims = await userManager.GetClaimsAsync(user);
             var result = await userManager.RemoveClaimsAsync(user, claims);
@@ -309,8 +315,7 @@ namespace ShowCase.Controllers
             }
 
             result = await userManager.AddClaimsAsync(user, 
-                model.Claims.Where(x => x.IsSelected)
-                            .Select(c => new Claim(c.ClaimType, c.ClaimType)));
+                model.Claims.Select(c => new Claim(c.ClaimType, c.IsSelected ? "true":"false")));
             
             if (!result.Succeeded)
             {
@@ -318,7 +323,14 @@ namespace ShowCase.Controllers
                 return View(model);
             }
 
-            return RedirectToAction("EditUser", new { Id = id});
+            return RedirectToAction("EditUser", new { Id = userId });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }
