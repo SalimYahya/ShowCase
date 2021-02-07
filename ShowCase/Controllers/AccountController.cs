@@ -14,11 +14,13 @@ namespace ShowCase.Controllers
     public class AccountController : Controller
     {
         private readonly UserManager<ApplicationUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         private readonly SignInManager<ApplicationUser> signInManager;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager)
         {
             this.userManager = userManager;
+            this.roleManager = roleManager;
             this.signInManager = signInManager;
         }
 
@@ -47,8 +49,10 @@ namespace ShowCase.Controllers
                 var registerationResult = await userManager.CreateAsync(user, model.Password);
                 if (registerationResult.Succeeded)
                 {
-                    //await userManager.AddToRoleAsync(user, "Admin");
-                    await userManager.AddToRoleAsync(user, "Customer");
+
+                    IEnumerable<string> roles = new string[] { "Customer","Seller" };
+
+                    await userManager.AddToRolesAsync(user, roles);
 
                     await signInManager.SignInAsync(user, isPersistent: false);
 

@@ -43,7 +43,8 @@ namespace ShowCase
                     Configuration.GetConnectionString("DBConnection")).EnableSensitiveDataLogging()
             );
 
-            services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<AppDbContext>();
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                    .AddEntityFrameworkStores<AppDbContext>();
 
             services.Configure<IdentityOptions>(
                 options => {

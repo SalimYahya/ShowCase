@@ -25,7 +25,7 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        @if (signInManager.IsSignedIn(User) && User.IsInRole("User"))
+                        @if (signInManager.IsSignedIn(User) && (User.IsInRole("Customer") || User.IsInRole("Seller")))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Product</a>
@@ -40,8 +40,8 @@
                                 </a>
 
                                 <div class="dropdown-menu" aria-labelledby="adminDropDown">
-                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="Users">Users</a>
-                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="Index">Roles</a>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="UsersList">Users</a>
+                                    <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="RolesList">Roles</a>
                                 </div>
                             </li>
                             

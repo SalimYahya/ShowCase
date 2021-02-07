@@ -27,6 +27,11 @@ namespace ShowCase.Data
                 {
                     Name="Customer",
                     NormalizedName="CUSTOMER"
+                },
+                new IdentityRole
+                {
+                    Name="Seller",
+                    NormalizedName="SELLER"
                 }
             };
 

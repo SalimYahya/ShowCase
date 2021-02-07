@@ -23,13 +23,13 @@ namespace ShowCase.Controllers
             this.userManager = userManager;
         }
 
-        public IActionResult Index()
+        public IActionResult RolesList()
         {
             IEnumerable<IdentityRole> roles = roleManager.Roles;
             return View(roles);
         }
 
-        public IActionResult Users()
+        public IActionResult UsersList()
         {
             IEnumerable<ApplicationUser> users = userManager.Users;
             return View(users);
@@ -71,9 +71,9 @@ namespace ShowCase.Controllers
 
         [HttpGet]
         [Authorize(Policy = "EditRolePolicy")]
-        public async Task<IActionResult> EditRole(string roleId)
+        public async Task<IActionResult> EditRole(string id)
         {
-            var role = await roleManager.FindByIdAsync(roleId);
+            var role = await roleManager.FindByIdAsync(id);
 
             var model = new EditRoleViewModel { Id = role.Id, RoleName = role.Name };
 
@@ -99,7 +99,7 @@ namespace ShowCase.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("index");
+                return RedirectToAction("EditRole", new { Id = role.Id });
             }
 
             foreach (var error in result.Errors)
@@ -117,8 +117,25 @@ namespace ShowCase.Controllers
             var role = await roleManager.FindByIdAsync(id);
             var result = await roleManager.DeleteAsync(role);
 
-            return RedirectToAction("index", "Adminstration");
+            return RedirectToAction("RolesList", "Adminstration");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await userManager.FindByIdAsync(id);
+
+            var roles = await userManager.GetRolesAsync(user);
+            if (roles.Count > 0)
+            {
+                await userManager.RemoveFromRolesAsync(user, roles);
+            }
+
+            await userManager.DeleteAsync(user);
+
+            return RedirectToAction("UsersList", "Adminstration");
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> EditUsersInRoles(string id)
@@ -203,6 +220,24 @@ namespace ShowCase.Controllers
             };
 
             
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser user = await userManager.FindByIdAsync(model.User.Id);
+
+                user.FirstName = model.User.FirstName;
+                user.LastName = model.User.LastName;
+
+                await userManager.UpdateAsync(user);
+
+                return RedirectToAction("UsersList", "Adminstration");
+            }
+
             return View(model);
         }
 

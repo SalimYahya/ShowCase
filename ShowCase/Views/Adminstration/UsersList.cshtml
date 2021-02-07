@@ -25,7 +25,7 @@
                         <a class="btn btn-warning mr-auto" asp-controller="Adminstration" asp-action="EditUser" asp-route-Id="@user.Id">
                             <i class="fas fa-pencil-alt text-white"></i>
                         </a>
-                        <form method="post">
+                        <form method="post" asp-action="DeleteUser" asp-route-Id="@user.Id">
                             <button class="btn btn-danger mx-2" type="submit">
                                 <i class="fas fa-trash-alt"></i>
                             </button>
