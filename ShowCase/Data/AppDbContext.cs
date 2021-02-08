@@ -28,6 +28,11 @@ namespace ShowCase.Data
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
 
+            // Configure User-Porduct relations
+            modelBuilder
+                .Entity<Product>()
+                .HasOne(u => u.ApplicationUser)
+                .WithMany(p => p.Products);
 
             // Invoice Entity
             modelBuilder

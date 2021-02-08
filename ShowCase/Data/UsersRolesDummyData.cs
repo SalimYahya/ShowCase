@@ -20,8 +20,18 @@ namespace ShowCase.Data
             {
                 new IdentityRole
                 {
+                    Name="Super Admin",
+                    NormalizedName ="SUPER ADMIN"
+                },
+                new IdentityRole
+                {
                     Name="Admin",
                     NormalizedName ="ADMIN"
+                },
+                new IdentityRole
+                {
+                    Name="Supervisor",
+                    NormalizedName ="SUPERVISOR"
                 },
                 new IdentityRole
                 {
@@ -78,9 +88,25 @@ namespace ShowCase.Data
                 if (result.Succeeded)
                 {
                     await userManager.AddPasswordAsync(user, password);
-                    await userManager.AddToRoleAsync(user, roles[1].Name);
+                    foreach (var role in roles)
+                    {
+                        await userManager.AddToRoleAsync(user, role.Name);
+                    }
                 }
             }
+
+            ApplicationUser sellerUser = await userManager.FindByEmailAsync("john@doe.com");
+            var products = appDbContext.Products;
+
+            foreach (var model in products)
+            {
+                model.ApplicationUserId = sellerUser.Id;
+
+                var product = appDbContext.Products.Attach(model);
+                product.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            }
+
+            appDbContext.SaveChanges();
         }
     }
 }

@@ -30,5 +30,20 @@ namespace ShowCase.Models
          *      Many-To-Many relationship with products
          */
         public virtual ICollection<Invoice> Invoices { get; set; }
+
+        /* 
+        *  Navaigation Property: Fully Defined Relationship
+        *  -   Relation Type: One-to-Many
+        *  
+        *  Description: 
+        *  -   Each User (ApplicationUser) can have 
+        *      one or many orders.
+        *      
+        *   Note:
+        *   -  A user with role Seller, will have
+        *      One-To-Many relationship with products
+        */
+        public virtual ICollection<Product> Products { get; set; }
+
     }
 }

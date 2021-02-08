@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShowCase.Data;
 using ShowCase.Models;
@@ -25,7 +26,7 @@ namespace ShowCase.Controllers
 
         public IActionResult Index()
         {
-            var modelList = _dbContext.Products;
+            var modelList = _dbContext.Products.Include(u => u.ApplicationUser);
 
             return View(modelList);
         }

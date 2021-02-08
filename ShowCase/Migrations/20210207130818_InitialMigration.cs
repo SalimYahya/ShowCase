@@ -50,21 +50,6 @@ namespace ShowCase.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
-                    Price = table.Column<double>(type: "float", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Products", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -196,6 +181,28 @@ namespace ShowCase.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
+                    Price = table.Column<double>(type: "float", nullable: false),
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "InvoiceProduct",
                 columns: table => new
                 {
@@ -222,34 +229,34 @@ namespace ShowCase.Migrations
 
             migrationBuilder.InsertData(
                 table: "Products",
-                columns: new[] { "Id", "Description", "Name", "Price" },
+                columns: new[] { "Id", "ApplicationUserId", "Description", "Name", "Price" },
                 values: new object[,]
                 {
-                    { 1, "Lorem Ipsum is simply dummy text", "Item 1", 822.02999999999997 },
-                    { 23, "Lorem Ipsum is simply dummy text", "Item 23", 208.5 },
-                    { 22, "Lorem Ipsum is simply dummy text", "Item 22", 304.33999999999997 },
-                    { 21, "Lorem Ipsum is simply dummy text", "Item 21", 270.75 },
-                    { 20, "Lorem Ipsum is simply dummy text", "Item 20", 980.89999999999998 },
-                    { 19, "Lorem Ipsum is simply dummy text", "Item 19", 310.89999999999998 },
-                    { 18, "Lorem Ipsum is simply dummy text", "Item 18", 79.519999999999996 },
-                    { 17, "Lorem Ipsum is simply dummy text", "Item 17", 175.16999999999999 },
-                    { 16, "Lorem Ipsum is simply dummy text", "Item 16", 951.53999999999996 },
-                    { 15, "Lorem Ipsum is simply dummy text", "Item 15", 146.63 },
-                    { 14, "Lorem Ipsum is simply dummy text", "Item 14", 718.40999999999997 },
-                    { 24, "Lorem Ipsum is simply dummy text", "Item 24", 564.39999999999998 },
-                    { 13, "Lorem Ipsum is simply dummy text", "Item 13", 276.0 },
-                    { 11, "Lorem Ipsum is simply dummy text", "Item 11", 73.780000000000001 },
-                    { 10, "Lorem Ipsum is simply dummy text", "Item 10", 661.04999999999995 },
-                    { 9, "Lorem Ipsum is simply dummy text", "Item 9", 445.69 },
-                    { 8, "Lorem Ipsum is simply dummy text", "Item 8", 425.26999999999998 },
-                    { 7, "Lorem Ipsum is simply dummy text", "Item 7", 501.56999999999999 },
-                    { 6, "Lorem Ipsum is simply dummy text", "Item 6", 661.54999999999995 },
-                    { 5, "Lorem Ipsum is simply dummy text", "Item 5", 595.13999999999999 },
-                    { 4, "Lorem Ipsum is simply dummy text", "Item 4", 187.09999999999999 },
-                    { 3, "Lorem Ipsum is simply dummy text", "Item 3", 200.88 },
-                    { 2, "Lorem Ipsum is simply dummy text", "Item 2", 123.2 },
-                    { 12, "Lorem Ipsum is simply dummy text", "Item 2", 263.08999999999997 },
-                    { 25, "Lorem Ipsum is simply dummy text", "Item 25", 843.22000000000003 }
+                    { 1, null, "Lorem Ipsum is simply dummy text", "Item 1", 963.90999999999997 },
+                    { 23, null, "Lorem Ipsum is simply dummy text", "Item 23", 634.13 },
+                    { 22, null, "Lorem Ipsum is simply dummy text", "Item 22", 711.95000000000005 },
+                    { 21, null, "Lorem Ipsum is simply dummy text", "Item 21", 131.88 },
+                    { 20, null, "Lorem Ipsum is simply dummy text", "Item 20", 149.19 },
+                    { 19, null, "Lorem Ipsum is simply dummy text", "Item 19", 273.54000000000002 },
+                    { 18, null, "Lorem Ipsum is simply dummy text", "Item 18", 89.189999999999998 },
+                    { 17, null, "Lorem Ipsum is simply dummy text", "Item 17", 631.32000000000005 },
+                    { 16, null, "Lorem Ipsum is simply dummy text", "Item 16", 654.58000000000004 },
+                    { 15, null, "Lorem Ipsum is simply dummy text", "Item 15", 654.19000000000005 },
+                    { 14, null, "Lorem Ipsum is simply dummy text", "Item 14", 575.21000000000004 },
+                    { 24, null, "Lorem Ipsum is simply dummy text", "Item 24", 762.65999999999997 },
+                    { 13, null, "Lorem Ipsum is simply dummy text", "Item 13", 403.25 },
+                    { 11, null, "Lorem Ipsum is simply dummy text", "Item 11", 124.06999999999999 },
+                    { 10, null, "Lorem Ipsum is simply dummy text", "Item 10", 764.29999999999995 },
+                    { 9, null, "Lorem Ipsum is simply dummy text", "Item 9", 930.65999999999997 },
+                    { 8, null, "Lorem Ipsum is simply dummy text", "Item 8", 968.44000000000005 },
+                    { 7, null, "Lorem Ipsum is simply dummy text", "Item 7", 449.47000000000003 },
+                    { 6, null, "Lorem Ipsum is simply dummy text", "Item 6", 595.00999999999999 },
+                    { 5, null, "Lorem Ipsum is simply dummy text", "Item 5", 364.0 },
+                    { 4, null, "Lorem Ipsum is simply dummy text", "Item 4", 115.86 },
+                    { 3, null, "Lorem Ipsum is simply dummy text", "Item 3", 906.98000000000002 },
+                    { 2, null, "Lorem Ipsum is simply dummy text", "Item 2", 148.56999999999999 },
+                    { 12, null, "Lorem Ipsum is simply dummy text", "Item 2", 237.91999999999999 },
+                    { 25, null, "Lorem Ipsum is simply dummy text", "Item 25", 931.67999999999995 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -299,6 +306,11 @@ namespace ShowCase.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Invoices_ApplicationUserId",
                 table: "Invoices",
+                column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_ApplicationUserId",
+                table: "Products",
                 column: "ApplicationUserId");
         }
 
