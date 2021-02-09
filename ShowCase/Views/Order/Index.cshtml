@@ -20,8 +20,7 @@
                     </p>
                 </div>
                 <div class="ml-auto">
-                    <a
-                       asp-controller="Order" asp-action="Details" asp-route-Id="@item.Id">
+                    <a asp-controller="Order" asp-action="Details" asp-route-Id="@item.Id">
                         @if (item.IsConfirmed)
                         {
                             <i class="far fa-check-circle text-success"></i>

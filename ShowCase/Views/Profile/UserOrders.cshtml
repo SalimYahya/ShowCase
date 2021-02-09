@@ -15,8 +15,22 @@
 
                     var invoice_id = item.Invoice.Id;
                     <div id="accordion">
-                        <div class="container bg-white border border-left-0 border-right-0 border-warning mb-3 p-4 shadow-sm">
-                            <div class="row clickable-row" data-toggle="collapse" data-target="#collapseDetails_@(invoice_id)" aria-expanded="true" aria-controls="collapseDetails_@(invoice_id)" id="item_@(invoice_id)">
+                        <div class="relative-position-container container bg-white border border-left-0 border-right-0 border-warning mb-4 p-4 shadow-sm">
+                            <div class="ml-auto order-status-position">
+                                @if (item.Invoice.IsConfirmed)
+                                {
+                                    <i class="far fa-check-circle fa-2x m-0 text-success"></i>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-action="ConfirmOrder" asp-route-Id="@item.Invoice.Id">
+                                        <button class="btn" type="submit">
+                                            <i class="fas fa-exclamation fa-2x m-0 text-danger"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                            <div class="row clickable-row" style="position:relative;" data-toggle="collapse" data-target="#collapseDetails_@(invoice_id)" aria-expanded="true" aria-controls="collapseDetails_@(invoice_id)" id="item_@(invoice_id)">
 
                                 <div class="mr-auto">
                                     <p class="m-0">
@@ -30,7 +44,9 @@
                                         <strong class="text-secondary">Payment: </strong> @item.Invoice.TotalIncludeVat SAR
                                     </p>
                                 </div>
-                                <div class="ml-auto">
+
+                                <!--
+                                <div class="ml-auto" style="position:absolute; bottom:1px; right:10px;">
                                     @if (item.Invoice.IsConfirmed)
                                     {
                                         <i class="far fa-check-circle fa-2x m-0 text-success"></i>
@@ -39,9 +55,8 @@
                                     {
                                         <i class="fas fa-exclamation fa-2x m-0 text-warning"></i>
                                     }
-                                </div>
+                                </div>-->
                             </div>
-
                             <!-- Collapse: Order Detaials -->
                             <div class="row mt-3 collapse" id="collapseDetails_@(invoice_id)" aria-labelledby="item_@(invoice_id)" data-parent="#accordion">
                                 <div class="col-12">
@@ -136,7 +151,6 @@
                                 </div>
 
                             </div>
-
                         </div>
                     </div>
                 }

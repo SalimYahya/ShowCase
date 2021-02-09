@@ -79,6 +79,16 @@ body {
     cursor: pointer;
 }
 
+.relative-position-container{
+    position: relative;
+}
+
+.order-status-position{
+    position:absolute;
+    top: -15px;
+    right: 1%;
+}
+
 @media (min-width: 1700px) {
     .container {
         max-width: 1600px;

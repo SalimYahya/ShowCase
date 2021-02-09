@@ -91,5 +91,28 @@ namespace ShowCase.Controllers
             return View(orderDetailsViewModelList);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ConfirmOrder(string Id)
+        {
+            int invoice_id = int.Parse(Id);
+            string userId = _userManager.GetUserId(HttpContext.User);
+
+            var invoice = _appDbContext.Invoices.Single(i => i.ApplicationUserId == userId && i.Id == invoice_id);
+            
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            invoice.IsConfirmed = true;
+
+            var inv = _appDbContext.Invoices.Attach(invoice);
+            inv.State = EntityState.Modified;
+
+            _appDbContext.SaveChanges();
+
+            return RedirectToAction("UserOrders", "Profile");
+        }
     }
 }
