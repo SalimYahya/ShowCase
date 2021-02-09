@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Models.Temp;
+using ShowCase.ViewModel.Order;
 using ShowCase.ViewModel.Role;
 using System;
 using System.Collections.Generic;
@@ -41,6 +43,24 @@ namespace ShowCase.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
+
+                user.FirstName = model.User.FirstName;
+                user.LastName = model.User.LastName;
+
+                await _userManager.UpdateAsync(user);
+
+                return RedirectToAction("UserInformation", "Profile");
+            }
+
+            return View(model);
+        }
+
         public async Task<IActionResult> UserOrders()
         {
             string userId = _userManager.GetUserId(HttpContext.User);
@@ -48,8 +68,28 @@ namespace ShowCase.Controllers
 
             var invoiceList = _appDbContext.Invoices.Include(u => u.ApplicationUser)
                                                     .Where(i=> i.ApplicationUserId == userId);
+            
+            var orderDetailsViewModelList = new List<OrderDetailsViewModel>();
 
-            return View(invoiceList);
+            foreach (var invoice in invoiceList)
+            {
+                var productList = _appDbContext.InvoiceProduct
+                                                .Where(i => i.InvoiceId == invoice.Id)
+                                                .Select(p => new InvoiceProductInfo {
+                                                    Product = p.Product,
+                                                    Qty = p.Qty,
+                                                    Invoice = p.Invoice
+                                                });
+
+                orderDetailsViewModelList.Add(new OrderDetailsViewModel { 
+                        ApplicationUser = user,
+                        ProductInfo = productList.ToList(),
+                        Invoice = invoice
+                });
+            }
+            
+            return View(orderDetailsViewModelList);
         }
+
     }
 }

@@ -20,7 +20,7 @@
                             </div>
                         </div>
 
-                        <form>
+                        <form method="post" asp-action="EditUser">
                             <input asp-for="User.Id" hidden />
 
                             <div class="form-row">
@@ -51,7 +51,6 @@
                             <div class="form-group row">
                                 <div class="col-sm-6">
                                     <button type="submit" class="btn btn-primary">Update</button>
-                                    <a asp-action="UsersList">Cancel</a>
                                 </div>
                                 <a href="#" class="ml-auto mr-3 text-warning font-weight-bold">Change Password</a>
                             </div>
