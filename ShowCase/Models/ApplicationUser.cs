@@ -14,8 +14,39 @@ namespace ShowCase.Models
         
         [Required]
         public string LastName { get; set; }
-        
-        public string City { get; set; }
+
+        public DateTime JoinedAt { get; set; } = DateTime.Now;
+
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
+
+        /* 
+        *  Navaigation Property: Fully Defined Relationship
+        *  -   Relation Type: One-to-One
+        *  
+        *  Description: 
+        *  -   Each User (ApplicationUser) can have 
+        *      one Address.
+        *      
+        *   Note:
+        *   -  Address Table, will have
+        *      One-To-One relationship with User
+        */
+        public virtual Address Address { get; set; }
+
+        /* 
+        *  Navaigation Property: Fully Defined Relationship
+        *  -   Relation Type: One-to-One
+        *  
+        *  Description: 
+        *  -   Each User (ApplicationUser) can have 
+        *      one PaymentMethod.
+        *      
+        *   Note:
+        *   -  PaymentMethod Table, will have
+        *      One-To-One relationship with User
+        */
+        public virtual PaymentMethod PaymentMethod { get; set; }
 
         /* 
          *  Navaigation Property: Fully Defined Relationship

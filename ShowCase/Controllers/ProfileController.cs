@@ -5,6 +5,7 @@ using ShowCase.Data;
 using ShowCase.Models;
 using ShowCase.Models.Temp;
 using ShowCase.ViewModel.Order;
+using ShowCase.ViewModel.Profile;
 using ShowCase.ViewModel.Role;
 using System;
 using System.Collections.Generic;
@@ -28,23 +29,21 @@ namespace ShowCase.Controllers
         {
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            var address = user.Address;
+            var payment = user.PaymentMethod;
 
-            var userClaims = await _userManager.GetClaimsAsync(user);
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            EditUserViewModel model = new EditUserViewModel
+            ProfileEditUserViewModel model = new ProfileEditUserViewModel
             {
                 User = user,
-                Claims = userClaims.Select(c => c.Type + " : " + c.Value).ToList(),
-                Roles = userRoles.ToList()
+                Address = address,
+                PaymentMethod = payment
             };
-
 
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        public async Task<IActionResult> EditUserInformation(ProfileEditUserViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -52,22 +51,46 @@ namespace ShowCase.Controllers
 
                 user.FirstName = model.User.FirstName;
                 user.LastName = model.User.LastName;
+                user.UpdatedAt = DateTime.Now;
 
                 await _userManager.UpdateAsync(user);
 
                 return RedirectToAction("UserInformation", "Profile");
             }
 
-            return View(model);
+            return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
+
         }
 
+        [HttpPost]
+        public async Task<IActionResult> EditUserAddress(ProfileEditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
+
+                user.Address.District = model.Address.District;
+                user.Address.Street = model.Address.Street;
+                user.Address.City = model.Address.City;
+                user.Address.ZipCode = model.Address.ZipCode;
+                user.Address.POBox = model.Address.POBox;
+
+                await _userManager.UpdateAsync(user);
+
+                return RedirectToAction("UserInformation", "Profile");
+            }
+
+            return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
+
+        }
         public async Task<IActionResult> UserOrders()
         {
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
             var invoiceList = _appDbContext.Invoices.Include(u => u.ApplicationUser)
-                                                    .Where(i=> i.ApplicationUserId == userId);
+                                                    .Where(i=> i.ApplicationUserId == userId)
+                                                    .OrderByDescending(d => d.CreateedAt);
             
             var orderDetailsViewModelList = new List<OrderDetailsViewModel>();
 

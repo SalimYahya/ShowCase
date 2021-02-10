@@ -1,4 +1,4 @@
-﻿@model ShowCase.ViewModel.Role.EditUserViewModel
+﻿@model ShowCase.ViewModel.Profile.ProfileEditUserViewModel
 
 <div class="container">
 
@@ -15,12 +15,12 @@
                     <div class="col-12 px-4 pb-1">
 
                         <div class="row p-2 mb-2">
-                            <div class="h4 text-primary text-left">
+                            <div class="h4 text-secondary text-left">
                                 My Information
                             </div>
                         </div>
 
-                        <form method="post" asp-action="EditUser">
+                        <form method="post" asp-controller="Profile" asp-action="EditUserInformation">
                             <input asp-for="User.Id" hidden />
 
                             <div class="form-row">
@@ -49,8 +49,8 @@
                             </div>
 
                             <div class="form-group row">
-                                <div class="col-sm-6">
-                                    <button type="submit" class="btn btn-primary">Update</button>
+                                <div class="col-2 col-md-4 col-sm-12">
+                                    <button type="submit" class="btn btn-block btn-primary">Update</button>
                                 </div>
                                 <a href="#" class="ml-auto mr-3 text-warning font-weight-bold">Change Password</a>
                             </div>
@@ -61,51 +61,57 @@
                 </div>
 
                 <!-- Address Information Row -->
-                <div class="row bg-white shadow-sm mb-4">
+                <div class="row bg-white shadow-sm mb-4 h-25">
                     <div class="col-12 px-4 pb-1">
 
                         <div class="row p-2 mb-2">
-                            <div class="h4 text-primary text-left">
+                            <div class="h4 text-secondary text-left">
                                 Address Information
                             </div>
                         </div>
 
-                        <form>
+                        <form method="post" asp-controller="Profile" asp-action="EditUserAddress">
                             <input asp-for="User.Id" hidden />
 
                             <div class="form-row">
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.FirstName"></label>
-                                    <input asp-for="User.FirstName" class="form-control" />
-                                    <span asp-validation-for="User.FirstName" class="text-danger"></span>
+                                    <label asp-for="User.Address.District"></label>
+                                    <input asp-for="User.Address.District" class="form-control" />
+                                    <span asp-validation-for="User.Address.District" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-8 mb-3">
+                                    <label asp-for="User.Address.Street"></label>
+                                    <input asp-for="User.Address.Street" class="form-control" />
+                                    <span asp-validation-for="User.Address.Street" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="User.Address.City"></label>
+                                    <input asp-for="User.Address.City" class="form-control" />
+                                    <span asp-validation-for="User.Address.City" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.LastName"></label>
-                                    <input asp-for="User.LastName" class="form-control" />
-                                    <span asp-validation-for="User.LastName" class="text-danger"></span>
+                                    <label asp-for="User.Address.ZipCode"></label>
+                                    <input asp-for="User.Address.ZipCode" class="form-control" />
+                                    <span asp-validation-for="User.Address.ZipCode" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.UserName"></label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">&#64;</span>
-                                        </div>
-                                        <input asp-for="User.UserName" disabled class="form-control" />
-                                    </div>
+                                    <label asp-for="User.Address.POBox"></label>
+                                    <input asp-for="User.Address.POBox" class="form-control" />
+                                    <span asp-validation-for="User.Address.POBox" class="text-danger"></span>
                                 </div>
-
                             </div>
 
                             <div class="form-group row">
-                                <div class="col-sm-6">
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                    <a asp-action="UsersList">Cancel</a>
+                                <div class="col-2 col-md-4 col-sm-12">
+                                    <button type="submit" class="btn btn-block btn-primary">Update</button>
                                 </div>
-                                <a href="#" class="ml-auto mr-3 text-warning font-weight-bold">Change Password</a>
                             </div>
-
                         </form>
 
 
@@ -113,16 +119,16 @@
                 </div>
 
                 <!-- Payment Information Row -->
-                <div class="row bg-white shadow-sm mb-4">
+                <div class="row bg-white shadow-sm mb-4 h-25">
                     <div class="col-12 px-4 pb-1">
 
                         <div class="row p-2 mb-2">
-                            <div class="h4 text-primary text-left">
+                            <div class="h4 text-secondary text-left">
                                 Payment Information
                             </div>
                         </div>
 
-                        <form>
+                        <form method="post" asp-controller="Profile" asp-action="EditPayment">
                             <input asp-for="User.Id" hidden />
 
                             <div class="form-row">
@@ -151,13 +157,10 @@
                             </div>
 
                             <div class="form-group row">
-                                <div class="col-sm-6">
-                                    <button type="submit" class="btn btn-primary">Update</button>
-                                    <a asp-action="UsersList">Cancel</a>
+                                <div class="col-2 col-md-4 col-sm-12">
+                                    <button type="submit" class="btn btn-block btn-primary">Update</button>
                                 </div>
-                                <a href="#" class="ml-auto mr-3 text-warning font-weight-bold">Change Password</a>
                             </div>
-
                         </form>
 
 
