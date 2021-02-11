@@ -20,7 +20,7 @@ namespace ShowCase.Models
          *      User (ApplicationUser)
          *
          *   Note:
-         *   -  Invice Table, will have
+         *   -  Invoice Table, will have
          *      Many-To-Many relationship with products
          */
         public string ApplicationUserId { get; set; }

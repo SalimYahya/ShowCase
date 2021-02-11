@@ -8,7 +8,7 @@
     <img src="@imagePath" asp-append-version="true"
          class="img-fluid" />
 
-    <div class="card-body">
+    <div class="card-body pb-0">
 
         <div class="text-center">
             <h4 class="card-title text-primary">@Model.Name</h4>
@@ -16,7 +16,7 @@
         </div>
 
         <div class="row d-flex w-100 p-0 m-0">
-            <a href="#" class="add-to-cart btn btn-danger" 
+            <a href="#" class="add-to-cart btn btn-danger"
                data-id="@Model.Id" data-name="@Model.Name"
                data-desc="@Model.Description" data-price="@Model.Price"
                data-image="@imagePath">
@@ -24,6 +24,9 @@
             </a>
             <h6 class="text-warning ml-auto"><strong>@Model.Price SAR</strong></h6>
         </div>
-
+        
+        <div class="row p-0 mx-0 mt-4 mb-0">
+            <p>By:&nbsp;<div class="text-info">@Model.ApplicationUser.UserName</div></p>
+        </div>
     </div>
 </div>

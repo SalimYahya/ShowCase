@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShowCase.Data;
 
 namespace ShowCase.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210207130818_InitialMigration")]
+    partial class InitialMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -150,36 +152,6 @@ namespace ShowCase.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("ShowCase.Models.Address", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("District")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("POBox")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Street")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ZipCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Addresses");
-                });
-
             modelBuilder.Entity("ShowCase.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
@@ -187,6 +159,9 @@ namespace ShowCase.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -202,9 +177,6 @@ namespace ShowCase.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("LastName")
                         .IsRequired()
@@ -238,9 +210,6 @@ namespace ShowCase.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -322,33 +291,6 @@ namespace ShowCase.Migrations
                     b.ToTable("InvoiceProduct");
                 });
 
-            modelBuilder.Entity("ShowCase.Models.PaymentMethod", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("CVCCode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CardNumber")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("HolderName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Type")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("PaymentMethod");
-                });
-
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -383,175 +325,175 @@ namespace ShowCase.Migrations
                             Id = 1,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 1",
-                            Price = 381.51999999999998
+                            Price = 963.90999999999997
                         },
                         new
                         {
                             Id = 2,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 640.92999999999995
+                            Price = 148.56999999999999
                         },
                         new
                         {
                             Id = 3,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 3",
-                            Price = 565.40999999999997
+                            Price = 906.98000000000002
                         },
                         new
                         {
                             Id = 4,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 4",
-                            Price = 298.64999999999998
+                            Price = 115.86
                         },
                         new
                         {
                             Id = 5,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 5",
-                            Price = 679.05999999999995
+                            Price = 364.0
                         },
                         new
                         {
                             Id = 6,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 6",
-                            Price = 580.34000000000003
+                            Price = 595.00999999999999
                         },
                         new
                         {
                             Id = 7,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 7",
-                            Price = 664.49000000000001
+                            Price = 449.47000000000003
                         },
                         new
                         {
                             Id = 8,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 8",
-                            Price = 313.45999999999998
+                            Price = 968.44000000000005
                         },
                         new
                         {
                             Id = 9,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 9",
-                            Price = 883.64999999999998
+                            Price = 930.65999999999997
                         },
                         new
                         {
                             Id = 10,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 10",
-                            Price = 357.45999999999998
+                            Price = 764.29999999999995
                         },
                         new
                         {
                             Id = 11,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 11",
-                            Price = 406.57999999999998
+                            Price = 124.06999999999999
                         },
                         new
                         {
                             Id = 12,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 722.65999999999997
+                            Price = 237.91999999999999
                         },
                         new
                         {
                             Id = 13,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 13",
-                            Price = 359.13999999999999
+                            Price = 403.25
                         },
                         new
                         {
                             Id = 14,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 14",
-                            Price = 431.06999999999999
+                            Price = 575.21000000000004
                         },
                         new
                         {
                             Id = 15,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 15",
-                            Price = 800.96000000000004
+                            Price = 654.19000000000005
                         },
                         new
                         {
                             Id = 16,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 16",
-                            Price = 736.92999999999995
+                            Price = 654.58000000000004
                         },
                         new
                         {
                             Id = 17,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 17",
-                            Price = 553.24000000000001
+                            Price = 631.32000000000005
                         },
                         new
                         {
                             Id = 18,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 18",
-                            Price = 934.71000000000004
+                            Price = 89.189999999999998
                         },
                         new
                         {
                             Id = 19,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 19",
-                            Price = 898.12
+                            Price = 273.54000000000002
                         },
                         new
                         {
                             Id = 20,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 20",
-                            Price = 341.50999999999999
+                            Price = 149.19
                         },
                         new
                         {
                             Id = 21,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 21",
-                            Price = 530.20000000000005
+                            Price = 131.88
                         },
                         new
                         {
                             Id = 22,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 22",
-                            Price = 861.30999999999995
+                            Price = 711.95000000000005
                         },
                         new
                         {
                             Id = 23,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 23",
-                            Price = 942.84000000000003
+                            Price = 634.13
                         },
                         new
                         {
                             Id = 24,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 24",
-                            Price = 681.32000000000005
+                            Price = 762.65999999999997
                         },
                         new
                         {
                             Id = 25,
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 25",
-                            Price = 968.10000000000002
+                            Price = 931.67999999999995
                         });
                 });
 
@@ -606,17 +548,6 @@ namespace ShowCase.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ShowCase.Models.Address", b =>
-                {
-                    b.HasOne("ShowCase.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("Address")
-                        .HasForeignKey("ShowCase.Models.Address", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
             modelBuilder.Entity("ShowCase.Models.Invoice", b =>
                 {
                     b.HasOne("ShowCase.Models.ApplicationUser", "ApplicationUser")
@@ -645,17 +576,6 @@ namespace ShowCase.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ShowCase.Models.PaymentMethod", b =>
-                {
-                    b.HasOne("ShowCase.Models.ApplicationUser", "ApplicationUser")
-                        .WithOne("PaymentMethod")
-                        .HasForeignKey("ShowCase.Models.PaymentMethod", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
                     b.HasOne("ShowCase.Models.ApplicationUser", "ApplicationUser")
@@ -667,11 +587,7 @@ namespace ShowCase.Migrations
 
             modelBuilder.Entity("ShowCase.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("Address");
-
                     b.Navigation("Invoices");
-
-                    b.Navigation("PaymentMethod");
 
                     b.Navigation("Products");
                 });

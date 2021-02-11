@@ -1,0 +1,165 @@
+﻿@model IEnumerable<ShowCase.ViewModel.Order.OrderDetailsViewModel>
+
+<div class="container">
+    <div class="row p-0 min-vh-100">
+        <div class="col-2 p-2 mr-auto">
+            <partial name="_DisplayProfileSidebarPartial">
+        </div>
+
+        <div class="col-10 p-2 ml-auto">
+            @if (Model.Any())
+            {
+
+                @foreach (var item in Model)
+                {
+
+                    var invoice_id = item.Invoice.Id;
+                    <div id="accordion">
+                        <div class="relative-position-container container bg-white border border-left-0 border-right-0 border-warning mb-4 p-4 shadow-sm">
+                            <div class="ml-auto order-status-position">
+                                @if (item.Invoice.IsConfirmed)
+                                {
+                                    <i class="far fa-check-circle fa-2x m-0 text-success"></i>
+                                }
+                                else
+                                {
+                                    <form method="post" asp-action="ConfirmOrder" asp-route-Id="@item.Invoice.Id">
+                                        <button class="btn" type="submit">
+                                            <i class="fas fa-exclamation fa-2x m-0 text-danger"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                            <div class="row clickable-row" style="position:relative;" data-toggle="collapse" data-target="#collapseDetails_@(invoice_id)" aria-expanded="true" aria-controls="collapseDetails_@(invoice_id)" id="item_@(invoice_id)">
+
+                                <div class="mr-auto">
+                                    <p class="m-0">
+                                        <strong class="text-secondary">ID: </strong> @item.Invoice.Id
+                                        &nbsp;
+                                        <strong class="text-secondary">Createed At: </strong> @item.Invoice.CreateedAt
+                                    </p>
+                                    <p class="m-0">
+                                        <strong class="text-secondary">Items: </strong> @item.Invoice.TotalItems
+                                        &nbsp;
+                                        <strong class="text-secondary">Payment: </strong> @item.Invoice.TotalIncludeVat SAR
+                                    </p>
+                                </div>
+
+                                <!--
+                                <div class="ml-auto" style="position:absolute; bottom:1px; right:10px;">
+                                    @if (item.Invoice.IsConfirmed)
+                                    {
+                                        <i class="far fa-check-circle fa-2x m-0 text-success"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fas fa-exclamation fa-2x m-0 text-warning"></i>
+                                    }
+                                </div>-->
+                            </div>
+                            <!-- Collapse: Order Detaials -->
+                            <div class="row mt-3 collapse" id="collapseDetails_@(invoice_id)" aria-labelledby="item_@(invoice_id)" data-parent="#accordion">
+                                <div class="col-12">
+
+                                    <div class="row px-3">
+                                        <div class="title h4 text-warning mr-auto">Order Details</div>
+                                    </div>
+
+                                    <hr class="mb-4" />
+
+                                    <div class="row mt-2 mb-4">
+                                        <div class="col-4">
+                                            <div class="text-left">
+                                                <span class="text-secondary">Date</span>
+                                                <br>
+                                                <span>@item.Invoice.CreateedAt</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <div class="text-center">
+                                                <span class="text-secondary">Order No</span>
+                                                <br>
+                                                <span>@item.Invoice.Id</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-4">
+                                            <div class="text-center">
+                                                <span class="text-secondary">Items Qty</span>
+                                                <br>
+                                                <span>@item.Invoice.TotalItems</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr class="mb-4" />
+
+
+                                    @foreach (var info in item.ProductInfo)
+                                    {
+                                        <div class="row mt-2 mb-2 px-2 py-1 bg-light">
+
+                                            <div class="col-8">
+                                                <div class="row">
+                                                    @info.Product.Name,<div class="text-secondary">&nbsp;Qty @info.Qty &nbsp;X @info.Product.Price SAR</div>
+                                                    <div class="w-100"></div>
+                                                    @info.Product.Description
+                                                </div>
+                                            </div>
+                                            <div class="col-4">
+                                                <div class="text-center">
+                                                    @(info.Product.Price * info.Qty) SAR
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+
+                                    <hr class="mt-4" />
+
+                                    <div class="col-lg-5 offset-lg-7 col-md-8 offset-md-4 col-sm-12 offset-sm-0">
+                                        <div class="row py-2 px-2">
+                                            <div class="col-6"> <span id="name">Shipping</span> </div>
+                                            <div class="col-6"> <span id="price">33.00 SAR</span> </div>
+                                        </div>
+
+                                        <div class="row px-2">
+                                            <div class="col-6"> <span class="text-secondary" id="name">VAT</span></div>
+                                            <div class="col-6"> <span class="text-secondary" id="price">@item.Invoice.Vat %</span> </div>
+                                        </div>
+
+                                        <div class="row px-2">
+                                            <div class="col-6"> <span class="text-secondary" id="name">Total (Exclude Vat)</span></div>
+                                            <div class="col-6"> <span class="text-secondary" id="price">@item.Invoice.TotalExcludeVat SAR</span> </div>
+                                        </div>
+
+                                        <div class="row px-2">
+                                            <div class="col-6"> <span class="text-secondary" id="name">Total (Include Vat)</span></div>
+                                            <div class="col-6"> <span class="text-warning" id="price">@item.Invoice.TotalIncludeVat SAR</span> </div>
+                                        </div>
+                                        <div class="row px-2">
+                                            <div class="col-6"> <span class="text-secondary" id="name">Payed</span></div>
+                                            <div class="col-6">
+                                                @if (item.Invoice.IsConfirmed)
+                                                {<span class="text-success">Yes</span> }
+                                                else
+                                                {<span class="text-danger">Not Yet !</span>}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="h3">OrderList is Empty</p>
+            }
+        </div>
+    </div>
+
+</div>

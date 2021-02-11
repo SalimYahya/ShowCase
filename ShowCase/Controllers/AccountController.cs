@@ -43,7 +43,6 @@ namespace ShowCase.Controllers
                     LastName = model.LastName,
                     UserName = model.Email,
                     Email = model.Email,
-                    City = model.City
                 };
 
                 var registerationResult = await userManager.CreateAsync(user, model.Password);

@@ -13,3 +13,10 @@ $(document).ready(function () {
         console.log(invoice_id);
     });
 });*/
+
+
+/*$(document).ready(function () {
+    $('.clickable-row').click(function () {
+        $('collapse').show();
+    });
+});*/

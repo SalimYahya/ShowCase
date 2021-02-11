@@ -32,7 +32,5 @@ namespace ShowCase.ViewModel.Account
         [Compare("Password", ErrorMessage = "Not Matched to Password")]
         public string ConfirmPassword { get; set; }
 
-        [Display(Name = "City")]
-        public string City { get; set; }
     }
 }

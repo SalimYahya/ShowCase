@@ -28,5 +28,16 @@ namespace ShowCase.Models
          *  -   Pivot Table (Middle Table): InvoiceProduct Table
          */
         public virtual ICollection<InvoiceProduct> InvoiceProducts { get; set; }
+
+        /* 
+         *  Navaigation Property: Fully Defined Relationship
+         *  -   Relation Type: Many-To-One
+         *  
+         *  Description:
+         *  -   Multiple Products, belongs to one 
+         *      User (ApplicationUser) with Role ("Seller")
+         */
+        public string ApplicationUserId { get; set; }
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }

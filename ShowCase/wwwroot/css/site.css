@@ -59,13 +59,38 @@ html {
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    margin-bottom: 150px;
+    background-color: #fafafa !important;
 }
+
 .footer {
   position: absolute;
   bottom: 0;
   width: 100%;
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
+}
+
+
+/* My Custome styles
+-------------------------------------------------- */
+.clickable-row {
+    cursor: pointer;
+}
+
+.relative-position-container{
+    position: relative;
+}
+
+.order-status-position{
+    position:absolute;
+    top: -15px;
+    right: 1%;
+}
+
+@media (min-width: 1700px) {
+    .container {
+        max-width: 1600px;
+    }
 }
