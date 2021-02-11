@@ -9,7 +9,6 @@
 
         <div class="col-10 p-2 ml-auto">
             <div class="container">
-
                 <!-- Personal Information Information Row -->
                 <div class="row bg-white shadow-sm mb-4">
                     <div class="col-12 px-4 pb-1">
@@ -21,28 +20,28 @@
                         </div>
 
                         <form method="post" asp-controller="Profile" asp-action="EditUserInformation">
-                            <input asp-for="User.Id" hidden />
+                            <input asp-for="@Model.User.Id" hidden />
 
                             <div class="form-row">
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.FirstName"></label>
-                                    <input asp-for="User.FirstName" class="form-control" />
-                                    <span asp-validation-for="User.FirstName" class="text-danger"></span>
+                                    <label asp-for="@Model.User.FirstName"></label>
+                                    <input asp-for="@Model.User.FirstName" class="form-control" />
+                                    <span asp-validation-for="@Model.User.FirstName" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.LastName"></label>
-                                    <input asp-for="User.LastName" class="form-control" />
-                                    <span asp-validation-for="User.LastName" class="text-danger"></span>
+                                    <label asp-for="@Model.User.LastName"></label>
+                                    <input asp-for="@Model.User.LastName" class="form-control" />
+                                    <span asp-validation-for="@Model.User.LastName" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.UserName"></label>
+                                    <label asp-for="@Model.User.UserName"></label>
                                     <div class="input-group">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text">&#64;</span>
                                         </div>
-                                        <input asp-for="User.UserName" disabled class="form-control" />
+                                        <input asp-for="@Model.User.UserName" disabled class="form-control" />
                                     </div>
                                 </div>
 
@@ -70,40 +69,45 @@
                             </div>
                         </div>
 
-                        <form method="post" asp-controller="Profile" asp-action="EditUserAddress">
-                            <input asp-for="User.Id" hidden />
+                        <form method="post" asp-controller="Profile" asp-action="EditOrCreateUserAddress">
+                            <!--
+                            <input asp-for="@Model.User.Id" hidden />
+                            <input asp-for="@Model.User.FirstName" hidden />
+                            <input asp-for="@Model.User.LastName" hidden />
+                            -->
+
 
                             <div class="form-row">
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.Address.District"></label>
-                                    <input asp-for="User.Address.District" class="form-control" />
-                                    <span asp-validation-for="User.Address.District" class="text-danger"></span>
+                                    <label asp-for="@Model.Address.District"></label>
+                                    <input asp-for="@Model.Address.District" class="form-control" />
+                                    <span asp-validation-for="@Model.Address.District" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-8 mb-3">
-                                    <label asp-for="User.Address.Street"></label>
-                                    <input asp-for="User.Address.Street" class="form-control" />
-                                    <span asp-validation-for="User.Address.Street" class="text-danger"></span>
+                                    <label asp-for="@Model.Address.Street"></label>
+                                    <input asp-for="@Model.Address.Street" class="form-control" />
+                                    <span asp-validation-for="@Model.Address.Street" class="text-danger"></span>
                                 </div>
                             </div>
 
                             <div class="form-row">
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.Address.City"></label>
-                                    <input asp-for="User.Address.City" class="form-control" />
-                                    <span asp-validation-for="User.Address.City" class="text-danger"></span>
+                                    <label asp-for="@Model.Address.City"></label>
+                                    <input asp-for="@Model.Address.City" class="form-control" />
+                                    <span asp-validation-for="@Model.Address.City" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.Address.ZipCode"></label>
-                                    <input asp-for="User.Address.ZipCode" class="form-control" />
-                                    <span asp-validation-for="User.Address.ZipCode" class="text-danger"></span>
+                                    <label asp-for="@Model.Address.ZipCode"></label>
+                                    <input asp-for="@Model.Address.ZipCode" class="form-control" />
+                                    <span asp-validation-for="@Model.Address.ZipCode" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.Address.POBox"></label>
-                                    <input asp-for="User.Address.POBox" class="form-control" />
-                                    <span asp-validation-for="User.Address.POBox" class="text-danger"></span>
+                                    <label asp-for="@Model.Address.POBox"></label>
+                                    <input asp-for="@Model.Address.POBox" class="form-control" />
+                                    <span asp-validation-for="@Model.Address.POBox" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -128,32 +132,45 @@
                             </div>
                         </div>
 
-                        <form method="post" asp-controller="Profile" asp-action="EditPayment">
-                            <input asp-for="User.Id" hidden />
+                        <form method="post" asp-controller="Profile" asp-action="EditOrCreatePaymentMethod">
+                            <!--
+                            <input asp-for="@Model.User.Id" hidden />
+                            <input asp-for="@Model.User.FirstName" hidden />
+                            <input asp-for="@Model.User.LastName" hidden />
+                            -->
 
                             <div class="form-row">
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.FirstName"></label>
-                                    <input asp-for="User.FirstName" class="form-control" />
-                                    <span asp-validation-for="User.FirstName" class="text-danger"></span>
+                                    <label asp-for="@Model.PaymentMethod.Type"></label>
+                                    <input asp-for="@Model.PaymentMethod.Type" class="form-control" />
+                                    <span asp-validation-for="@Model.PaymentMethod.Type" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.LastName"></label>
-                                    <input asp-for="User.LastName" class="form-control" />
-                                    <span asp-validation-for="User.LastName" class="text-danger"></span>
+                                    <label asp-for="@Model.PaymentMethod.HolderName"></label>
+                                    <input asp-for="@Model.PaymentMethod.HolderName" class="form-control" />
+                                    <span asp-validation-for="@Model.PaymentMethod.HolderName" class="text-danger"></span>
                                 </div>
 
                                 <div class="col-md-4 mb-3">
-                                    <label asp-for="User.UserName"></label>
-                                    <div class="input-group">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text">&#64;</span>
-                                        </div>
-                                        <input asp-for="User.UserName" disabled class="form-control" />
-                                    </div>
+                                    <label asp-for="@Model.PaymentMethod.ExpiresAt"></label>
+                                    <input asp-for="@Model.PaymentMethod.ExpiresAt" class="form-control" />
+                                    <span asp-validation-for="@Model.PaymentMethod.ExpiresAt" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="@Model.PaymentMethod.CardNumber"></label>
+                                    <input asp-for="@Model.PaymentMethod.CardNumber" class="form-control" />
+                                    <span asp-validation-for="@Model.PaymentMethod.CardNumber" class="text-danger"></span>
                                 </div>
 
+                                <div class="col-md-4 mb-3">
+                                    <label asp-for="@Model.PaymentMethod.CVCCode"></label>
+                                    <input asp-for="@Model.PaymentMethod.CVCCode" class="form-control" />
+                                    <span asp-validation-for="@Model.PaymentMethod.CVCCode" class="text-danger"></span>
+                                </div>
                             </div>
 
                             <div class="form-group row">
@@ -167,7 +184,14 @@
                     </div>
                 </div>
 
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts{
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

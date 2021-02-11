@@ -29,8 +29,8 @@ namespace ShowCase.Controllers
         {
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
-            var address = user.Address;
-            var payment = user.PaymentMethod;
+            var address = _appDbContext.Addresses.Find(user.Id);
+            var payment = _appDbContext.PaymentMethods.Find(user.Id);
 
             ProfileEditUserViewModel model = new ProfileEditUserViewModel
             {
@@ -63,19 +63,42 @@ namespace ShowCase.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditUserAddress(ProfileEditUserViewModel model)
+        public async Task<IActionResult> EditOrCreateUserAddress(ProfileEditUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
+                string userId = _userManager.GetUserId(HttpContext.User);
+                Address address = _appDbContext.Addresses.Find(userId);
 
-                user.Address.District = model.Address.District;
-                user.Address.Street = model.Address.Street;
-                user.Address.City = model.Address.City;
-                user.Address.ZipCode = model.Address.ZipCode;
-                user.Address.POBox = model.Address.POBox;
+                if (address != null)
+                {
+                    address.District = model.Address.District;
+                    address.Street = model.Address.Street;
+                    address.City = model.Address.City;
+                    address.ZipCode = model.Address.ZipCode;
+                    address.POBox = model.Address.POBox;
 
-                await _userManager.UpdateAsync(user);
+                    var tmp_address = _appDbContext.Addresses.Attach(address);
+                    tmp_address.State = EntityState.Modified;
+
+                    await _appDbContext.SaveChangesAsync();
+                }
+                else
+                {
+                   Address new_address = new Address
+                   {
+                       Id = userId,
+                       District = model.Address.District,
+                       Street = model.Address.Street,
+                       City = model.Address.City,
+                       ZipCode = model.Address.ZipCode,
+                       POBox = model.Address.POBox
+                    };
+              
+                    _appDbContext.Addresses.Add(new_address);
+                    await _appDbContext.SaveChangesAsync();
+                }
+
 
                 return RedirectToAction("UserInformation", "Profile");
             }
@@ -83,6 +106,53 @@ namespace ShowCase.Controllers
             return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
 
         }
+
+        [HttpPost]
+        public async Task<IActionResult> EditOrCreatePaymentMethod(ProfileEditUserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string userId = _userManager.GetUserId(HttpContext.User);
+
+                PaymentMethod paymentMethod = _appDbContext.PaymentMethods.Find(userId);
+
+                if (paymentMethod != null)
+                {
+                    paymentMethod.Type = model.PaymentMethod.Type;
+                    paymentMethod.HolderName = model.PaymentMethod.HolderName;
+                    paymentMethod.CardNumber = model.PaymentMethod.CardNumber;
+                    paymentMethod.CVCCode = model.PaymentMethod.CVCCode;
+                    paymentMethod.ExpiresAt = model.PaymentMethod.ExpiresAt;
+
+                    var tmp_paymentMethod = _appDbContext.PaymentMethods.Attach(paymentMethod);
+                    tmp_paymentMethod.State = EntityState.Modified;
+
+                    await _appDbContext.SaveChangesAsync();
+                }
+                else
+                {
+                    PaymentMethod new_paymentMethod = new PaymentMethod
+                    {
+                        Id = userId,
+                        Type = model.PaymentMethod.Type,
+                        HolderName = model.PaymentMethod.HolderName,
+                        CardNumber = model.PaymentMethod.CardNumber,
+                        CVCCode = model.PaymentMethod.CVCCode,
+                        ExpiresAt = model.PaymentMethod.ExpiresAt
+                    };
+              
+                    _appDbContext.PaymentMethods.Add(new_paymentMethod);
+                    await _appDbContext.SaveChangesAsync();
+                }
+
+
+                return RedirectToAction("UserInformation", "Profile");
+            }
+
+            return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
+
+        }
+
         public async Task<IActionResult> UserOrders()
         {
             string userId = _userManager.GetUserId(HttpContext.User);

@@ -19,11 +19,9 @@ namespace ShowCase.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         public DbSet<Address> Addresses { get; set; }
-
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<Product> Products { get; set; }
-
         public DbSet<Invoice> Invoices { get; set; }
-
         public DbSet<InvoiceProduct> InvoiceProduct { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
