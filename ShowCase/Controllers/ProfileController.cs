@@ -207,5 +207,15 @@ namespace ShowCase.Controllers
 
             return RedirectToAction("UserOrders", "Profile");
         }
+
+        [HttpGet]
+        public IActionResult UserProducts()
+        {
+            string userId = _userManager.GetUserId(HttpContext.User);
+            var productList = _appDbContext.Products.Include(u => u.ApplicationUser)
+                                                    .Where(p => p.ApplicationUserId == userId);
+
+            return View(productList);
+        }
     }
 }
