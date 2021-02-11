@@ -18,7 +18,7 @@ namespace ShowCase.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _appDbContext;
-
+        
         public ProfileController(UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
         {
             _userManager = userManager;
