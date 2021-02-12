@@ -18,7 +18,7 @@ namespace ShowCase.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _appDbContext;
-
+        
         public ProfileController(UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
         {
             _userManager = userManager;
@@ -206,6 +206,16 @@ namespace ShowCase.Controllers
             _appDbContext.SaveChanges();
 
             return RedirectToAction("UserOrders", "Profile");
+        }
+
+        [HttpGet]
+        public IActionResult UserProducts()
+        {
+            string userId = _userManager.GetUserId(HttpContext.User);
+            var productList = _appDbContext.Products.Include(u => u.ApplicationUser)
+                                                    .Where(p => p.ApplicationUserId == userId);
+
+            return View(productList);
         }
     }
 }
