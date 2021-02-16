@@ -28,7 +28,8 @@ namespace ShowCase.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    City = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    JoinedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -50,6 +51,21 @@ namespace ShowCase.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Solds",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Qty = table.Column<int>(type: "int", nullable: false),
+                    DiscountRate = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Solds", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -66,6 +82,28 @@ namespace ShowCase.Migrations
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Addresses",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    District = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ZipCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    POBox = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    City = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Addresses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Addresses_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -162,7 +200,7 @@ namespace ShowCase.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    CreateedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     IsConfirmed = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
                     TotalItems = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     Vat = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
@@ -181,6 +219,28 @@ namespace ShowCase.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PaymentMethods",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HolderName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CardNumber = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
+                    CVCCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExpiresAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PaymentMethods", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PaymentMethods_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -189,6 +249,8 @@ namespace ShowCase.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(150)", maxLength: 150, nullable: true),
                     Price = table.Column<double>(type: "float", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
@@ -227,36 +289,60 @@ namespace ShowCase.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "ProductSolds",
+                columns: table => new
+                {
+                    ProductId = table.Column<int>(type: "int", nullable: false),
+                    SoldId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProductSolds", x => new { x.ProductId, x.SoldId });
+                    table.ForeignKey(
+                        name: "FK_ProductSolds_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductSolds_Solds_SoldId",
+                        column: x => x.SoldId,
+                        principalTable: "Solds",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Products",
-                columns: new[] { "Id", "ApplicationUserId", "Description", "Name", "Price" },
+                columns: new[] { "Id", "ApplicationUserId", "CreatedAt", "Description", "Name", "Price", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, null, "Lorem Ipsum is simply dummy text", "Item 1", 963.90999999999997 },
-                    { 23, null, "Lorem Ipsum is simply dummy text", "Item 23", 634.13 },
-                    { 22, null, "Lorem Ipsum is simply dummy text", "Item 22", 711.95000000000005 },
-                    { 21, null, "Lorem Ipsum is simply dummy text", "Item 21", 131.88 },
-                    { 20, null, "Lorem Ipsum is simply dummy text", "Item 20", 149.19 },
-                    { 19, null, "Lorem Ipsum is simply dummy text", "Item 19", 273.54000000000002 },
-                    { 18, null, "Lorem Ipsum is simply dummy text", "Item 18", 89.189999999999998 },
-                    { 17, null, "Lorem Ipsum is simply dummy text", "Item 17", 631.32000000000005 },
-                    { 16, null, "Lorem Ipsum is simply dummy text", "Item 16", 654.58000000000004 },
-                    { 15, null, "Lorem Ipsum is simply dummy text", "Item 15", 654.19000000000005 },
-                    { 14, null, "Lorem Ipsum is simply dummy text", "Item 14", 575.21000000000004 },
-                    { 24, null, "Lorem Ipsum is simply dummy text", "Item 24", 762.65999999999997 },
-                    { 13, null, "Lorem Ipsum is simply dummy text", "Item 13", 403.25 },
-                    { 11, null, "Lorem Ipsum is simply dummy text", "Item 11", 124.06999999999999 },
-                    { 10, null, "Lorem Ipsum is simply dummy text", "Item 10", 764.29999999999995 },
-                    { 9, null, "Lorem Ipsum is simply dummy text", "Item 9", 930.65999999999997 },
-                    { 8, null, "Lorem Ipsum is simply dummy text", "Item 8", 968.44000000000005 },
-                    { 7, null, "Lorem Ipsum is simply dummy text", "Item 7", 449.47000000000003 },
-                    { 6, null, "Lorem Ipsum is simply dummy text", "Item 6", 595.00999999999999 },
-                    { 5, null, "Lorem Ipsum is simply dummy text", "Item 5", 364.0 },
-                    { 4, null, "Lorem Ipsum is simply dummy text", "Item 4", 115.86 },
-                    { 3, null, "Lorem Ipsum is simply dummy text", "Item 3", 906.98000000000002 },
-                    { 2, null, "Lorem Ipsum is simply dummy text", "Item 2", 148.56999999999999 },
-                    { 12, null, "Lorem Ipsum is simply dummy text", "Item 2", 237.91999999999999 },
-                    { 25, null, "Lorem Ipsum is simply dummy text", "Item 25", 931.67999999999995 }
+                    { 1, null, new DateTime(2021, 2, 15, 13, 37, 1, 566, DateTimeKind.Local).AddTicks(4167), "Lorem Ipsum is simply dummy text", "Item 1", 529.59000000000003, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(3798) },
+                    { 23, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8782), "Lorem Ipsum is simply dummy text", "Item 23", 238.78, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8783) },
+                    { 22, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8778), "Lorem Ipsum is simply dummy text", "Item 22", 828.02999999999997, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8779) },
+                    { 21, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8775), "Lorem Ipsum is simply dummy text", "Item 21", 201.56, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8776) },
+                    { 20, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8771), "Lorem Ipsum is simply dummy text", "Item 20", 60.270000000000003, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8772) },
+                    { 19, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8767), "Lorem Ipsum is simply dummy text", "Item 19", 539.00999999999999, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8768) },
+                    { 18, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8763), "Lorem Ipsum is simply dummy text", "Item 18", 228.41, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8764) },
+                    { 17, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8758), "Lorem Ipsum is simply dummy text", "Item 17", 148.65000000000001, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8759) },
+                    { 16, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8754), "Lorem Ipsum is simply dummy text", "Item 16", 514.40999999999997, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8755) },
+                    { 15, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8750), "Lorem Ipsum is simply dummy text", "Item 15", 739.42999999999995, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8751) },
+                    { 14, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8746), "Lorem Ipsum is simply dummy text", "Item 14", 285.42000000000002, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8747) },
+                    { 24, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8787), "Lorem Ipsum is simply dummy text", "Item 24", 284.92000000000002, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8788) },
+                    { 13, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8742), "Lorem Ipsum is simply dummy text", "Item 13", 957.25, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8743) },
+                    { 11, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8734), "Lorem Ipsum is simply dummy text", "Item 11", 237.34, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8735) },
+                    { 10, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8730), "Lorem Ipsum is simply dummy text", "Item 10", 109.73999999999999, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8731) },
+                    { 9, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8725), "Lorem Ipsum is simply dummy text", "Item 9", 118.06, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8726) },
+                    { 8, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8722), "Lorem Ipsum is simply dummy text", "Item 8", 496.82999999999998, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8723) },
+                    { 7, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8718), "Lorem Ipsum is simply dummy text", "Item 7", 884.46000000000004, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8719) },
+                    { 6, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8713), "Lorem Ipsum is simply dummy text", "Item 6", 68.010000000000005, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8715) },
+                    { 5, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8700), "Lorem Ipsum is simply dummy text", "Item 5", 579.72000000000003, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8702) },
+                    { 4, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8696), "Lorem Ipsum is simply dummy text", "Item 4", 526.46000000000004, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8698) },
+                    { 3, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8690), "Lorem Ipsum is simply dummy text", "Item 3", 991.89999999999998, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8691) },
+                    { 2, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8660), "Lorem Ipsum is simply dummy text", "Item 2", 969.70000000000005, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8672) },
+                    { 12, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8738), "Lorem Ipsum is simply dummy text", "Item 2", 997.89999999999998, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8739) },
+                    { 25, null, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8791), "Lorem Ipsum is simply dummy text", "Item 25", 89.069999999999993, new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8792) }
                 });
 
             migrationBuilder.CreateIndex(
@@ -312,10 +398,18 @@ namespace ShowCase.Migrations
                 name: "IX_Products_ApplicationUserId",
                 table: "Products",
                 column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductSolds_SoldId",
+                table: "ProductSolds",
+                column: "SoldId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Addresses");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -335,6 +429,12 @@ namespace ShowCase.Migrations
                 name: "InvoiceProduct");
 
             migrationBuilder.DropTable(
+                name: "PaymentMethods");
+
+            migrationBuilder.DropTable(
+                name: "ProductSolds");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
@@ -342,6 +442,9 @@ namespace ShowCase.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Solds");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

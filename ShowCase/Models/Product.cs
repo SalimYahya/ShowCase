@@ -21,6 +21,10 @@ namespace ShowCase.Models
         [Range(0.1, 100000.00, ErrorMessage = "Price Must be Greater than 0")]
         public double Price { get; set; }
 
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+
 
         /*  
          *  Navaigation Property:
@@ -39,5 +43,19 @@ namespace ShowCase.Models
          */
         public string ApplicationUserId { get; set; }
         public ApplicationUser ApplicationUser { get; set; }
+
+        /* 
+         *  Navaigation Property: Fully Defined Relationship
+         *  -   Relation Type: Many-to-Many
+         *  
+         *  Description: 
+         *  -   Each Product can have 
+         *      Many to many ProductSold.
+         *      
+         *   Note:
+         *   -  ProductSold Table, will have
+         *      Many-To-Many relationship with products
+         */
+        public virtual ICollection<ProductSold> ProductSolds { get; set; }
     }
 }

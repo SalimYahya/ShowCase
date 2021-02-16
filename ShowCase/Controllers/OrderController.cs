@@ -107,7 +107,7 @@ namespace ShowCase.Controllers
             int vat = 15;
             Invoice newInvoice = new Invoice { 
                 ApplicationUserId = userId,
-                CreateedAt = DateTime.Now,
+                CreatedAt = DateTime.Now,
                 Vat = vat
             };
 
@@ -158,7 +158,7 @@ namespace ShowCase.Controllers
             {
                 Success = true,
                 Message = "Order confirmed succefully", 
-                Redirect = "/order/details",
+                Redirect = "/Profile/UserOrders",
                 InvoiceId = newInvoice.Id
             };
 

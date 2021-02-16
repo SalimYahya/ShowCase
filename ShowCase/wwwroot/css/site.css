@@ -75,6 +75,61 @@ body {
 
 /* My Custome styles
 -------------------------------------------------- */
+.my-sidebar {
+    min-height: 100vh;
+    width: 20%;
+    text-align: left;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: transparent;
+    padding-top: 100px;
+    padding-left: 210px;
+}
+
+.my-sidebar a {
+    color: #0a267c !important;
+}
+
+.bg-my-background {
+    background-color: #15a9ce;
+    background-image: linear-gradient(-90deg, #1588a5 10%, #0a267c 100%);
+    background-size: cover;
+}
+
+.my-container {
+    padding-top: 15px;
+    padding-left: 21%;
+}
+
+nav .navbar-brand {
+    color: gold !important;
+    font-size: 1.5rem;
+}
+
+nav .navbar-nav .nav-link{
+    color: white !important;
+}
+
+nav .dropdown-menu .nav-link {
+    color: black !important;
+}
+
+nav a {
+    /*font-size: 1.2rem;*/
+}
+
+.navbar-nav i {
+    color: #ffc107;
+}
+
+footer .container {
+    color: white !important;
+}
+footer .container a{
+    color: gold !important;
+}
+
 .clickable-row {
     cursor: pointer;
 }
@@ -89,8 +144,17 @@ body {
     right: 1%;
 }
 
+
 @media (min-width: 1700px) {
+    .my-container {
+        max-width: 1680px;
+    }
+
+    .my-sidebar {
+        padding-left: 210px;
+    }
+
     .container {
-        max-width: 1600px;
+        max-width: 1500px;
     }
 }

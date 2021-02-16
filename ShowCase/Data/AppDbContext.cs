@@ -21,6 +21,8 @@ namespace ShowCase.Data
         public DbSet<Address> Addresses { get; set; }
         public DbSet<PaymentMethod> PaymentMethods { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<ProductSold> ProductSolds { get; set; }
+        public DbSet<Sold> Solds { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceProduct> InvoiceProduct { get; set; }
         
@@ -66,6 +68,15 @@ namespace ShowCase.Data
                 .Entity<InvoiceProduct>()
                 .HasKey(up => new {up.InvoiceId, up.ProductId });
 
+            // InvoiceProduct Entity
+            modelBuilder
+                .Entity<InvoiceProduct>()
+                .HasKey(up => new { up.InvoiceId, up.ProductId });
+            
+            // ProductSolds Entity
+            modelBuilder
+                .Entity<ProductSold>()
+                .HasKey(ps => new { ps.ProductId, ps.SoldId });
         }
 
     }

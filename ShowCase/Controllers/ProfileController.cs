@@ -106,6 +106,7 @@ namespace ShowCase.Controllers
             return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
 
         }
+         
 
         [HttpPost]
         public async Task<IActionResult> EditOrCreatePaymentMethod(ProfileEditUserViewModel model)
@@ -160,7 +161,7 @@ namespace ShowCase.Controllers
 
             var invoiceList = _appDbContext.Invoices.Include(u => u.ApplicationUser)
                                                     .Where(i=> i.ApplicationUserId == userId)
-                                                    .OrderByDescending(d => d.CreateedAt);
+                                                    .OrderByDescending(d => d.CreatedAt);
             
             var orderDetailsViewModelList = new List<OrderDetailsViewModel>();
 
@@ -186,7 +187,7 @@ namespace ShowCase.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult ConfirmOrder(string Id)
+        public async Task<IActionResult> ConfirmOrder(string Id)
         {
             int invoice_id = int.Parse(Id);
             string userId = _userManager.GetUserId(HttpContext.User);
@@ -205,17 +206,74 @@ namespace ShowCase.Controllers
 
             _appDbContext.SaveChanges();
 
+            // Implement: Product-Sold logic
+            List<ProductSold> productSoldList = new List<ProductSold>();
+
+            var productList = _appDbContext.InvoiceProduct
+                            .Where(i => i.InvoiceId == invoice.Id)
+                            .Select(p => new InvoiceProductInfo
+                            {
+                                Product = p.Product,
+                                Qty = p.Qty,
+                                Invoice = p.Invoice
+                            }).ToList();
+
+
+            foreach (var product in productList)
+            {
+                var sold = new Sold { Qty = product.Qty };
+                await _appDbContext.Solds.AddAsync(sold);
+                await _appDbContext.SaveChangesAsync();
+
+                var productSold = new ProductSold
+                {
+                    SoldId = sold.Id,
+                    ProductId = product.Product.Id
+                };
+
+                productSoldList.Add(productSold);
+            }
+
+            await _appDbContext.ProductSolds.AddRangeAsync(productSoldList);
+            await _appDbContext.SaveChangesAsync();
+
             return RedirectToAction("UserOrders", "Profile");
         }
 
         [HttpGet]
-        public IActionResult UserProducts()
+        public IActionResult UserInventory()
         {
             string userId = _userManager.GetUserId(HttpContext.User);
             var productList = _appDbContext.Products.Include(u => u.ApplicationUser)
-                                                    .Where(p => p.ApplicationUserId == userId);
+                                                    .Where(p => p.ApplicationUserId == userId)
+                                                    .OrderByDescending(d => d.CreatedAt);
 
-            return View(productList);
+            List<ProductInventoryInfo> productInventoryInfos = new List<ProductInventoryInfo>();
+
+            foreach (var product in productList)
+            {
+                var sold = _appDbContext.ProductSolds.Where(p => p.ProductId == product.Id)
+                                                     .Select(s => s.Sold);
+                
+                int qtySum = 0;
+                if (sold != null)
+                {
+                    foreach (var s in sold)
+                    {
+                        qtySum += s.Qty;
+                    }
+                }
+
+                productInventoryInfos.Add(new ProductInventoryInfo { Product = product, QtySold = qtySum});
+            }
+
+            UserInventoryModelView model = new UserInventoryModelView
+            {
+                ProductInventoryInfoList = productInventoryInfos
+            };
+
+            return View(model);
         }
     }
+
 }
