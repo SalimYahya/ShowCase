@@ -16,19 +16,20 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-my-background box-shadow">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ShowCase</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between align-self-center">
+                    <ul class="navbar-nav mr-auto">
                         @if (signInManager.IsSignedIn(User) && (User.IsInRole("Customer") || User.IsInRole("Seller")))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Product</a>
+                                <a class="nav-link " asp-area="" asp-controller="Product" asp-action="Index">Product</a>
                             </li>
                         }
 
@@ -48,12 +49,25 @@
                         }
                     </ul>
 
+                    <!--
+                    <div class="nav-item">
+                        <div class="input-group md-form form-sm form-1 pl-0">
+                            <input class="form-control my-0 py-1" type="text" placeholder="Search for Product" aria-label="Search">
+                            <div class="input-group-append">
+                                <span class="input-group-text bg-info lighten-3" id="basic-text1">
+                                    <i class="fas fa-search text-white" aria-hidden="true"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+                    
                     <ul class="navbar-nav ml-auto">
                         @if (signInManager.IsSignedIn(User))
                         {
                             <li class="nav-item dropdown" py-1>
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle " href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    <i class="fas fa-user fa-lg px-1 text-dark"></i>
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                    <i class="fas fa-user px-1"></i>
                                     @User.Identity.Name
                                 </a>
 
@@ -90,13 +104,13 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="register">Register</a>
+                                <a class="nav-link" asp-area="" asp-controller="account" asp-action="register">Register</a>
                             </li>
 
                             <li class="nav-item nav-link">|</li>
 
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="login">Login</a>
+                                <a class="nav-link" asp-area="" asp-controller="account" asp-action="login">Login</a>
                             </li>
                         }
                     </ul>
@@ -104,11 +118,11 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+
 
 
     <div class="modal fade" id="cart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -143,7 +157,7 @@
         </div>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="footer text-muted bg-my-background">
         <div class="container">
             &copy; 2021 - ShowCase - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

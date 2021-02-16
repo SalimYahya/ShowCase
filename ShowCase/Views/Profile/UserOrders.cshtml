@@ -1,12 +1,14 @@
 ﻿@model IEnumerable<ShowCase.ViewModel.Order.OrderDetailsViewModel>
 
-<div class="container">
-    <div class="row p-0 min-vh-100">
-        <div class="col-2 p-2 mr-auto">
-            <partial name="_DisplayProfileSidebarPartial">
-        </div>
 
-        <div class="col-10 p-2 ml-auto">
+<div class="my-sidebar">
+    <partial name="_DisplayProfileSidebarPartial">
+</div>
+
+<div class="my-container m-0">
+    <div class="row p-0 min-vh-100">
+
+        <div class="col-12 p-2 ml-auto">
             @if (Model.Any())
             {
 
@@ -30,13 +32,17 @@
                                     </form>
                                 }
                             </div>
-                            <div class="row clickable-row" style="position:relative;" data-toggle="collapse" data-target="#collapseDetails_@(invoice_id)" aria-expanded="true" aria-controls="collapseDetails_@(invoice_id)" id="item_@(invoice_id)">
+
+                            <div class="row clickable-row" style="position:relative;" 
+                                 data-toggle="collapse" data-target="#collapseDetails_@(invoice_id)" 
+                                 aria-expanded="true" aria-controls="collapseDetails_@(invoice_id)"
+                                 id="item_@(invoice_id)">
 
                                 <div class="mr-auto">
                                     <p class="m-0">
                                         <strong class="text-secondary">ID: </strong> @item.Invoice.Id
                                         &nbsp;
-                                        <strong class="text-secondary">Createed At: </strong> @item.Invoice.CreateedAt
+                                        <strong class="text-secondary">Createed At: </strong> @item.Invoice.CreatedAt
                                     </p>
                                     <p class="m-0">
                                         <strong class="text-secondary">Items: </strong> @item.Invoice.TotalItems
@@ -58,7 +64,11 @@
                                 </div>-->
                             </div>
                             <!-- Collapse: Order Detaials -->
-                            <div class="row mt-3 collapse" id="collapseDetails_@(invoice_id)" aria-labelledby="item_@(invoice_id)" data-parent="#accordion">
+                            <div class="row mt-3 collapse" id="collapseDetails_@(invoice_id)" 
+                                 aria-labelledby="item_@(invoice_id)" 
+                                 data-parent="#accordion"
+                                 >
+
                                 <div class="col-12">
 
                                     <div class="row px-3">
@@ -72,7 +82,7 @@
                                             <div class="text-left">
                                                 <span class="text-secondary">Date</span>
                                                 <br>
-                                                <span>@item.Invoice.CreateedAt</span>
+                                                <span>@item.Invoice.CreatedAt</span>
                                             </div>
                                         </div>
 
@@ -143,7 +153,14 @@
                                                 @if (item.Invoice.IsConfirmed)
                                                 {<span class="text-success">Yes</span> }
                                                 else
-                                                {<span class="text-danger">Not Yet !</span>}
+                                                {<span class="text-danger">Not Yet !</span>
+                                                    <form method="post" asp-action="ConfirmOrder" asp-route-Id="@item.Invoice.Id">
+                                                        <button class="btn btn-success" type="submit">
+                                                            <i class="fas fa-exclamation fa-2x m-0 text-white"></i>
+                                                            Confirm Order
+                                                        </button>
+                                                    </form>
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -163,3 +180,4 @@
     </div>
 
 </div>
+

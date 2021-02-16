@@ -17,8 +17,8 @@
 @if (signInManager.IsSignedIn(User) && User.IsInRole("Seller"))
 {
     <div class="row-fluid px-2 mb-2">
-        <a asp-controller="Profile" asp-action="UserProducts">
-            Products
+        <a asp-controller="Profile" asp-action="UserInventory">
+            Inventory
         </a>
     </div>
 }

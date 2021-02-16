@@ -10,8 +10,8 @@ using ShowCase.Data;
 namespace ShowCase.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210210122351_AddAddressOneToOneWithUser")]
-    partial class AddAddressOneToOneWithUser
+    [Migration("20210215103702_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -271,7 +271,7 @@ namespace ShowCase.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime>("CreateedAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsConfirmed")
@@ -324,6 +324,33 @@ namespace ShowCase.Migrations
                     b.ToTable("InvoiceProduct");
                 });
 
+            modelBuilder.Entity("ShowCase.Models.PaymentMethod", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("CVCCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CardNumber")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("HolderName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PaymentMethods");
+                });
+
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -333,6 +360,9 @@ namespace ShowCase.Migrations
 
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .HasMaxLength(150)
@@ -346,6 +376,9 @@ namespace ShowCase.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ApplicationUserId");
@@ -356,178 +389,264 @@ namespace ShowCase.Migrations
                         new
                         {
                             Id = 1,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 566, DateTimeKind.Local).AddTicks(4167),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 1",
-                            Price = 578.94000000000005
+                            Price = 529.59000000000003,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(3798)
                         },
                         new
                         {
                             Id = 2,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8660),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 358.29000000000002
+                            Price = 969.70000000000005,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8672)
                         },
                         new
                         {
                             Id = 3,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8690),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 3",
-                            Price = 113.44
+                            Price = 991.89999999999998,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8691)
                         },
                         new
                         {
                             Id = 4,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8696),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 4",
-                            Price = 546.79999999999995
+                            Price = 526.46000000000004,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8698)
                         },
                         new
                         {
                             Id = 5,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8700),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 5",
-                            Price = 432.64999999999998
+                            Price = 579.72000000000003,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8702)
                         },
                         new
                         {
                             Id = 6,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8713),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 6",
-                            Price = 514.34000000000003
+                            Price = 68.010000000000005,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8715)
                         },
                         new
                         {
                             Id = 7,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8718),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 7",
-                            Price = 387.64999999999998
+                            Price = 884.46000000000004,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8719)
                         },
                         new
                         {
                             Id = 8,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8722),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 8",
-                            Price = 580.29999999999995
+                            Price = 496.82999999999998,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8723)
                         },
                         new
                         {
                             Id = 9,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8725),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 9",
-                            Price = 496.97000000000003
+                            Price = 118.06,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8726)
                         },
                         new
                         {
                             Id = 10,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8730),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 10",
-                            Price = 449.58999999999997
+                            Price = 109.73999999999999,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8731)
                         },
                         new
                         {
                             Id = 11,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8734),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 11",
-                            Price = 617.71000000000004
+                            Price = 237.34,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8735)
                         },
                         new
                         {
                             Id = 12,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8738),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 2",
-                            Price = 374.88999999999999
+                            Price = 997.89999999999998,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8739)
                         },
                         new
                         {
                             Id = 13,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8742),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 13",
-                            Price = 434.73000000000002
+                            Price = 957.25,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8743)
                         },
                         new
                         {
                             Id = 14,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8746),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 14",
-                            Price = 645.26999999999998
+                            Price = 285.42000000000002,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8747)
                         },
                         new
                         {
                             Id = 15,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8750),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 15",
-                            Price = 828.99000000000001
+                            Price = 739.42999999999995,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8751)
                         },
                         new
                         {
                             Id = 16,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8754),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 16",
-                            Price = 850.29999999999995
+                            Price = 514.40999999999997,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8755)
                         },
                         new
                         {
                             Id = 17,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8758),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 17",
-                            Price = 269.13999999999999
+                            Price = 148.65000000000001,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8759)
                         },
                         new
                         {
                             Id = 18,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8763),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 18",
-                            Price = 606.97000000000003
+                            Price = 228.41,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8764)
                         },
                         new
                         {
                             Id = 19,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8767),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 19",
-                            Price = 318.85000000000002
+                            Price = 539.00999999999999,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8768)
                         },
                         new
                         {
                             Id = 20,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8771),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 20",
-                            Price = 127.56
+                            Price = 60.270000000000003,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8772)
                         },
                         new
                         {
                             Id = 21,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8775),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 21",
-                            Price = 330.24000000000001
+                            Price = 201.56,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8776)
                         },
                         new
                         {
                             Id = 22,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8778),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 22",
-                            Price = 830.89999999999998
+                            Price = 828.02999999999997,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8779)
                         },
                         new
                         {
                             Id = 23,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8782),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 23",
-                            Price = 697.98000000000002
+                            Price = 238.78,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8783)
                         },
                         new
                         {
                             Id = 24,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8787),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 24",
-                            Price = 701.12
+                            Price = 284.92000000000002,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8788)
                         },
                         new
                         {
                             Id = 25,
+                            CreatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8791),
                             Description = "Lorem Ipsum is simply dummy text",
                             Name = "Item 25",
-                            Price = 964.86000000000001
+                            Price = 89.069999999999993,
+                            UpdatedAt = new DateTime(2021, 2, 15, 13, 37, 1, 567, DateTimeKind.Local).AddTicks(8792)
                         });
+                });
+
+            modelBuilder.Entity("ShowCase.Models.ProductSold", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoldId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "SoldId");
+
+                    b.HasIndex("SoldId");
+
+                    b.ToTable("ProductSolds");
+                });
+
+            modelBuilder.Entity("ShowCase.Models.Sold", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .UseIdentityColumn();
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DiscountRate")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Qty")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Solds");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -620,6 +739,17 @@ namespace ShowCase.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("ShowCase.Models.PaymentMethod", b =>
+                {
+                    b.HasOne("ShowCase.Models.ApplicationUser", "ApplicationUser")
+                        .WithOne("PaymentMethod")
+                        .HasForeignKey("ShowCase.Models.PaymentMethod", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+                });
+
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
                     b.HasOne("ShowCase.Models.ApplicationUser", "ApplicationUser")
@@ -629,11 +759,32 @@ namespace ShowCase.Migrations
                     b.Navigation("ApplicationUser");
                 });
 
+            modelBuilder.Entity("ShowCase.Models.ProductSold", b =>
+                {
+                    b.HasOne("ShowCase.Models.Product", "Product")
+                        .WithMany("ProductSolds")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ShowCase.Models.Sold", "Sold")
+                        .WithMany("ProductSolds")
+                        .HasForeignKey("SoldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Product");
+
+                    b.Navigation("Sold");
+                });
+
             modelBuilder.Entity("ShowCase.Models.ApplicationUser", b =>
                 {
                     b.Navigation("Address");
 
                     b.Navigation("Invoices");
+
+                    b.Navigation("PaymentMethod");
 
                     b.Navigation("Products");
                 });
@@ -646,6 +797,13 @@ namespace ShowCase.Migrations
             modelBuilder.Entity("ShowCase.Models.Product", b =>
                 {
                     b.Navigation("InvoiceProducts");
+
+                    b.Navigation("ProductSolds");
+                });
+
+            modelBuilder.Entity("ShowCase.Models.Sold", b =>
+                {
+                    b.Navigation("ProductSolds");
                 });
 #pragma warning restore 612, 618
         }
