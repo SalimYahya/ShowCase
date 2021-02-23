@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShowCase.Models;
+using ShowCase.Models.Temp;
+using ShowCase.ViewModel.Admin;
 using ShowCase.ViewModel.Role;
 using System;
 using System.Collections.Generic;
@@ -21,6 +23,34 @@ namespace ShowCase.Controllers
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            IEnumerable<IdentityRole> roles = roleManager.Roles;
+            IEnumerable<ApplicationUser> users = userManager.Users;
+
+            List<UserRolesAndClaims> userRolesAndClaims = new List<UserRolesAndClaims>();
+            foreach (var user in users)
+            {
+                var userClaims = await userManager.GetClaimsAsync(user);
+                var userRoles = await userManager.GetRolesAsync(user);
+
+                userRolesAndClaims.Add(new UserRolesAndClaims { 
+                    applicationUser = user,
+                    Roles = userRoles.ToList(),
+                    Claims = userClaims.Select(c => c.Type + " : " + c.Value).ToList()
+
+                });
+            }
+
+            AdminstrationViewModel model = new AdminstrationViewModel
+            {
+                userRolesAndClaims = userRolesAndClaims,
+                roles = roles.ToList()
+            };
+            
+            return View(model);
         }
 
         public IActionResult RolesList()

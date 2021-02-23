@@ -229,3 +229,11 @@ footer .container a{
   background-color: #3b5998;
   border-color: #fff;
 }
+
+
+/*--- Table ---*/
+
+.user-table th, td{
+    text-align: center !important;
+}
+

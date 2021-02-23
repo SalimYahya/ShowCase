@@ -1,0 +1,27 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> signInManager
+
+@{ 
+    var link = ViewContext.RouteData.Values["action"].ToString();
+}
+
+<div class="row-fluid px-2 mb-2">
+    <a class="btn btn-block sidebar-btn @( link.Equals("Index") ? "active-sidebar-btn":"")"
+       asp-controller="Adminstration" asp-action="Index">
+        Index
+    </a>
+
+</div>
+<div class="row-fluid px-2 mb-2">
+    <a class="btn btn-block sidebar-btn @( link.Equals("UserInformation") ? "active-sidebar-btn":"")"
+       asp-controller="" asp-action="">
+        Users
+    </a>
+</div>
+
+<div class="row-fluid px-2 mb-2">
+    <a class="btn btn-block sidebar-btn @( link.Equals("UserOrders") ? "active-sidebar-btn":"")" 
+       asp-controller="" asp-action="">
+        Roles
+    </a>
+</div>
