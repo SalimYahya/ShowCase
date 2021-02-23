@@ -233,7 +233,7 @@ footer .container a{
 
 /*--- Table ---*/
 
-.user-table th, td{
+.my-table-alignment th, td{
     text-align: center !important;
 }
 
