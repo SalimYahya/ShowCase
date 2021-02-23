@@ -1,168 +1,169 @@
 ﻿@model ShowCase.ViewModel.Profile.UserInventoryModelView
 
-<div class="my-sidebar">
-    <partial name="_DisplayProfileSidebarPartial">
-</div>
 
-<div class="my-container m-0">
-
+<div class="container mt-2">
     <div class="row p-0 min-vh-100">
-        <div class="col-12 py-2 px-0 ml-auto">
+  
+        <div class="my-style col-lg-2 col-md-3 p-2 mr-auto">
+            <partial name="_DisplayProfileSidebarPartial">
+        </div>
 
-            <!-- Accordion: Product List -->
-            <div class="mb-3" id="accordion">
-                <!-- Row Headers: Product List -->
-                <div class="row clickable-row rounded-top bg-warning shadow-sm px-3 py-3 mb-0"
-                     data-toggle="collapse" data-target="#collapseProductList"
-                     aria-expanded="true" aria-controls="#collapseProductList">
+        <div class="col-lg-10 col-md-9 p-2 ml-auto">
+            <div class="container">
+                <!-- Accordion: Product List -->
+                <div class="mb-3" id="accordion">
+                    <!-- Row Headers: Product List -->
+                    <div class="row clickable-row rounded-top bg-warning shadow-sm p-3 mb-0"
+                         data-toggle="collapse" data-target="#collapseProductList"
+                         aria-expanded="true" aria-controls="#collapseProductList">
 
-                    <p class="h5 text-white mr-auto">
-                        <i class="fas fa-list pr-2"></i>
-                        <strong>Porduct List</strong>
-                    </p>
+                        <p class="h5 text-white mr-auto">
+                            <i class="fas fa-list pr-2"></i>
+                            <strong>Porduct List</strong>
+                        </p>
 
-                    <p class="h5 text-primary ml-auto">
-                        <a asp-action="Create">
-                            <i class="fa fa-plus"></i>
-                            Add Product
-                        </a>
-                    </p>
-                </div>
-
-                <!-- Row Content: Collapseable Product List -->
-                <div class="row collapse show bg-white rounded-bottom shadow-sm mt-0"
-                     id="collapseProductList"
-                     data-parent="#accordion" aria-labelledby="productList">
-
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>
-                                    Name
-                                </th>
-                                <th>
-                                    Description
-                                </th>
-                                <th>
-                                    Price
-                                </th>
-                                <th>
-                                    Unit Sold
-                                </th>
-                                <th>
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var item in Model.ProductInventoryInfoList)
-                            {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Product.Name)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Product.Description)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Product.Price)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.QtySold)
-                                </td>
-                                <td>
-                                    @Html.ActionLink("Edit", "Edit", new { /* id=item.Id */ }) |
-                                    @Html.ActionLink("Details", "Details", new { /* id=item.item.Id */ }) |
-                                    @Html.ActionLink("Delete", "Delete", new { /* id=item.item.Id */ })
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-
-                </div>
-            </div>
-
-            <!-- Accordion: Something Else -->
-            <div class="mb-3" id="accordion1">
-                <!-- Row Headers:  -->
-                <div class="row clickable-row rounded-top bg-warning shadow-sm px-3 py-3 mb-0"
-                     data-toggle="collapse" data-target="#collapseSomethingElse1"
-                     aria-expanded="true" aria-controls="#collapseSomethingElse1">
-
-                    <p class="h5 text-white mr-auto">
-                        <i class="fas fa-box-open pr-2"></i>
-                        <strong>Something Else 1</strong>
-                    </p>
-                </div>
-
-                <!-- Row Content: Collapseable  -->
-                <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
-                     id="collapseSomethingElse1"
-                     data-parent="#accordion1" aria-labelledby="SomethingElse1">
-
-                    <div class="col-12 bg-white py-2">
-                        <div class="text-center">
-                            <p class="h5">Empty</p>
-                        </div>
+                        <p class="h5 text-primary ml-auto">
+                            <a asp-action="Create">
+                                <i class="fa fa-plus"></i>
+                                Add Product
+                            </a>
+                        </p>
                     </div>
 
+                    <!-- Row Content: Collapseable Product List -->
+                    <div class="row collapse show bg-white rounded-bottom shadow-sm mt-0"
+                         id="collapseProductList"
+                         data-parent="#accordion" aria-labelledby="productList">
+
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Name
+                                    </th>
+                                    <th>
+                                        Description
+                                    </th>
+                                    <th>
+                                        Price
+                                    </th>
+                                    <th>
+                                        Unit Sold
+                                    </th>
+                                    <th>
+                                        Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.ProductInventoryInfoList)
+                                {
+                                    <tr>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Product.Name)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Product.Description)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Product.Price)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.QtySold)
+                                        </td>
+                                        <td>
+                                            @Html.ActionLink("Edit", "Edit", new { /* id=item.Id */ }) |
+                                            @Html.ActionLink("Details", "Details", new { /* id=item.item.Id */ }) |
+                                            @Html.ActionLink("Delete", "Delete", new { /* id=item.item.Id */ })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+
+                    </div>
                 </div>
-            </div>
 
-            <!-- Accordion: Something Else -->
-            <div class="mb-3" id="accordion2">
-                <!-- Row Headers:  -->
-                <div class="row clickable-row rounded-top bg-warning shadow-sm px-3 py-3 mb-0"
-                     data-toggle="collapse" data-target="#collapseSomethingElse2"
-                     aria-expanded="true" aria-controls="#collapseSomethingElse2">
+                <!-- Accordion: Something Else -->
+                <div class="mb-3" id="accordion1">
+                    <!-- Row Headers:  -->
+                    <div class="row clickable-row rounded-top bg-warning shadow-sm px-3 py-3 mb-0"
+                         data-toggle="collapse" data-target="#collapseSomethingElse1"
+                         aria-expanded="true" aria-controls="#collapseSomethingElse1">
 
-                    <p class="h5 text-white mr-auto">
-                        <i class="fas fa-chart-pie pr-2"></i>
-                        <strong>Something Else 2</strong>
-                    </p>
-                </div>
-
-                <!-- Row Content: Collapseable  -->
-                <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
-                     id="collapseSomethingElse2"
-                     data-parent="#accordion2" aria-labelledby="SomethingElse2">
-
-                    <div class="col-12 bg-white py-2">
-                        <div class="text-center">
-                            <p class="h5">Empty</p>
-                        </div>
+                        <p class="h5 text-white mr-auto">
+                            <i class="fas fa-box-open pr-2"></i>
+                            <strong>Something Else 1</strong>
+                        </p>
                     </div>
 
-                </div>
-            </div>
+                    <!-- Row Content: Collapseable  -->
+                    <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
+                         id="collapseSomethingElse1"
+                         data-parent="#accordion1" aria-labelledby="SomethingElse1">
 
-            <!-- Accordion: Something Else -->
-            <div class="mb-3" id="accordion3">
-                <!-- Row Headers:  -->
-                <div class="row clickable-row rounded-top bg-warning shadow-sm px-3 py-3 mb-0"
-                     data-toggle="collapse" data-target="#collapseSomethingElse3"
-                     aria-expanded="true" aria-controls="#collapseSomethingElse3">
-
-                    <p class="h5 text-white mr-auto">
-                        <strong>Something Else 3</strong>
-                    </p>
-                </div>
-
-                <!-- Row Content: Collapseable  -->
-                <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
-                     id="collapseSomethingElse3"
-                     data-parent="#accordion3" aria-labelledby="SomethingElse3">
-
-                    <div class="col-12 bg-white py-2">
-                        <div class="text-center">
-                            <p class="h5">Empty</p>
+                        <div class="col-12 bg-white py-2">
+                            <div class="text-center">
+                                <p class="h5">Empty</p>
+                            </div>
                         </div>
+
+                    </div>
+                </div>
+
+                <!-- Accordion: Something Else -->
+                <div class="mb-3" id="accordion2">
+                    <!-- Row Headers:  -->
+                    <div class="row clickable-row rounded-top bg-warning shadow-sm px-3 py-3 mb-0"
+                         data-toggle="collapse" data-target="#collapseSomethingElse2"
+                         aria-expanded="true" aria-controls="#collapseSomethingElse2">
+
+                        <p class="h5 text-white mr-auto">
+                            <i class="fas fa-chart-pie pr-2"></i>
+                            <strong>Something Else 2</strong>
+                        </p>
                     </div>
 
+                    <!-- Row Content: Collapseable  -->
+                    <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
+                         id="collapseSomethingElse2"
+                         data-parent="#accordion2" aria-labelledby="SomethingElse2">
+
+                        <div class="col-12 bg-white py-2">
+                            <div class="text-center">
+                                <p class="h5">Empty</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Accordion: Something Else -->
+                <div class="mb-3" id="accordion3">
+                    <!-- Row Headers:  -->
+                    <div class="row clickable-row rounded-top bg-warning shadow-sm px-3 py-3 mb-0"
+                         data-toggle="collapse" data-target="#collapseSomethingElse3"
+                         aria-expanded="true" aria-controls="#collapseSomethingElse3">
+
+                        <p class="h5 text-white mr-auto">
+                            <strong>Something Else 3</strong>
+                        </p>
+                    </div>
+
+                    <!-- Row Content: Collapseable  -->
+                    <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
+                         id="collapseSomethingElse3"
+                         data-parent="#accordion3" aria-labelledby="SomethingElse3">
+
+                        <div class="col-12 bg-white py-2">
+                            <div class="text-center">
+                                <p class="h5">Empty</p>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>

@@ -1,14 +1,20 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> signInManager
 
+@{ 
+    var link = ViewContext.RouteData.Values["action"].ToString();
+}
+
 <div class="row-fluid px-2 mb-2">
-    <a asp-controller="Profile" asp-action="UserInformation">
+    <a class="btn btn-block sidebar-btn @( link.Equals("UserInformation") ? "active-sidebar-btn":"")"
+       asp-controller="Profile" asp-action="UserInformation">
         Profile
     </a>
 </div>
 
 <div class="row-fluid px-2 mb-2">
-    <a asp-controller="Profile" asp-action="UserOrders">
+    <a class="btn btn-block sidebar-btn @( link.Equals("UserOrders") ? "active-sidebar-btn":"")" 
+       asp-controller="Profile" asp-action="UserOrders">
         Orders
     </a>
 </div>
@@ -17,7 +23,8 @@
 @if (signInManager.IsSignedIn(User) && User.IsInRole("Seller"))
 {
     <div class="row-fluid px-2 mb-2">
-        <a asp-controller="Profile" asp-action="UserInventory">
+        <a class="btn btn-block sidebar-btn @( link.Equals("UserInventory") ? "active-sidebar-btn":"")" 
+           asp-controller="Profile" asp-action="UserInventory">
             Inventory
         </a>
     </div>

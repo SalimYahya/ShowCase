@@ -5,7 +5,8 @@
 <a class="btn btn-primary" asp-controller="Adminstration" asp-action="CreateUser">
     Create New User
 </a>
-<div class="container">
+<div class="container mt-2">
+
 
     @if (Model.Any())
     {
@@ -37,6 +38,6 @@
     }
     else
     {
-        <p class="h3">RoleList is Empty</p>
+        <p class="h3">UserList is Empty</p>
     }
 </div>

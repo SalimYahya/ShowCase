@@ -5,64 +5,64 @@
 
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-xl-6 col-lg-8 col-md-10 col-sm-12">
+        <div class="col-xl-8 col-lg-6 col-md-10 col-sm-12">
             <div class="card border-0 shadow">
+                <div class="card-body p-0">
+                    <div class="row">
+                        <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+                        <div class="col-lg-7 p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
+                            </div>
 
-                <div class="card-header border-0">
-                    <i class="fas fa-user-edit fa-2x"></i>
-                    Register
-                </div>
+                            <form method="post" class="form-user">
 
-                <div class="card-body">
-                    <form method="post">
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input asp-for="FirstName" placeholder="First Name" class="form-control" />
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input asp-for="LastName" placeholder="Last Name" class="form-control" />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
 
-                        <div class="form-group row">
-                            <label asp-for="FirstName" class="col-md-4 col-form-label d-flex justify-content-end"></label>
-                            <div class="col-md-6">
-                                <input asp-for="FirstName" class="form-control" />
-                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                                <div class="form-group">
+                                    <input asp-for="Email" placeholder="Email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input asp-for="Password" placeholder="Password" class="form-control" />
+                                        <span asp-validation-for="Password" class="text-danger"></span>
+                                    </div>
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                                                            <input asp-for="ConfirmPassword" placeholder="Confirm Password" class="form-control" />
+                                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                            </form>
+                            <hr />
+                            <a href="index.html" class="btn btn-google btn-user btn-google btn-block">
+                                <i class="fab fa-google fa-fw"></i> Login with Google
+                            </a>
+
+                            <a href="index.html" class="btn btn-facebook btn-user btn-facebook btn-block">
+                                <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
+                            </a>
+
+                            <hr />
+
+                            <div class="row d-flex">
+                                <a class="small mr-auto" href="forgot-password.html">Forgot Password?</a>
+                                <a class="small ml-auto" href="register.html">Already have an account? Login!</a>
                             </div>
                         </div>
-
-                        <div class="form-group row">
-                            <label asp-for="LastName" class="col-md-4 col-form-label d-flex justify-content-end"></label>
-                            <div class="col-md-6">
-                                <input asp-for="LastName" class="form-control" />
-                                <span asp-validation-for="LastName" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label asp-for="Email" class="col-md-4 col-form-label d-flex justify-content-end"></label>
-                            <div class="col-md-6">
-                                <input asp-for="Email" class="form-control" />
-                                <span asp-validation-for="Email" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label asp-for="Password" class="col-md-4 col-form-label d-flex justify-content-end"></label>
-                            <div class="col-md-6">
-                                <input asp-for="Password" class="form-control" />
-                                <span asp-validation-for="Password" class="text-danger"></span>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group row">
-                            <label asp-for="ConfirmPassword" class="col-md-4 col-form-label d-flex justify-content-end"></label>
-                            <div class="col-md-6">
-                                <input asp-for="ConfirmPassword" class="form-control" />
-                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary btn-block">Register</button>
-                            </div>
-                        </div>
-
-                    </form>
+                    </div>
                 </div>
 
             </div>
