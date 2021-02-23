@@ -13,50 +13,55 @@
                 <div class="mb-3" id="rolesAccordion">
                     <div class="row clickable-row rounded-top bg-warning shadow-sm p-3 mb-0"
                          data-toggle="collapse" data-target="#collapseRolesList"
-                         aria-expanded="true" aria-controls="#collapseRolesList">
+                         aria-expanded="true" aria-controls="#collapseRolesList"
+                         role="tab">
 
                         <p class="h5 text-white mr-auto">
                             <i class="fas fa-pencil-ruler"></i>
                             <strong>Roles List</strong>
                         </p>
+
+                        <i class="fas fa-angle-down fa-2x text-white"></i>
+                    </div>
+
+                    <!-- Row Content: Collapsable Roles List -->
+                    <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
+                         id="collapseRolesList" role="tabpanel"
+                         data-parent="#rolesAccordion" aria-labelledby="rolesList">
+
+                        <table class="table table-striped my-table-alignment">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var role in Model.roles)
+                                {
+                                    <tr>
+                                        <td class="align-middle">@role.Name</td>
+                                        <td class="align-middle">
+                                            <div class="row justify-content-center">
+                                                <a class="btn btn-warning" asp-controller="Adminstration" asp-action="EditRole" asp-route-Id="@role.Id">
+                                                    <i class="fas fa-pencil-alt text-white"></i>
+                                                </a>
+
+                                                <form method="post" asp-action="DeleteRole" asp-route-Id="@role.Id">
+                                                    <button class="btn btn-danger mx-2" type="submit">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <!-- Row Content: Collapsable Roles List -->
-                <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
-                     id="collapseRolesList"
-                     data-parent="#rolesAccordion" aria-labelledby="rolesList">
-
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var role in Model.roles)
-                            {
-                                <tr>
-                                    <td class="align-middle">@role.Name</td>
-                                    <td class="align-middle">
-                                        <div class="row">
-                                            <a class="btn btn-warning" asp-controller="Adminstration" asp-action="EditRole" asp-route-Id="@role.Id">
-                                                <i class="fas fa-pencil-alt text-white"></i>
-                                            </a>
-
-                                            <form method="post" asp-action="DeleteRole" asp-route-Id="@role.Id">
-                                                <button class="btn btn-danger mx-2" type="submit">
-                                                    <i class="fas fa-trash-alt"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+                
 
                 <!-- Accordion: Users List -->
                 <div class="mb-3" id="userAccordion">
@@ -68,76 +73,83 @@
                             <i class="fas fa-users"></i>
                             <strong>Users List</strong>
                         </p>
+
+                        <i class="fas fa-angle-down rotate-icon fa-2x text-white"></i>
+
                     </div>
-                </div>
 
-                <!-- Row Content: Collapsable Users List -->
-                <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
-                     id="collapseUsersList"
-                     data-parent="#userAccordion" aria-labelledby="usersList">
+                    <!-- Row Content: Collapsable Users List -->
+                    <div class="row collapse bg-white rounded-bottom shadow-sm mt-0"
+                         id="collapseUsersList"
+                         data-parent="#userAccordion" aria-labelledby="usersList">
 
-                    <table class="table table-striped user-table">
-                        <thead>
-                            <tr>
-                                <th scope="col">Name</th>
-                                <th scope="col">Roles</th>
-                                <th scope="col">Claims</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @if (Model.userRolesAndClaims.Any())
-                            {
-                                @foreach (var user in Model.userRolesAndClaims)
+                        <table class="table table-striped my-table-alignment">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Roles</th>
+                                    <th scope="col">Claims</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.userRolesAndClaims.Any())
                                 {
-                                    <tr>
-                                        <td class="align-middle">@user.applicationUser.UserName</td>
+                                    @foreach (var user in Model.userRolesAndClaims)
+                                    {
+                                        <tr>
+                                            <td class="align-middle">@user.applicationUser.UserName</td>
 
-                                        <!-- User Roles -->
-                                        @if (user.Roles.Any())
-                                        {
+                                            <!-- User Roles -->
+                                            @if (user.Roles.Any())
+                                            {
+                                                <td class="align-middle">
+                                                    <div class="col">
+                                                        <div class="text-center">
+                                                            @foreach (var role in user.Roles)
+                                                            {@role <br />}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            }
+
+                                            <!-- User Claims -->
                                             <td class="align-middle">
                                                 <div class="col">
                                                     <div class="text-center">
-                                                        @foreach (var role in user.Roles) { @role <br /> }
+                                                        @foreach (var claim in user.Claims)
+                                                        {@claim <br />}
                                                     </div>
                                                 </div>
                                             </td>
-                                        }
 
-                                        <!-- User Claims -->
-                                        <td class="align-middle">
-                                            <div class="col">
-                                                <div class="text-center">
-                                                    @foreach (var claim in user.Claims) { @claim <br /> }
+                                            <td class="align-middle">
+                                                <div class="row justify-content-center">
+                                                    <a class="btn btn-warning" asp-controller="Adminstration" asp-action="EditUser" asp-route-Id="@user.applicationUser.Id">
+                                                        <i class="fas fa-pencil-alt text-white"></i>
+                                                    </a>
+
+                                                    <form method="post" asp-action="DeleteRole" asp-route-Id="@user.applicationUser.Id">
+                                                        <button class="btn btn-danger mx-2" type="submit">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
+                                        </tr>
+                                    }
 
-                                        <td class="align-middle">
-                                            <div class="row justify-content-center">
-                                                <a class="btn btn-warning" asp-controller="Adminstration" asp-action="EditUser" asp-route-Id="@user.applicationUser.Id">
-                                                    <i class="fas fa-pencil-alt text-white"></i>
-                                                </a>
-
-                                                <form method="post" asp-action="DeleteRole" asp-route-Id="@user.applicationUser.Id">
-                                                    <button class="btn btn-danger mx-2" type="submit">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
                                 }
-
-                            }
-                            else
-                            {
-                                <p class="h3">UserList is Empty</p>
-                            }
-                        </tbody>
-                    </table>
+                                else
+                                {
+                                    <p class="h3">UserList is Empty</p>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+
+
             </div>
         </div>
     </div>
