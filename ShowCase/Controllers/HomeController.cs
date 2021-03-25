@@ -23,7 +23,7 @@ namespace ShowCase.Controllers
             _logger = logger;
             _dbContext = dbContext;
         }
-
+        
         public IActionResult Index()
         {
             var modelList = _dbContext.Products.Include(u => u.ApplicationUser);
