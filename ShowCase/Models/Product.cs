@@ -18,7 +18,7 @@ namespace ShowCase.Models
         [MaxLength(150, ErrorMessage = "Description Cannot Exceed 150 characters")]
         public string Description { get; set; }
 
-        [Range(0.1, 100000.00, ErrorMessage = "Price Must be Greater than 0")]
+        [Range(0.1, 1000.00, ErrorMessage = "Price Must be Greater than 0")]
         public double Price { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;

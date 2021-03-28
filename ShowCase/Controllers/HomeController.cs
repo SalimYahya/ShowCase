@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,9 +25,28 @@ namespace ShowCase.Controllers
             _dbContext = dbContext;
         }
         
-        public IActionResult Index()
+        public IActionResult Index(int page = 1)
         {
-            var modelList = _dbContext.Products.Include(u => u.ApplicationUser);
+            List<Product> products = _dbContext.Products.Include(u => u.ApplicationUser).ToList();
+            
+            if (page < 0)
+                page = 1;
+
+            int pageSize = 25;
+            int countRecords = products.Count;
+            var pager = new Pager(countRecords, page, pageSize);
+            int skipRecords = (page - 1) * pageSize;
+
+            var modelList = _dbContext.Products.Include(u => u.ApplicationUser)
+                                                .Skip(skipRecords)
+                                                .Take(pager.PageSize);
+
+            ViewData["TotalPages"] = pager.TotalPages;
+            ViewData["Products"] = products.Count;
+            ViewData["ModelList"] = modelList.Count();
+
+
+            ViewBag.Pager = pager;
 
             return View(modelList);
         }
