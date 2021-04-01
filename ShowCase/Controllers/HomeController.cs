@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShowCase.Data;
 using ShowCase.Models;
-using ShowCase.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using ShowCase.Views.Shared.Components.SearchBar;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ShowCase.Controllers
 {
@@ -23,30 +24,91 @@ namespace ShowCase.Controllers
         {
             _logger = logger;
             _dbContext = dbContext;
+
         }
-        
-        public IActionResult Index(int page = 1)
+
+
+        private List<SelectListItem> GetPageSizes(int selectedPagesSize = 10)
         {
-            List<Product> products = _dbContext.Products.Include(u => u.ApplicationUser).ToList();
+            var pagesSizes = new List<SelectListItem>();
+
+            if (selectedPagesSize == 5)
+                pagesSizes.Add(new SelectListItem("5", "5", true));
+            else
+                pagesSizes.Add(new SelectListItem("5", "5"));
+
+            for (int lp = 10; lp <= 100; lp += 10)
+            {
+                if (lp == selectedPagesSize)
+                    pagesSizes.Add(new SelectListItem(lp.ToString(), lp.ToString(), true));
+                else
+                    pagesSizes.Add(new SelectListItem(lp.ToString(), lp.ToString()));
+            }
+
+            return pagesSizes;
+        }
+        public IActionResult Index(string SearchText = "", int page = 1, int pageSize = 30)
+        {
+            _logger.LogInformation($"Total Products available {_dbContext.Products.Count()}");
+
+            List<Product> products;
+
+            if (SearchText != "" && SearchText != null)
+            {
+                //_dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                var stopWatch = Stopwatch.StartNew();
+
+                products = _dbContext.Products
+                    .Where(p => p.Name.Contains(SearchText))
+                    .Include(u => u.ApplicationUser)
+                    //.OrderByDescending(p => p.CreatedAt)
+                    .ToList();
+
+
+                _logger.LogInformation($"Search and Fetch specific records in Records in, ${stopWatch.Elapsed}");
+
+            }
+            else
+            {
+                _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+
+                var stopWatch1 = Stopwatch.StartNew();
+
+                products = _dbContext.Products
+                    .Include(u => u.ApplicationUser)
+                    //.OrderByDescending(p => p.CreatedAt)
+                    .Take(10000)
+                    .ToList();
+
+
+                stopWatch1.Stop();
+                _logger.LogInformation($"Fethcing All Records in, {stopWatch1.Elapsed}");
+                _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
+
+            }
+
+
+            //int pageSize = 30;
             
-            if (page < 0)
+            if (page < 1)
                 page = 1;
 
-            int pageSize = 25;
             int countRecords = products.Count;
-            var pager = new Pager(countRecords, page, pageSize);
             int skipRecords = (page - 1) * pageSize;
 
-            var modelList = _dbContext.Products.Include(u => u.ApplicationUser)
-                                                .Skip(skipRecords)
-                                                .Take(pager.PageSize);
+            var modelList = products.Skip(skipRecords).Take(pageSize);
 
-            ViewData["TotalPages"] = pager.TotalPages;
-            ViewData["Products"] = products.Count;
-            ViewData["ModelList"] = modelList.Count();
+            SearchPager searchPager = new SearchPager(countRecords, page, pageSize)
+            {
+                Action = "Index",
+                Controller = "Home",
+                SearchText = SearchText
+            };
 
-
-            ViewBag.Pager = pager;
+            ViewBag.SearchPager = searchPager;
+            ViewBag.PageSizes = GetPageSizes(pageSize);
+           //_logger.LogInformation($"pageSize: {pageSize}");
 
             return View(modelList);
         }

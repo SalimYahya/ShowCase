@@ -3,10 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ShowCase.Utilities
+namespace ShowCase.Views.Shared.Components.SearchBar
 {
-    public class Pager
+    public class SearchPager
     {
+        public SearchPager()
+        {
+
+        }
+
+        public string SearchText { get; set; }
+        public string Controller { get; set; }
+        public string Action { get; set; }
+
+
         public int TotalItems { get; set; }
         public int CurrentPage { get; set; }
         public int PageSize { get; set; }
@@ -14,14 +24,14 @@ namespace ShowCase.Utilities
         public int StartPage { get; set; }
         public int EndPage { get; set; }
 
-        public Pager()
-        {
+        public int StartRecord { get; set; }
+        public int EndRecord{ get; set; }
 
-        }
 
-        public Pager(int totalItems, int page, int pageSize = 10)
+
+        public SearchPager(int totalItems, int page, int pageSize = 10)
         {
-            int totalPages = (int)Math.Ceiling( (decimal)totalItems / (decimal)pageSize);
+            int totalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)pageSize);
             int currentPage = page;
 
             int startPage = currentPage - 5;
@@ -51,6 +61,9 @@ namespace ShowCase.Utilities
             TotalPages = totalPages;
             StartPage = startPage;
             EndPage = endPage;
+
+            StartRecord = (CurrentPage - 1) * PageSize + 1;
+            EndRecord = StartRecord - 1 + PageSize;
         }
     }
 }

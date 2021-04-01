@@ -60,6 +60,11 @@
 
                                     @if (User.IsInRole("Super Admin") || User.IsInRole("Admin") || User.IsInRole("Supervisor"))
                                     {
+                                        <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Product" asp-action="CreateMagicProducts">
+                                            <i class="fas fa-magic"></i>
+                                             Create 50k Products
+                                        </a>
+
                                         <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="Index">
                                             <i class="fas fa-users-cog"></i>
                                             Admin
