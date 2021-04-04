@@ -1,0 +1,15 @@
+﻿List Todos:-
+
+
+____________________________________________________________
+This assigment was assigned on "3/4/2021"
+------------------------------------------------------------
+
+Within "1 Week" Starting on {4/4/2021}, 
+Finish on {10/4/2021}:
+---------------------------------------
+
+#-Develop [Add, Edit, Delete] Products By the Users;
+	- Applys only on Users with Roles "Seller".
+	- Users Can [add, edit, delete], only their products.
+____________________________________________________________	

@@ -20,8 +20,8 @@ namespace ShowCase.Data
             {
                 new IdentityRole
                 {
-                    Name="Super Admin",
-                    NormalizedName ="SUPER ADMIN"
+                    Name="SuperAdmin",
+                    NormalizedName ="SUPERADMIN"
                 },
                 new IdentityRole
                 {
@@ -78,6 +78,12 @@ namespace ShowCase.Data
                     LastName = "Doe",
                     Email = "jane@doe.com",
                     UserName = "jane@doe.com",
+                },
+                new ApplicationUser{
+                    FirstName = "Juan",
+                    LastName = "Doe",
+                    Email = "juan@doe.com",
+                    UserName = "juan@doe.com",
                 }
             };
 
@@ -95,12 +101,19 @@ namespace ShowCase.Data
                 }
             }
 
-            ApplicationUser sellerUser = await userManager.FindByEmailAsync("john@doe.com");
+            ApplicationUser sellerUser1 = await userManager.FindByEmailAsync("john@doe.com");
+            ApplicationUser sellerUser2 = await userManager.FindByEmailAsync("jane@doe.com");
+            ApplicationUser sellerUser3 = await userManager.FindByEmailAsync("juan@doe.com");
+
+            string[] userId = {sellerUser1.Id, sellerUser2.Id, sellerUser3.Id };
+
+            Random random = new Random();
+
             var products = appDbContext.Products;
 
             foreach (var model in products)
             {
-                model.ApplicationUserId = sellerUser.Id;
+                model.ApplicationUserId = userId[random.Next(userId.Length)];
 
                 var product = appDbContext.Products.Attach(model);
                 product.State = Microsoft.EntityFrameworkCore.EntityState.Modified;

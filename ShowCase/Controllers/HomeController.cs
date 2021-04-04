@@ -55,42 +55,55 @@ namespace ShowCase.Controllers
 
             if (SearchText != "" && SearchText != null)
             {
-                //_dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-
+               _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
                 var stopWatch = Stopwatch.StartNew();
 
                 products = _dbContext.Products
                     .Where(p => p.Name.Contains(SearchText))
                     .Include(u => u.ApplicationUser)
-                    //.OrderByDescending(p => p.CreatedAt)
+                    .OrderByDescending(p => p.CreatedAt)
                     .ToList();
 
-
+                stopWatch.Stop();
                 _logger.LogInformation($"Search and Fetch specific records in Records in, ${stopWatch.Elapsed}");
+                //_dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
 
             }
             else
             {
-                _dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
-
-                var stopWatch1 = Stopwatch.StartNew();
+                //_dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
+                var stopWatchList = Stopwatch.StartNew();
 
                 products = _dbContext.Products
                     .Include(u => u.ApplicationUser)
-                    //.OrderByDescending(p => p.CreatedAt)
-                    .Take(10000)
+                    .OrderByDescending(p => p.CreatedAt)
+                    .Take(1000)
                     .ToList();
 
+                stopWatchList.Stop();
+                _logger.LogInformation($"1- Fethcing All Records using (Include) in, {stopWatchList.Elapsed}");
+                //_dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
 
-                stopWatch1.Stop();
-                _logger.LogInformation($"Fethcing All Records in, {stopWatch1.Elapsed}");
-                _dbContext.ChangeTracker.AutoDetectChangesEnabled = true;
 
+                // Eager Loading using 'SELECT',
+                // don’t need an 'Include' call anymore since Entity Framework “understands” from the Select call that we need a field
+             
+                /*
+                 * var stopWatchVar = Stopwatch.StartNew();
+                 * var varProducts = _dbContext.Products
+                 *      .OrderByDescending(p => p.CreatedAt)
+                 *       .Select(p => new { p.Id, p.Name, p.Description, p.Price, p.ApplicationUser.UserName })
+                 *       .ToList();
+
+                 * stopWatchVar.Stop();
+                 *_logger.LogInformation($"2- Fethcing All Records using (Select)  in, {stopWatchVar.Elapsed}");
+                 */
+                
             }
 
 
             //int pageSize = 30;
-            
+
             if (page < 1)
                 page = 1;
 
