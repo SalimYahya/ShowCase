@@ -231,6 +231,12 @@ footer .container a{
 }
 
 
+/* My Custom Button Style */
+.my-btn{
+    cursor: pointer;
+    border-radius: 0 !important
+}
+
 /*--- Table ---*/
 
 .my-table-alignment th, td{

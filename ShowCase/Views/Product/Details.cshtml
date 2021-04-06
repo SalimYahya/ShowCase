@@ -7,14 +7,13 @@
 <h1>Details</h1>
 
 <div>
-    <h4>Product</h4>
     <hr />
-    <div class="row align-items-center">
+    <div class="row justify-content-center">
             @{ <partial name="_DisplayProductPartial" model="Model" /> }
     </div>
 </div>
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-controller="Home" asp-action="Index">Back to List</a>
 </div>

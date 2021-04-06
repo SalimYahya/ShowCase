@@ -18,7 +18,7 @@ namespace ShowCase.Data
             Random random = new Random();
 
             var products = new List<Product>();
-            for (int i = 1; i <= 10000; i++)
+            for (int i = 1; i <= 1000; i++)
             {
                 products.Add(new Product {
                     Id = i,

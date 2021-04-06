@@ -12,7 +12,7 @@ namespace ShowCase.Security
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ManageUserRolesAndClaimsRequirement requirement)
         {
-            if (context.User.IsInRole("Super Admin"))
+            if (context.User.IsInRole("SuperAdmin"))
             {
                 context.Succeed(requirement);
             }
