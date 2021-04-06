@@ -1,0 +1,19 @@
+﻿@model ShowCase.Models.Product
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+<div>
+    <h5>User Can Update This Product</h5>
+    <hr />
+    <div class="row justify-content-center">
+        
+    </div>
+</div>
+
+<div>
+    <a asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-controller="Home" asp-action="Index">Back to List</a>
+</div>

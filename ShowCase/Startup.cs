@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -21,6 +22,7 @@ using ShowCase.Security.ManageRoles;
 using ShowCase.Security.ManageRoles.CreateRoles;
 using ShowCase.Security.ManageRoles.DeleteRoles;
 using ShowCase.Security.ManageRoles.EditRoles;
+using ShowCase.Security.Operations.ProductOperations;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -105,7 +107,7 @@ namespace ShowCase
             });
 
             services.AddAuthorization(options => {
-
+               
                 options.AddPolicy("CreateRolePolicy",
                     policy => policy.AddRequirements(new CreateRoleRequirement()));
 
@@ -118,17 +120,22 @@ namespace ShowCase
                 options.AddPolicy("EditUserRolesAndPolicy",
                     policy => policy.AddRequirements(new ManageUserRolesAndClaimsRequirement()));
 
+                options.AddPolicy("ProductOperations",
+                    policy => policy.AddRequirements(new OperationAuthorizationRequirement()));
             });
 
             // Creart, Edit & Delete Roles
             services.AddSingleton<IAuthorizationHandler, CanCreateRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanEditRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
-            services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
+            services.AddSingleton<IAuthorizationHandler, ProductAuthorizationHandler>();
             // End of: Creart, Edit & Delete Roles
 
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+            services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+
 
 
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
