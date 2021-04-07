@@ -33,33 +33,44 @@ namespace ShowCase.Controllers
         }
 
 
-        //[Authorize]
         public async Task<IActionResult> Index()
         {
             string userId = _userManager.GetUserId(HttpContext.User);
 
-            IEnumerable<Product> modelList = await _dbContext.Products
+            if (User.IsInRole("SuperAdmin"))
+            {
+                IEnumerable<Product> adminModelList = await _dbContext.Products
+                    .OrderByDescending(p => p.CreatedAt)
+                    .ToListAsync();
+
+                return View(adminModelList);
+            }
+
+            IEnumerable<Product> sellerModelList = await _dbContext.Products
                     .OrderByDescending(p => p.CreatedAt)
                     .Include(u => u.ApplicationUser)
                     .Where(u => u.ApplicationUser.Id == userId)
                     .ToListAsync();
 
-            return View(modelList);
+            return View(sellerModelList);
         }
 
         [HttpGet]
+        [Authorize(Roles = "Seller")]
         public IActionResult Create()
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(CreateViewModel model)
-        {
-            string userId = _userManager.GetUserId(HttpContext.User);
-
+        [Authorize(Roles = "Seller")]
+        public async Task<IActionResult> Create(CreateViewModel model)
+        {   
             if (ModelState.IsValid)
             {
+                string userId = _userManager.GetUserId(HttpContext.User);
+                //ApplicationUser user = await _dbContext.ApplicationUsers.FindAsync(userId);
+
                 Product product = new Product {
                     Name = model.Name,
                     Description = model.Description,
@@ -67,15 +78,27 @@ namespace ShowCase.Controllers
                     ApplicationUserId = userId
                 };
 
-                _dbContext.Products.Add(product);
-                _dbContext.SaveChanges();
+                var authorizationResult = await _authorizationService
+                    .AuthorizeAsync(User, product, CRUD.Create);
 
+                if (authorizationResult.Succeeded)
+                {
+                    /* Presist the Create
+                     * ------------------
+                     * 1- Add the product to _dbContext 
+                     * 2- SaveChanges()
+                     */
 
-                return RedirectToAction("Details", new { id = product.Id});
+                    _logger.LogInformation($"Product: {product.ToString()}, has been Created.");
+                    return RedirectToAction("Index", "Product");
+                }
+                else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+                else { return new ChallengeResult(); }
             }
 
             return View(model);
         }
+
 
 
         [HttpGet]
@@ -83,7 +106,7 @@ namespace ShowCase.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             var product = await _dbContext.Products
-                                            .Include( u => u.ApplicationUser)
+                                            .Include(u => u.ApplicationUser)
                                             .Where(p => p.Id == id)
                                             .FirstOrDefaultAsync();
 
@@ -91,6 +114,8 @@ namespace ShowCase.Controllers
 
             return NotFound();
         }
+
+
 
         [HttpGet]
         public async Task<IActionResult> CreateMagicProducts()
@@ -106,7 +131,7 @@ namespace ShowCase.Controllers
 
             var authorizationResult = await _authorizationService.AuthorizeAsync(User, product, CRUD.Create);
 
-            if (authorizationResult.Succeeded) 
+            if (authorizationResult.Succeeded)
             {
                 _logger.LogInformation($"100k records added !!!");
                 _logger.LogInformation($"User: {User.Identity.Name}");
@@ -142,7 +167,10 @@ namespace ShowCase.Controllers
             */
         }
 
+
+
         [HttpGet]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _dbContext.Products
@@ -155,12 +183,122 @@ namespace ShowCase.Controllers
             var authorizationResult = await _authorizationService
                 .AuthorizeAsync(User, product, CRUD.Update);
 
-            _logger.LogInformation($"User: {User}");
+            if (authorizationResult.Succeeded) {
 
-            if (authorizationResult.Succeeded) { return View(product); }
+                EditProductViewModel model = new EditProductViewModel {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price
+                };
+
+                return View(model);
+            }
+            else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+            else { return new ChallengeResult(); }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Seller")]
+        public async Task<IActionResult> Edit(EditProductViewModel model)
+        {
+            string userId = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+
+            if (ModelState.IsValid)
+            {
+                Product product = new Product
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Price = model.Price,
+                    ApplicationUser = user
+                };
+
+
+                var authorizationResult = await _authorizationService
+                .AuthorizeAsync(User, product, CRUD.Update);
+
+                if (authorizationResult.Succeeded) 
+                {
+                    /* Presist the Edit
+                    * ------------------
+                    * 1- Configure the Entity.State Modificatoin
+                    * 2- SaveChanges()
+                    */
+
+                    _logger.LogInformation($"Product: {product.ToString()}, has been Edited.");
+                    return RedirectToAction("Details", new { id = product.Id });
+                }
+                else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+                else { return new ChallengeResult(); }
+            }
+
+            return View(model);
+        }
+
+
+
+        [HttpGet]
+        [Authorize(Roles = "SuperAdmin, Supervisor, Seller")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var product = await _dbContext.Products
+                .Include(u => u.ApplicationUser)
+                .Where(p => p.Id == id)
+                .FirstOrDefaultAsync();
+
+            if (product == null) { return new NotFoundResult(); }
+
+           
+            var authorizationResult = await _authorizationService
+                .AuthorizeAsync(User, product, CRUD.Delete);
+            if (authorizationResult.Succeeded)
+            {
+                DeleteProductViewModel model = new DeleteProductViewModel
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price
+                };
+
+                return View(model);
+            }
             else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
             else { return new ChallengeResult(); }
 
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "SuperAdmin, Supervisor, Seller")]
+        public async Task<IActionResult> Delete(DeleteProductViewModel model)
+        {
+            var product = await _dbContext.Products
+                                .Include(u => u.ApplicationUser)
+                                .Where(p => p.Id == model.Id)
+                                .FirstOrDefaultAsync();
+
+            if (product == null) { return new NotFoundResult(); }
+
+
+            var authorizationResult = await _authorizationService
+                .AuthorizeAsync(User, product, CRUD.Delete);
+
+            if (authorizationResult.Succeeded)
+            {
+                /* Presist the Delete
+                 * ------------------
+                 * 1- Remove the product from _dbContext 
+                 * 2- SaveChanges()
+                 */
+
+                _logger.LogInformation($"Product: {product.ToString()}, has been Deleted.");
+                return RedirectToAction("Index","Product"); 
+            }
+            else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+            else { return new ChallengeResult(); }
         }
     }
 }

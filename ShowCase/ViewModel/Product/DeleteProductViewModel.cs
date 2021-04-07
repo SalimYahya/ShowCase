@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ShowCase.ViewModel.Product
 {
-    public class EditProductViewModel
+    public class DeleteProductViewModel
     {
         public int Id { get; set; }
 
