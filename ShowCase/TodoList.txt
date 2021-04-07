@@ -1,6 +1,7 @@
 ﻿List Todos:-
 
 
+Assignment # 1 
 ____________________________________________________________
 This assigment was assigned on "3/4/2021"
 ------------------------------------------------------------
@@ -12,4 +13,53 @@ Finish on {10/4/2021}:
 #-Develop [Add, Edit, Delete] Products By the Users;
 	- Applys only on Users with Roles "Seller".
 	- Users Can [add, edit, delete], only their products.
-____________________________________________________________	
+
+	#--- Accomplished ---#
+
+	Product Operations:
+	1- Operation - Create. (Only users with role.name "Seller" can CREATE Product).
+		#--SuperAdmin:	1.1 - Can not Create Product.
+		#--Supervisor:	1.2 - Can not Create Product.
+		#--Seller:		1.3 - Can Create Product.
+
+	2- Operation - Edit(Update). (Only users with role.name "Seller" can Edit(Update) only their own Products).
+		#--SuperAdmin:	2.1 - Can not Edit Product.
+		#--Supervisor:	2.2 - Can not Edit Product.
+		#--Seller:		2.3 - Can Edit(Update) only their own Products.
+
+	3- Operation - Delete. (Users with Role "SuperAdmin, Supervisor" can Delete Products(Note: In the Future, they should be able to delete on if the product has a Flag of"inappropriate Product" ),
+							Users with Role "Seller" can only Delete their own products).
+		#--SuperAdmin:	3.1 - Can Delete Product.
+		#--Supervisor:	3.2 - Can Delete Product.
+		#--Seller:		3.3 - Can Delete only their own Products.
+
+------------------------------------------------------------
+This assigment was finished on "7/4/2021"
+____________________________________________________________
+
+############################################################
+
+Assignment # 2 
+____________________________________________________________
+This assigment was assigned on "7/4/2021"
+------------------------------------------------------------
+
+Within "1 Week" Starting on {21/4/2021}, 
+Finish on {14/4/2021}:
+---------------------------------------
+
+#-Develop - Business Scenario where a "Customer" can perform a
+			new account Registration, order products and add them
+			into one invoice, proceed the payment and shipment.
+			
+Note: Customer Should have:
+		1- Shipping Address.
+		2- Payment Method.
+
+	#--- Accomplished ---#
+	.
+	.
+	.
+------------------------------------------------------------
+This assigment was finished on "7/4/2021"
+____________________________________________________________

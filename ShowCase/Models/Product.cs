@@ -25,6 +25,11 @@ namespace ShowCase.Models
 
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
+        public override string ToString()
+        {
+            return String.Format("{0}", this.Name);
+        }
+
 
         /*  
          *  Navaigation Property:

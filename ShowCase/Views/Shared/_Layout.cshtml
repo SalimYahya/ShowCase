@@ -48,7 +48,7 @@
                                         Orders
                                     </a>
 
-                                    @if (User.IsInRole("Seller"))
+                                    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Seller"))
                                     {
                                         <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">
                                             <i class="fas fa-store"></i>
