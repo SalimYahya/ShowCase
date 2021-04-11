@@ -5,12 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Utilities\**" />
     <Compile Remove="ViewModel\ShoppingCart\**" />
     <Compile Remove="Views\Shopping\**" />
+    <Content Remove="Utilities\**" />
     <Content Remove="ViewModel\ShoppingCart\**" />
     <Content Remove="Views\Shopping\**" />
+    <EmbeddedResource Remove="Utilities\**" />
     <EmbeddedResource Remove="ViewModel\ShoppingCart\**" />
     <EmbeddedResource Remove="Views\Shopping\**" />
+    <None Remove="Utilities\**" />
     <None Remove="ViewModel\ShoppingCart\**" />
     <None Remove="Views\Shopping\**" />
   </ItemGroup>
@@ -27,10 +31,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Utilities\" />
   </ItemGroup>
 
 </Project>

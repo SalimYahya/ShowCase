@@ -19,7 +19,6 @@ namespace ShowCase.Controllers
     public class ProductController : Controller
     {
         private readonly ILogger<ProductController> _logger;
-
         private readonly AppDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;

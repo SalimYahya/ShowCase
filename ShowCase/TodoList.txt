@@ -57,9 +57,45 @@ Note: Customer Should have:
 		2- Payment Method.
 
 	#--- Accomplished ---#
-	.
-	.
+	#1 - Orders. (User add single/multiple products into a Cart.)
+		1- Operation - Create. (Only users with role.name "Customer" can CREATE Invoice).
+			#--SuperAdmin:	1.1 - Can not Create Invoice. ==> 'add-to-cart' button dosen't appears
+			#--Supervisor:	1.2 - Can not Create Invoice. ==> 'add-to-cart' button dosen't appears
+			#--Seller:		1.3 - Can not Create Invoice. ==> 'add-to-cart' button dosen't appears
+			#--Customer:	1.4 - Can Create Invoice, which has a list products belongs to other users.
+
+		2- Operation - Read. (Only users with role.name "SuperAdmin, Admin and Superviosr" can read All Invoices,
+							 and user with role.name "Customer" can only read invoices belongs to them).
+			#--SuperAdmin:	2.1 - Can not Edit Invoice.
+			#--Supervisor:	2.2 - Can not Edit Invoice.
+			#--Seller:		2.3 - Can not Edit Invoice.
+			#--Customer:	2.4 - Can Edit(Update) Invoice.
+
+		3- Operation - Edit(Update). (Only users with role.name "Customer" which have Invoice can Update the Invoice Status).
+			#--SuperAdmin:	3.1 - Can not Edit Invoice.
+			#--Supervisor:	3.2 - Can not Edit Invoice.
+			#--Seller:		3.3 - Can not Edit Invoice.
+			#--Customer:	3.4 - Can Edit(Update) Invoice.
+
+     #2 - UserInformation. (User Update personal information, Create/Update Address & PaymentMethod.)
+		2.1- Personal Information.
+			#--SuperAdmin:	2.2.1.1 - Can Edit(Update) PersonalInformation.
+			#--Supervisor:	2.2.1.2 - Can Edit(Update) PersonalInformation.
+			#--Seller:		2.2.1.3 - Can Edit(Update) PersonalInformation.
+			#--Customer:	2.2.1.4 - Can Edit(Update) PersonalInformation.
+
+		2.2- Address.
+			#--SuperAdmin:	2.2.2.1 - Can Edit(Update) AddressInformation.
+			#--Supervisor:	2.2.2.2 - Can Edit(Update) AddressInformation.
+			#--Seller:		2.2.2.3 - Can Edit(Update) AddressInformation.
+			#--Customer:	2.2.2.4 - Can Edit(Update) AddressInformation.
+
+		2.3- PaymentMethod.
+			#--SuperAdmin:	2.2.3.1 - Can Edit(Update) PaymentMethodInformation.
+			#--Supervisor:	2.2.3.2 - Can Edit(Update) PaymentMethodInformation.
+			#--Seller:		2.2.3.3 - Can Edit(Update) PaymentMethodInformation.
+			#--Customer:	2.2.3.4 - Can Edit(Update) PaymentMethodInformation.
 	.
 ------------------------------------------------------------
-This assigment was finished on "7/4/2021"
+This assigment was finished on ""
 ____________________________________________________________

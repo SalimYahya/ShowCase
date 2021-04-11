@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ShowCase.Data;
 using ShowCase.Models;
 using ShowCase.Models.Temp;
+using ShowCase.Security;
 using ShowCase.ViewModel.Order;
 using ShowCase.ViewModel.Profile;
 using ShowCase.ViewModel.Role;
@@ -14,32 +17,47 @@ using System.Threading.Tasks;
 
 namespace ShowCase.Controllers
 {
+    [Authorize]
     public class ProfileController : Controller
     {
+        private readonly ILogger<ProfileController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _appDbContext;
-        
-        public ProfileController(UserManager<ApplicationUser> userManager, AppDbContext appDbContext)
+        private readonly IAuthorizationService _authorizationService;
+
+        public ProfileController(ILogger<ProfileController> logger, UserManager<ApplicationUser> userManager, AppDbContext appDbContext, IAuthorizationService authorizationService)
         {
+            _logger = logger;
             _userManager = userManager;
             _appDbContext = appDbContext;
+            _authorizationService = authorizationService;
         }
+
 
         public async Task<IActionResult> UserInformation()
         {
             string userId = _userManager.GetUserId(HttpContext.User);
+            
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
-            var address = _appDbContext.Addresses.Find(user.Id);
-            var payment = _appDbContext.PaymentMethods.Find(user.Id);
-
+            Address address = _appDbContext.Addresses.Find(user.Id);
+            PaymentMethod payment = _appDbContext.PaymentMethods.Find(user.Id);
+  
             ProfileEditUserViewModel model = new ProfileEditUserViewModel
             {
                 User = user,
-                Address = address,
-                PaymentMethod = payment
+                Address = user.Address,
+                PaymentMethod = user.PaymentMethod
             };
 
-            return View(model);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, model.User, CRUD.Read);
+
+            if (authorizationResult.Succeeded) 
+            {
+                return View(model);
+            }
+            else if (User.Identity.IsAuthenticated){ return new ForbidResult(); }
+            else { return new ChallengeResult(); }
+
         }
 
         [HttpPost]
@@ -47,15 +65,21 @@ namespace ShowCase.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
+                var authorizationResult = await _authorizationService.AuthorizeAsync(User, model.User, CRUD.Update);
+                if (authorizationResult.Succeeded)
+                {
+                    ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
 
-                user.FirstName = model.User.FirstName;
-                user.LastName = model.User.LastName;
-                user.UpdatedAt = DateTime.Now;
+                    user.FirstName = model.User.FirstName;
+                    user.LastName = model.User.LastName;
+                    user.UpdatedAt = DateTime.Now;
 
-                await _userManager.UpdateAsync(user);
+                    await _userManager.UpdateAsync(user);
 
-                return RedirectToAction("UserInformation", "Profile");
+                    return RedirectToAction("UserInformation", "Profile");
+                }
+                else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+                else { return new ChallengeResult(); }
             }
 
             return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
@@ -67,44 +91,61 @@ namespace ShowCase.Controllers
         {
             if (ModelState.IsValid)
             {
-                string userId = _userManager.GetUserId(HttpContext.User);
-                Address address = _appDbContext.Addresses.Find(userId);
+                ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
+                Address address = _appDbContext.Addresses.Find(model.User.Id);
 
                 if (address != null)
                 {
-                    address.District = model.Address.District;
-                    address.Street = model.Address.Street;
-                    address.City = model.Address.City;
-                    address.ZipCode = model.Address.ZipCode;
-                    address.POBox = model.Address.POBox;
+                    address.District = model.User.Address.District;
+                    address.Street = model.User.Address.Street;
+                    address.City = model.User.Address.City;
+                    address.ZipCode = model.User.Address.ZipCode;
+                    address.POBox = model.User.Address.POBox;
 
-                    var tmp_address = _appDbContext.Addresses.Attach(address);
-                    tmp_address.State = EntityState.Modified;
+                    var authResult = await _authorizationService.AuthorizeAsync(User, user.Address, CRUD.Update);
+                    if (authResult.Succeeded)
+                    {
+                        var tmp_address = _appDbContext.Addresses.Attach(address);
+                        tmp_address.State = EntityState.Modified;
 
-                    await _appDbContext.SaveChangesAsync();
+
+                        await _appDbContext.SaveChangesAsync();
+                        _logger.LogInformation($"EditOrCreateUserAddress, Address: {tmp_address.ToString()} Updated");
+
+                    }
+                    else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+                    else { return new ChallengeResult(); }
                 }
                 else
                 {
                    Address new_address = new Address
                    {
-                       Id = userId,
-                       District = model.Address.District,
-                       Street = model.Address.Street,
-                       City = model.Address.City,
-                       ZipCode = model.Address.ZipCode,
-                       POBox = model.Address.POBox
+                       Id = model.User.Id,
+                       District = model.User.Address.District,
+                       Street = model.User.Address.Street,
+                       City = model.User.Address.City,
+                       ZipCode = model.User.Address.ZipCode,
+                       POBox = model.User.Address.POBox
                     };
-              
-                    _appDbContext.Addresses.Add(new_address);
-                    await _appDbContext.SaveChangesAsync();
-                }
 
+                    var authResult = await _authorizationService.AuthorizeAsync(User, new_address, CRUD.Create);
+
+                    if (authResult.Succeeded)
+                    {
+                        _appDbContext.Addresses.Add(new_address);
+                        await _appDbContext.SaveChangesAsync();
+
+                        _logger.LogInformation($"EditOrCreateUserAddress, Address: {new_address.ToString()} Cretaed");
+                    }
+                    else if (User.Identity.IsAuthenticated){ return new ForbidResult(); }
+                    else { return new ChallengeResult(); }
+
+                }
 
                 return RedirectToAction("UserInformation", "Profile");
             }
 
             return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
-
         }
          
 
@@ -113,37 +154,52 @@ namespace ShowCase.Controllers
         {
             if (ModelState.IsValid)
             {
-                string userId = _userManager.GetUserId(HttpContext.User);
-
-                PaymentMethod paymentMethod = _appDbContext.PaymentMethods.Find(userId);
+                ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
+                PaymentMethod paymentMethod = _appDbContext.PaymentMethods.Find(model.User.Id);
 
                 if (paymentMethod != null)
                 {
-                    paymentMethod.Type = model.PaymentMethod.Type;
-                    paymentMethod.HolderName = model.PaymentMethod.HolderName;
-                    paymentMethod.CardNumber = model.PaymentMethod.CardNumber;
-                    paymentMethod.CVCCode = model.PaymentMethod.CVCCode;
-                    paymentMethod.ExpiresAt = model.PaymentMethod.ExpiresAt;
+                    paymentMethod.Type = model.User.PaymentMethod.Type;
+                    paymentMethod.HolderName = model.User.PaymentMethod.HolderName;
+                    paymentMethod.CardNumber = model.User.PaymentMethod.CardNumber;
+                    paymentMethod.CVCCode = model.User.PaymentMethod.CVCCode;
+                    paymentMethod.ExpiresAt = model.User.PaymentMethod.ExpiresAt;
 
-                    var tmp_paymentMethod = _appDbContext.PaymentMethods.Attach(paymentMethod);
-                    tmp_paymentMethod.State = EntityState.Modified;
+                    var authResult = await _authorizationService.AuthorizeAsync(User, user.PaymentMethod, CRUD.Update);
+                    
+                    if (authResult.Succeeded)
+                    {
+                        var tmp_paymentMethod = _appDbContext.PaymentMethods.Attach(paymentMethod);
+                        tmp_paymentMethod.State = EntityState.Modified;
 
-                    await _appDbContext.SaveChangesAsync();
+                        await _appDbContext.SaveChangesAsync();
+                        _logger.LogInformation($"EditOrCreateUserAddress, Payment: {tmp_paymentMethod.ToString()} Updated");
+                    }
+                    else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+                    else { return new ChallengeResult(); }
                 }
                 else
                 {
                     PaymentMethod new_paymentMethod = new PaymentMethod
                     {
-                        Id = userId,
-                        Type = model.PaymentMethod.Type,
-                        HolderName = model.PaymentMethod.HolderName,
-                        CardNumber = model.PaymentMethod.CardNumber,
-                        CVCCode = model.PaymentMethod.CVCCode,
-                        ExpiresAt = model.PaymentMethod.ExpiresAt
+                        Id = model.User.Id,
+                        Type = model.User.PaymentMethod.Type,
+                        HolderName = model.User.PaymentMethod.HolderName,
+                        CardNumber = model.User.PaymentMethod.CardNumber,
+                        CVCCode = model.User.PaymentMethod.CVCCode,
+                        ExpiresAt = model.User.PaymentMethod.ExpiresAt
                     };
-              
-                    _appDbContext.PaymentMethods.Add(new_paymentMethod);
-                    await _appDbContext.SaveChangesAsync();
+
+                    var authResult = await _authorizationService.AuthorizeAsync(User, new_paymentMethod, CRUD.Create);
+                    if (authResult.Succeeded)
+                    {
+                        _appDbContext.PaymentMethods.Add(new_paymentMethod);
+                        await _appDbContext.SaveChangesAsync();
+
+                        _logger.LogInformation($"EditOrCreateUserAddress, Payment: {new_paymentMethod.ToString()} Created");
+                    }
+                    else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+                    else { return new ChallengeResult(); }
                 }
 
 
@@ -154,16 +210,50 @@ namespace ShowCase.Controllers
 
         }
 
+        [Authorize(Roles = "SuperAdmin, Supervisor, Customer")]
         public async Task<IActionResult> UserOrders()
         {
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
-            var invoiceList = _appDbContext.Invoices.Include(u => u.ApplicationUser)
-                                                    .Where(i=> i.ApplicationUserId == userId)
-                                                    .OrderByDescending(d => d.CreatedAt);
-            
+            var invoiceList = await _appDbContext.Invoices
+                .Include(u => u.ApplicationUser)
+                .OrderByDescending(p => p.CreatedAt)
+                .ToListAsync();
+
             var orderDetailsViewModelList = new List<OrderDetailsViewModel>();
+
+            var isUserInAdminstrativeRole = User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Supervisor");
+
+            if (User.IsInRole("Customer") && !isUserInAdminstrativeRole)
+            {
+                var userInvoiceList = invoiceList.Where(u=>u.ApplicationUserId == userId).ToList();
+
+                foreach (var invoice in userInvoiceList)
+                {
+                    var productList = _appDbContext.InvoiceProduct
+                                                    .Where(i => i.InvoiceId == invoice.Id)
+                                                    .Select(p => new InvoiceProductInfo
+                                                    {
+                                                        Product = p.Product,
+                                                        Qty = p.Qty,
+                                                        Invoice = p.Invoice
+                                                    });
+
+                    orderDetailsViewModelList.Add(new OrderDetailsViewModel
+                    {
+                        ApplicationUser = user,
+                        ProductInfo = productList.ToList(),
+                        Invoice = invoice
+                    });
+                }
+
+                return View(orderDetailsViewModelList);
+            }
+
+
+            //var invoiceList = _appDbContext.Invoices.Include(u => u.ApplicationUser).Where(i=> i.ApplicationUserId == userId).OrderByDescending(d => d.CreatedAt);
+            
 
             foreach (var invoice in invoiceList)
             {
@@ -191,6 +281,8 @@ namespace ShowCase.Controllers
         {
             int invoice_id = int.Parse(Id);
             string userId = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+
 
             var invoice = _appDbContext.Invoices.Single(i => i.ApplicationUserId == userId && i.Id == invoice_id);
             

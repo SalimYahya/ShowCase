@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using ShowCase.Data;
 using ShowCase.Models;
 using ShowCase.Models.Temp;
+using ShowCase.Security;
 using ShowCase.ViewModel.Order;
 using System;
 using System.Collections.Generic;
@@ -20,21 +22,29 @@ namespace ShowCase.Controllers
     {
         private readonly AppDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public OrderController(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public OrderController(AppDbContext dbContext, UserManager<ApplicationUser> userManager, IAuthorizationService authorizationService)
         {
             _dbContext = dbContext;
             _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
+        [Authorize(Roles = "SuperAdmin, Supervisor, Customer")]
         public async Task<IActionResult> Index()
         {
-            string user_id = _userManager.GetUserId(HttpContext.User);
-            ApplicationUser user = await _userManager.FindByIdAsync(user_id);
+            string userId = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
-            var invoiceList = _dbContext.Invoices.Where(u => u.ApplicationUserId == user_id);
+            var invoiceList = await _dbContext.Invoices.Include(u => u.ApplicationUser).ToListAsync();
             
-           
+            if(User.IsInRole("Customer"))
+            {
+                var userInvoices = invoiceList.Where(u => u.ApplicationUserId == userId).ToList();
+                return View(userInvoices);
+            }
+
             return View(invoiceList);
         }
 
@@ -66,98 +76,95 @@ namespace ShowCase.Controllers
             return View(odvModel);
         }
 
-        /*public async Task<IActionResult> IndexAsync()
-        {
-            IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
-                                                            .Where(user => user.ApplicationUserID.Contains(userId));
-
-            string userId = _userManager.GetUserId(HttpContext.User);
-            ApplicationUser user = await _userManager.FindByIdAsync(userId);
-
-            var productList = _dbContext.ShoppingCart
-                          .Where(u => u.ApplicationUserID.Contains(userId))
-                          .Select(p => p.Product);
-
-            var shoppingCartList = _dbContext.ShoppingCart
-                                             .Where(u => u.ApplicationUserID.Contains(userId))
-                                             .Select(up => up);
-
-            SHPViewModel viewModel = new SHPViewModel
-            {
-                ApplicationUser = user,
-                Products = productList.ToList(),
-                ShoppingCarts = shoppingCartList.ToList()
-            };
-
-            return View(viewModel);
-        }*/
-
 
         [HttpPost]
+        [Authorize(Roles = "Customer")]
         [ValidateAntiForgeryToken]
-        public JsonResult OrderNow([FromBody] List<CartItem> shoppingCart)
+        public async Task<JsonResult> OrderNow([FromBody] List<CartItem> shoppingCart)
         {
 
             string userId = _userManager.GetUserId(HttpContext.User);
             //ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
-
-            // 1- Create New Invoice & save it to the database
-            // Vat = 15%
-            int vat = 15;
-            Invoice newInvoice = new Invoice { 
-                ApplicationUserId = userId,
-                CreatedAt = DateTime.Now,
-                Vat = vat
-            };
-
-            _dbContext.Invoices.Add(newInvoice);
-            _dbContext.SaveChanges();
-
-
-            // 2- Create Multiple InvoiceProduct objects 
-            // & Update vat, totalItems, totalExclude & totalInclude
-            // values in invoice table
-
-            int totalItem = 0;
-            double totalExcludeVat = 0.00;
-            double totalIncludeVat = 0.00;
-
-            List<InvoiceProduct> invoiceProductsList = new List<InvoiceProduct>();
-
+            List<Product> products = new List<Product>();
             foreach (var item in shoppingCart)
             {
-                totalItem += item.count;
-                totalExcludeVat += item.price;
-
-                invoiceProductsList.Add(new InvoiceProduct
+                var product = await _dbContext.Products
+                    .Include(u => u.ApplicationUser)
+                    .Where(p => p.Id == item.id)
+                    .FirstOrDefaultAsync();
+                
+                if (product != null)
                 {
-                    InvoiceId = newInvoice.Id,
-                    ProductId = item.id,
-                    Qty = item.count
-                });
+                    products.Add(product);
+                }
             }
 
-            _dbContext.InvoiceProduct.AddRange(invoiceProductsList);
-            _dbContext.SaveChanges();
+            int vat = 15;
+            Invoice newInvoice = new Invoice();
+
+            // Authorization: check if user is eleigible to create Invoice ==> Order
+            string authResultMessage = "";
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, products, CRUD.Create);
+
+            if (authorizationResult.Succeeded) 
+            { 
+                authResultMessage += "Create Order: Successfully Created";
+
+                // 1- Create New Invoice & save it to the database
+                newInvoice.ApplicationUserId = userId;
+                newInvoice.CreatedAt = DateTime.Now;
+                newInvoice.Vat = vat;
+
+                await _dbContext.Invoices.AddAsync(newInvoice);
+                await _dbContext.SaveChangesAsync();
+
+                int totalItem = 0;
+                double totalExcludeVat = 0.00;
+                double totalIncludeVat = 0.00;
+
+                List<InvoiceProduct> invoiceProductsList = new List<InvoiceProduct>();
+
+                foreach (var item in shoppingCart)
+                {
+                    totalItem += item.count;
+                    totalExcludeVat += item.price;
+
+                    invoiceProductsList.Add(new InvoiceProduct
+                    {
+                        InvoiceId = newInvoice.Id,
+                        ProductId = item.id,
+                        Qty = item.count
+                    });
+                }
 
 
-            // Update Invoice table
-            totalIncludeVat = (vat * totalExcludeVat / 100) + totalExcludeVat;
+                await _dbContext.InvoiceProduct.AddRangeAsync(invoiceProductsList);
+                await _dbContext.SaveChangesAsync();
 
-            newInvoice.TotalItems = totalItem;
-            newInvoice.TotalExcludeVat = totalExcludeVat;
-            newInvoice.TotalIncludeVat = totalIncludeVat;
+                // Update Invoice table
+                totalIncludeVat = (vat * totalExcludeVat / 100) + totalExcludeVat;
 
-            var updatedInvoice = _dbContext.Invoices.Attach(newInvoice);
-            updatedInvoice.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                newInvoice.TotalItems = totalItem;
+                newInvoice.TotalExcludeVat = Math.Round(totalExcludeVat, 2, MidpointRounding.AwayFromZero);
+                newInvoice.TotalIncludeVat = Math.Round(totalIncludeVat, 2, MidpointRounding.AwayFromZero);
 
-            _dbContext.SaveChanges();
+                var updatedInvoice = _dbContext.Invoices.Attach(newInvoice);
+                updatedInvoice.State = EntityState.Modified;
+
+                await _dbContext.SaveChangesAsync();
+            }
+            else 
+            {
+                authResultMessage += "Create Order: Failed to Create Order!";
+            }
+
+
 
             var response = new
             {
                 Success = true,
-                Message = "Order confirmed succefully", 
+                Message = authResultMessage, 
                 Redirect = "/Profile/UserOrders",
                 InvoiceId = newInvoice.Id
             };
@@ -169,21 +176,33 @@ namespace ShowCase.Controllers
 
         
         [HttpPost]
-        [Authorize]
-        public JsonResult ConfirmOrder(string Invoice_Id)
+        [Authorize(Roles = "Customer")]
+        public async Task<JsonResult> ConfirmOrder(string Invoice_Id)
         {
             int invoiceId = int.Parse(Invoice_Id);
             string userId = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
+            
+            /*
+            var SuccessStatus = false;
+            string message = "";
+            var InvoiceIsConfirmed = false;
+            */
 
+            if (user.PaymentMethod == null)
+            {
+               
+            }
+            
             // Get Invoice which invoiceId == id & belongs to the current user
-            Invoice invoice = _dbContext.Invoices.Single(i => i.ApplicationUserId == userId && i.Id == invoiceId);
+            Invoice invoice = await _dbContext.Invoices.SingleAsync(i => i.ApplicationUserId == userId && i.Id == invoiceId);
             invoice.IsConfirmed = true;
             
             var inv = _dbContext.Invoices.Attach(invoice);
-            inv.State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            inv.State = EntityState.Modified;
 
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
 
             var response = new

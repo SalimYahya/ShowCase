@@ -27,6 +27,11 @@ namespace ShowCase.Models
         [Required]
         public DateTime ExpiresAt { get; set; }
 
+        public override string ToString()
+        {
+            return String.Format("{0}, {1}, {2}, {3}, {4}", this.Type, this.HolderName, this.CardNumber, this.CVCCode, this.ExpiresAt);
+        }
+
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (ExpiresAt < DateTime.Now)

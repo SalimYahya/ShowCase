@@ -33,5 +33,10 @@ namespace ShowCase.Models
         [Required]
         [Display(Name = "City")]
         public string City { get; set; }
+
+        public override string ToString()
+        {
+            return String.Format("{0}, {1}, {2}, {3}, {4}", this.District, this.Street, this.ZipCode, this.POBox, this.City);
+        }
     }
 }

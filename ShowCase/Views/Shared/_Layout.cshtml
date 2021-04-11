@@ -91,13 +91,16 @@
                                     </form>
                                 </div>
                             </li>
+                            
+                            @if (User.IsInRole("Customer"))
+                            {
+                                <a class="nav-link" data-toggle="modal" data-target="#cart">
+                                    <i class="fas fa-shopping-cart px-0" style="padding-left: 0; padding-right: 1.2rem;"></i>
+                                    <span class="test rounded-circle total-count">
+                                    </span>
+                                </a>
+                            }
 
-
-                            <a class="nav-link" data-toggle="modal" data-target="#cart">
-                                <i class="fas fa-shopping-cart px-0" style="padding-left: 0; padding-right: 1.2rem;"></i>
-                                <span class="test rounded-circle total-count">
-                                </span>
-                            </a>
                         }
                         else
                         {
