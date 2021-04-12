@@ -1,6 +1,6 @@
 ﻿@model ShowCase.Models.Product
 @{
-    var imagePath = "~/images/no_image.png";
+    var imagePath = "../../images/no_image.png";
 }
 
 <div class="card border border-bottom-0 border-left-0 border-right-0 bg-white shadow-sm">
@@ -17,12 +17,23 @@
         </div>
 
         <div class="row d-flex w-100 p-0 m-0">
-            <a href="#" class="add-to-cart btn btn-danger"
-               data-id="@Model.Id" data-name="@Model.Name"
-               data-desc="@Model.Description" data-price="@Model.Price"
-               data-image="@imagePath">
-                <i class="fas fa-shopping-cart text-white"></i>
-            </a>
+            @if (!User.Identity.IsAuthenticated || User.IsInRole("Customer"))
+            {
+                if (User.Identity.Name != Model.ApplicationUser.UserName)
+                {
+                    <a href="#" class="add-to-cart btn btn-danger mr-auto"
+                       data-id="@Model.Id" data-name="@Model.Name"
+                       data-desc="@Model.Description" data-price="@Model.Price"
+                       data-image="@imagePath">
+                        <i class="fas fa-shopping-cart text-white"></i>
+                    </a>
+                }
+                else
+                {
+                    <i class="fas fa-crown fa-2x text-success"></i>
+
+                }
+            }
             <h6 class="text-warning ml-auto"><strong>@Model.Price SAR</strong></h6>
         </div>
         

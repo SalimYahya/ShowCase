@@ -175,7 +175,7 @@ function displayCart() {
     var cartArray = shoppingCart.listCart();
     var output = "";
     for (var i in cartArray) {
-        output += "<tr>"
+        output += "<tr scope='row'>"
             + "<td class='align-middle'><img class='img-fluid' width='150' height='180' src='" + cartArray[i].image + "'/></td> "
             + "<td class='align-middle'>" + cartArray[i].name + "</td>"
             + "<td class='align-middle'>(" + cartArray[i].price + ")</td>"
@@ -255,6 +255,7 @@ function Order() {
                 console.log("response.redirect: " + response.redirect);
                 console.log("response.InvoiceId: " + response.invoiceId);
                 console.log("token: " + token);
+
                 /*
                  * Redirect User to Order Details Page
                  * */

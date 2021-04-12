@@ -22,7 +22,9 @@ using ShowCase.Security.ManageRoles;
 using ShowCase.Security.ManageRoles.CreateRoles;
 using ShowCase.Security.ManageRoles.DeleteRoles;
 using ShowCase.Security.ManageRoles.EditRoles;
+using ShowCase.Security.Operations;
 using ShowCase.Security.Operations.ProductOperations;
+using ShowCase.Security.Operations.UserInformation;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -124,13 +126,19 @@ namespace ShowCase
                     policy => policy.AddRequirements(new OperationAuthorizationRequirement()));
             });
 
-            // Creart, Edit & Delete Roles
+            
             services.AddSingleton<IAuthorizationHandler, CanCreateRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanEditRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, ProductAuthorizationHandler>();
-            // End of: Creart, Edit & Delete Roles
+            services.AddSingleton<IAuthorizationHandler, OrderAuthorizationHandler>();
+
+            // UserInformation - PersonalInformation.
+            services.AddSingleton<IAuthorizationHandler, UserPersonalInformationHandler>();
+            services.AddSingleton<IAuthorizationHandler, UserAddressInformationHandler>();
+            services.AddSingleton<IAuthorizationHandler, UserPaymentMethodHandler>();
+            services.AddSingleton<IAuthorizationHandler, ConfirmOrderHandler>();
 
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
