@@ -282,7 +282,22 @@ namespace ShowCase.Controllers
             int invoice_id = int.Parse(Id);
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            Address address = _appDbContext.Addresses.Find(userId);
+            PaymentMethod paymentMethod = _appDbContext.PaymentMethods.Find(userId);
 
+            /*
+             * If Both Address and PaymentMethod are empty,
+             * The customer will be redirected to his profile 
+             * to fill address (For Shipping purpose),
+             * and paymentMethod (For Invoice Payment)
+             */
+            if (address == null || paymentMethod == null)
+            {   
+                /* In the future, i should add message with redirection,
+                 * to indicate what information to be filled
+                 */
+                return RedirectToAction("UserInformation", "Profile");
+            }
 
             var invoice = _appDbContext.Invoices.Single(i => i.ApplicationUserId == userId && i.Id == invoice_id);
             
@@ -291,45 +306,52 @@ namespace ShowCase.Controllers
                 return NotFound();
             }
 
-            invoice.IsConfirmed = true;
 
-            var inv = _appDbContext.Invoices.Attach(invoice);
-            inv.State = EntityState.Modified;
-
-            _appDbContext.SaveChanges();
-
-            // Implement: Product-Sold logic
-            List<ProductSold> productSoldList = new List<ProductSold>();
-
-            var productList = _appDbContext.InvoiceProduct
-                            .Where(i => i.InvoiceId == invoice.Id)
-                            .Select(p => new InvoiceProductInfo
-                            {
-                                Product = p.Product,
-                                Qty = p.Qty,
-                                Invoice = p.Invoice
-                            }).ToList();
-
-
-            foreach (var product in productList)
+            var authResult = await _authorizationService.AuthorizeAsync(User, invoice, CRUD.Update);
+            if (authResult.Succeeded)
             {
-                var sold = new Sold { Qty = product.Qty };
-                await _appDbContext.Solds.AddAsync(sold);
+                invoice.IsConfirmed = true;
+
+                var inv = _appDbContext.Invoices.Attach(invoice);
+                inv.State = EntityState.Modified;
+
                 await _appDbContext.SaveChangesAsync();
 
-                var productSold = new ProductSold
+                // Implement: Product-Sold logic
+                List<ProductSold> productSoldList = new List<ProductSold>();
+
+                var productList = _appDbContext.InvoiceProduct
+                                .Where(i => i.InvoiceId == invoice.Id)
+                                .Select(p => new InvoiceProductInfo
+                                {
+                                    Product = p.Product,
+                                    Qty = p.Qty,
+                                    Invoice = p.Invoice
+                                }).ToList();
+
+
+                foreach (var product in productList)
                 {
-                    SoldId = sold.Id,
-                    ProductId = product.Product.Id
-                };
+                    var sold = new Sold { Qty = product.Qty };
+                    await _appDbContext.Solds.AddAsync(sold);
+                    await _appDbContext.SaveChangesAsync();
 
-                productSoldList.Add(productSold);
+                    var productSold = new ProductSold
+                    {
+                        SoldId = sold.Id,
+                        ProductId = product.Product.Id
+                    };
+
+                    productSoldList.Add(productSold);
+                }
+
+                await _appDbContext.ProductSolds.AddRangeAsync(productSoldList);
+                await _appDbContext.SaveChangesAsync();
+
+                return RedirectToAction("UserOrders", "Profile");
             }
-
-            await _appDbContext.ProductSolds.AddRangeAsync(productSoldList);
-            await _appDbContext.SaveChangesAsync();
-
-            return RedirectToAction("UserOrders", "Profile");
+            else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+            else { return new ChallengeResult(); }
         }
 
         [HttpGet]

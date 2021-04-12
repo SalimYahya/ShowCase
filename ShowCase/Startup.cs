@@ -138,6 +138,8 @@ namespace ShowCase
             services.AddSingleton<IAuthorizationHandler, UserPersonalInformationHandler>();
             services.AddSingleton<IAuthorizationHandler, UserAddressInformationHandler>();
             services.AddSingleton<IAuthorizationHandler, UserPaymentMethodHandler>();
+            services.AddSingleton<IAuthorizationHandler, ConfirmOrderHandler>();
+
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
