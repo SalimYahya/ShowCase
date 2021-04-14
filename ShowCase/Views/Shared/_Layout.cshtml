@@ -91,7 +91,7 @@
                                     </form>
                                 </div>
                             </li>
-                            
+
                             @if (User.IsInRole("Customer"))
                             {
                                 <a class="nav-link" data-toggle="modal" data-target="#cart">
@@ -114,6 +114,11 @@
                                 <a class="nav-link" asp-area="" asp-controller="account" asp-action="login">Login</a>
                             </li>
                         }
+
+                        <li class="nav-link">
+                            <partial name="_Culture"  />
+                        </li>
+
                     </ul>
                 </div>
             </div>

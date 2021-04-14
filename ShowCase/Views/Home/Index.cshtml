@@ -1,4 +1,6 @@
 ﻿@using ShowCase.Views.Shared.Components.SearchBar
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer localizer
+
 @model IEnumerable<ShowCase.Models.Product>
 
 @{
@@ -15,7 +17,8 @@
 
 }
 
-
+<h1>@localizer["HelloWorld"]</h1>
+<h1>@ViewData["HelloController"]</h1>
 
 <!-- Filter: Search, Pagination -->
 <vc:search-bar search-pager="@ViewBag.SearchPager" bottom-bar="false"></vc:search-bar>

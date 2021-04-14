@@ -11,6 +11,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using ShowCase.Views.Shared.Components.SearchBar;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.Localization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
 
 namespace ShowCase.Controllers
 {
@@ -19,12 +22,13 @@ namespace ShowCase.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly AppDbContext _dbContext;
+        private readonly IHtmlLocalizer<HomeController> _localizer;
 
-        public HomeController(ILogger<HomeController> logger, AppDbContext dbContext)
+        public HomeController(ILogger<HomeController> logger, AppDbContext dbContext, IHtmlLocalizer<HomeController> localizer)
         {
             _logger = logger;
             _dbContext = dbContext;
-
+            _localizer = localizer;
         }
 
 
@@ -121,9 +125,24 @@ namespace ShowCase.Controllers
 
             ViewBag.SearchPager = searchPager;
             ViewBag.PageSizes = GetPageSizes(pageSize);
-           //_logger.LogInformation($"pageSize: {pageSize}");
+            //_logger.LogInformation($"pageSize: {pageSize}");
+
+            var test = _localizer["HelloController"];
+            ViewData["HelloController"] = test;
 
             return View(modelList);
+        }
+        
+        [HttpPost]
+        public IActionResult CultureManagement(string culture, string returnUrl)
+        {
+            Response.Cookies.Append(
+                    CookieRequestCultureProvider.DefaultCookieName,
+                    CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+                    new CookieOptions { Expires = DateTimeOffset.Now.AddDays(30)}
+                );
+
+            return LocalRedirect(returnUrl);
         }
 
         public IActionResult Privacy()
