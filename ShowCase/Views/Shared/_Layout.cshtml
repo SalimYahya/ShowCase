@@ -4,6 +4,7 @@
 @inject SignInManager<ApplicationUser> signInManager
 @inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -40,24 +41,24 @@
 
                                     <a class="dorpdown-item nav-link" asp-area="" asp-controller="Profile" asp-action="UserInformation">
                                         <i class="fas fa-file-alt px-1"></i>
-                                        Profile
+                                        @localizer["Profile"]
                                     </a>
 
                                     <a class="dorpdown-item nav-link" asp-area="" asp-controller="Profile" asp-action="UserOrders">
                                         <i class="fas fa-list px-1"></i>
-                                        Orders
+                                        @localizer["Orders"]
                                     </a>
 
                                     @if (User.IsInRole("SuperAdmin") || User.IsInRole("Seller"))
                                     {
                                         <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">
                                             <i class="fas fa-store"></i>
-                                            Products
+                                            @localizer["Products"]
                                         </a>
 
                                         <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Product" asp-action="CreateMagicProducts">
                                             <i class="fas fa-magic"></i>
-                                            Create 50k Products
+                                            @localizer["Create50kProducts"]
                                         </a>
                                     }
 
@@ -67,17 +68,17 @@
                                     {
                                         <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="Index">
                                             <i class="fas fa-users-cog"></i>
-                                            Admin
+                                            @localizer["Admin"]
                                         </a>
 
                                         <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="UsersList">
                                             <i class="fas fa-users-cog"></i>
-                                            Users
+                                            @localizer["Users"]
                                         </a>
 
                                         <a class="dropdown-item nav-link text-dark" asp-area="" asp-controller="Adminstration" asp-action="RolesList">
                                             <i class="fas fa-users-cog"></i>
-                                            Roles
+                                            @localizer["Roles"]
                                         </a>
                                     }
 
@@ -86,12 +87,12 @@
                                     <form method="post" asp-controller="account" asp-action="logout">
                                         <button type="submit" class="nav-link btn btn-link py-0">
                                             <i class="fas fa-sign-out-alt px-1"></i>
-                                            Logout
+                                            @localizer["Logout"]
                                         </button>
                                     </form>
                                 </div>
                             </li>
-                            
+
                             @if (User.IsInRole("Customer"))
                             {
                                 <a class="nav-link" data-toggle="modal" data-target="#cart">
@@ -105,15 +106,20 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="account" asp-action="register">Register</a>
+                                <a class="nav-link" asp-area="" asp-controller="account" asp-action="register">@localizer["Register"]</a>
                             </li>
 
                             <li class="nav-item nav-link">|</li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="account" asp-action="login">Login</a>
+                                <a class="nav-link" asp-area="" asp-controller="account" asp-action="login">@localizer["Login"]</a>
                             </li>
                         }
+
+                        <li class="nav-link">
+                            <partial name="_Culture"  />
+                        </li>
+
                     </ul>
                 </div>
             </div>
@@ -162,7 +168,7 @@
 
     <footer class="footer text-muted bg-my-background">
         <div class="container">
-            &copy; 2021 - ShowCase - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2021 - ShowCase - <a asp-area="" asp-controller="Home" asp-action="Privacy">@localizer["Privacy"]</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

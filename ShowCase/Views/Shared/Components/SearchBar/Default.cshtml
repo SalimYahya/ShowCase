@@ -7,7 +7,7 @@
         <form asp-controller="@Model.Controller" asp-action="@Model.Action">
             <div class="input-group mb-3">
                 <input type="text" name="SearchText" class="form-control"
-                       value="@Model.SearchText" placeholder="Search Product"
+                       value="@Model.SearchText" placeholder="@localizer["Search Product"]"
                        aria-label="Search Product">
 
                 <button class="btn btn-primary" type="submit">

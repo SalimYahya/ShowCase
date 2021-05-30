@@ -1,4 +1,5 @@
 ﻿@using ShowCase.Views.Shared.Components.SearchBar
+
 @model IEnumerable<ShowCase.Models.Product>
 
 @{
@@ -14,8 +15,6 @@
     }
 
 }
-
-
 
 <!-- Filter: Search, Pagination -->
 <vc:search-bar search-pager="@ViewBag.SearchPager" bottom-bar="false"></vc:search-bar>

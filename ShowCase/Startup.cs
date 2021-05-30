@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ShowCase.Configuration;
@@ -46,6 +47,25 @@ namespace ShowCase
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Localization
+            services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
+            services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+                .AddDataAnnotationsLocalization();
+
+            services.Configure<RequestLocalizationOptions>(opt => {
+
+                var supportedCultures = new List<CultureInfo> {
+                    new CultureInfo("en"),
+                    new CultureInfo("ar"),
+                };
+
+                opt.DefaultRequestCulture = new RequestCulture("en");
+                opt.SupportedCultures = supportedCultures;
+                opt.SupportedUICultures = supportedCultures;
+            });
+
+            services.AddControllersWithViews();
+
             // Configure Jwt - Secret Key
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
 
@@ -145,7 +165,6 @@ namespace ShowCase
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
 
 
-
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
@@ -182,6 +201,33 @@ namespace ShowCase
             app.UseAuthentication();
             app.UseAuthorization();
 
+            // Localization
+
+            app.UseRequestLocalization(app.ApplicationServices.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
+
+            /*
+             *   var supportedCultures = new[] { new CultureInfo("en"), new CultureInfo("ar") };
+             *   var localizationOptions = new RequestLocalizationOptions
+             *   {
+             *       SupportedCultures = supportedCultures,
+             *       SupportedUICultures = supportedCultures,
+             *       DefaultRequestCulture = new RequestCulture("en"),
+             *   };
+             *
+             *   localizationOptions.RequestCultureProviders.Clear();
+             *
+             *   localizationOptions.RequestCultureProviders.Add(new QueryStringRequestCultureProvider() { QueryStringKey = "lang" });
+            */
+
+            /*
+             *  var supportedCultures = new[] { "en", "ar" };
+             *  var localizationOptions = new RequestLocalizationOptions()
+             *      .SetDefaultCulture(supportedCultures[0])
+             *      .AddSupportedCultures(supportedCultures)
+             *      .AddSupportedUICultures(supportedCultures);
+             *
+             *  app.UseRequestLocalization(localizationOptions);
+             */
 
             app.UseEndpoints(endpoints =>
             {
