@@ -24,11 +24,10 @@ namespace ShowCase.Controllers
         private readonly AppDbContext _dbContext;
         private readonly IHtmlLocalizer<HomeController> _localizer;
 
-        public HomeController(ILogger<HomeController> logger, AppDbContext dbContext, IHtmlLocalizer<HomeController> localizer)
+        public HomeController(ILogger<HomeController> logger, AppDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
-            _localizer = localizer;
         }
 
 
@@ -126,9 +125,6 @@ namespace ShowCase.Controllers
             ViewBag.SearchPager = searchPager;
             ViewBag.PageSizes = GetPageSizes(pageSize);
             //_logger.LogInformation($"pageSize: {pageSize}");
-
-            var test = _localizer["HelloController"];
-            ViewData["HelloController"] = test;
 
             return View(modelList);
         }

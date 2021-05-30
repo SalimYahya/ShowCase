@@ -14,6 +14,6 @@
 </div>
 
 <div>
-    <a asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-controller="Home" asp-action="Index">Back to List</a>
+    <a asp-controller="Product" asp-action="Edit" asp-route-id="@Model.Id">@localizer["Edit"]</a> |
+    <a asp-controller="Home" asp-action="Index">@localizer["BackToList"]</a>
 </div>
