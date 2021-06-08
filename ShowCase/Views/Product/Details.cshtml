@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Details";
+    var imagePath = "../../images/no_image.png";
+
 }
 
 <h1>Details</h1>
@@ -9,7 +11,52 @@
 <div>
     <hr />
     <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-6 col-sm-12 vh-50">
             @{ <partial name="_DisplayProductPartial" model="Model" /> }
+
+        </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-12">
+            @if (!User.Identity.IsAuthenticated || User.IsInRole("Customer"))
+            {
+                if (User.Identity.Name != Model.ApplicationUser.UserName)
+                {
+                    <a href="#" class="add-to-cart btn btn-danger mr-auto"
+                       data-id="@Model.Id" data-name="@Model.Name"
+                       data-desc="@Model.Description" data-price="@Model.Price"
+                       data-image="@imagePath">
+                        <i class="fas fa-shopping-cart text-white"></i>
+                    </a>
+                }
+                else
+                {
+                    <i class="fas fa-crown fa-2x text-success"></i>
+
+                }
+            }
+        </div>
+
+        @{ <partial name="_DisplayProductPartial" model="Model" /> }
+
+        <div class="row d-flex w-100 p-0 m-0">
+            @if (!User.Identity.IsAuthenticated || User.IsInRole("Customer"))
+            {
+                if (User.Identity.Name != Model.ApplicationUser.UserName)
+                {
+                    <a href="#" class="add-to-cart btn btn-danger mr-auto"
+                       data-id="@Model.Id" data-name="@Model.Name"
+                       data-desc="@Model.Description" data-price="@Model.Price"
+                       data-image="@imagePath">
+                        <i class="fas fa-shopping-cart text-white"></i>
+                    </a>
+                }
+                else
+                {
+                    <i class="fas fa-crown fa-2x text-success"></i>
+
+                }
+            }
+        </div>
     </div>
 </div>
 

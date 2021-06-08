@@ -148,7 +148,6 @@ namespace ShowCase.Controllers
             return RedirectToAction("UserInformation", new { ProfileEditUserViewModel = model });
         }
          
-
         [HttpPost]
         public async Task<IActionResult> EditOrCreatePaymentMethod(ProfileEditUserViewModel model)
         {
