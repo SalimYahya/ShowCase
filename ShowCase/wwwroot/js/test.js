@@ -224,7 +224,6 @@ $('.show-cart').on("change", ".item-count", function (event) {
 
 displayCart();
 
-
 // Redirect function
 function redirecTo(url, id) {
     window.location.href = url + "/" + id;
@@ -248,7 +247,6 @@ function Order() {
             data: sessionStorage.getItem('shoppingCart'),
             url: '/Order/OrderNow',
             success: function (response) {
-                $('#confirmOrderSpinner').hide();
 
                 console.log("response.sussces: " + response.success);
                 console.log("response.message: " + response.message);
@@ -259,7 +257,7 @@ function Order() {
                 /*
                  * Redirect User to Order Details Page
                  * */
-                window.setTimeout(redirecTo(response.redirect, response.invoiceId), 10000);
+                setTimeout(function () { redirecTo(response.redirect, response.invoiceId); }, 1000);
             },
             error: function (response) {
                 console.log("There is some problem")
@@ -299,21 +297,38 @@ $('.confirm-order').click(function () {
             url: '/Order/ConfirmOrder',
 
             success: function (response) {
-                console.log("response.sussces: " + response.success);
-                console.log("response.message: " + response.message);
-                console.log("response.Invoice: " + response.invoice);
 
-                var shippmentDetails = "";
-                shippmentDetails += "<div class='card bg-white border-left-0 border-right-0 border-warning shadow-sm my-4 py-3>'";
-                shippmentDetails += "<div class='container'>";
-                shippmentDetails += "<div class='text-center'><p class='h4'>Shippment details</p>";
-                shippmentDetails += "</div>";
-                shippmentDetails += "</div>";
-                shippmentDetails += "</div>";
+                if (!response.success) {
+                    console.log("response.sussces: " + response.success);
+                    console.log("response.childNullId: " + response.childNullId);
+                    console.log("response.redirect: " + response.redirect);
 
-                $('#main-details-container').append(shippmentDetails);
+                    console.log("Class Name: " + $("#address").attr("class"));
+
+                    setTimeout(function () {
+                        window.location.href = response.redirect + "?text=" + response.childNullId;
+                    }, 5000);
 
 
+                } else {
+                    console.log("response.sussces: " + response.success);
+                    console.log("response.message: " + response.message);
+                    console.log("response.Invoice: " + response.invoice);
+                    console.log("response.ChildNullId: " + response.childNullId);
+
+                    /*
+                       var shippmentDetails = "";
+                       shippmentDetails += "<div class='card bg-white border-left-0 border-right-0 border-warning shadow-sm my-4 py-3>'";
+                       shippmentDetails += "<div class='container'>";
+                       shippmentDetails += "<div class='text-center'><p class='h4'>Shippment details</p>";
+                       shippmentDetails += "</div>";
+                       shippmentDetails += "</div>";
+                       shippmentDetails += "</div>";
+                      
+                      $('#main-details-container').append(shippmentDetails);
+
+                   */
+                }
             },
             error: function (response) {
                 console.log("There is some problem")

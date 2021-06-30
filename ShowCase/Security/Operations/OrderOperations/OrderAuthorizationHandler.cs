@@ -19,16 +19,21 @@ namespace ShowCase.Security.Operations
             _logger = logger;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, List<Product> resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
+            OperationAuthorizationRequirement requirement,
+            List<Product> resource)
         {
             _logger.LogInformation($"context.User.Identity.Name: {context.User.Identity.Name}");
             _logger.LogInformation($"context.User.IsInRole(Customer): {context.User.IsInRole("Customer")}");
 
             var isUserNotTheOwner = true;
             var isUserWithCustomerRole = context.User.IsInRole("Customer");
+
             //var isUserCanCreate = context.User.HasClaim(claim => claim.Type == "Create Product" && claim.Value == "true");
             if (requirement.Name == "Create" && isUserWithCustomerRole)
             {
+                _logger.LogInformation($"requirement.Name: Create");
+                
                 foreach (var item in resource)
                 {
                     if (context.User.Identity.Name == item.ApplicationUser.UserName) { isUserNotTheOwner = false;  }
@@ -40,7 +45,7 @@ namespace ShowCase.Security.Operations
                     return Task.CompletedTask;
                 }
             }
-            
+
             return Task.CompletedTask;
         }
     }

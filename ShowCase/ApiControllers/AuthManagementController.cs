@@ -147,7 +147,7 @@ namespace ShowCase.ApiControllers
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
 
-            var tokenDecriptor = new SecurityTokenDescriptor
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
                     new Claim("Id", user.Id),
@@ -159,7 +159,7 @@ namespace ShowCase.ApiControllers
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
-            var token = jwtTokenHandler.CreateToken(tokenDecriptor);
+            var token = jwtTokenHandler.CreateToken(tokenDescriptor);
             var jwtToken = jwtTokenHandler.WriteToken(token);
 
             return jwtToken;

@@ -87,6 +87,15 @@ body {
     padding-left: 210px;
 }
 
+.pagination-ul {
+    margin-bottom: 0 !important;
+}
+
+.page-link {
+    padding: 0.5rem 1rem !important; /*top-bottom & left-right*/
+    font-size: 1.2rem !important
+}
+
 
 .sidebar-btn {
     border-radius: 0 !important;

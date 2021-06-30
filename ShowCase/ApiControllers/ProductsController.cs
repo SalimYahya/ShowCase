@@ -1,9 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using ShowCase.Data;
+using ShowCase.Extensions;
 using ShowCase.Models;
+using ShowCase.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,17 +22,28 @@ namespace ShowCase.ApiControllers
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ProductsController : ControllerBase
     {
+        private readonly ILogger<ProductsController> _logger;
         private readonly AppDbContext _dbContext;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IAuthorizationService _authorizationService;
 
-        public ProductsController(AppDbContext dbContext)
+        public ProductsController(ILogger<ProductsController> logger, AppDbContext dbContext, UserManager<ApplicationUser> userManager, IAuthorizationService authorizationService)
         {
+            _logger = logger;
             _dbContext = dbContext;
+            _userManager = userManager;
+            _authorizationService = authorizationService;
         }
 
         // GET: api/<ProductsController>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
+            string userId = HttpContext.GetUserId();
+            _logger.LogInformation($"UserId: {userId} --- {HttpContext.User.Claims.Single(x => x.Type == "Id")}");
+            _logger.LogInformation($"{HttpContext.User.Claims.Single(x=> x.Type == "Id")}");
+            _logger.LogInformation($"User: {User}");
+
             var products = await _dbContext.Products.ToListAsync();
             return Ok(products);
         }
@@ -68,21 +83,39 @@ namespace ShowCase.ApiControllers
         {
             if (id != product.Id) return BadRequest();
 
-            var existProduct = await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id);
+            var existProduct = await _dbContext.Products
+                                .Include(u => u.ApplicationUser)
+                                .Where(p => p.Id == id)
+                                .FirstOrDefaultAsync();
+
+            _logger.LogInformation($"existProduct: {existProduct.ToString()}");
+
             if (existProduct == null) return NotFound();
 
-            existProduct.Name = product.Name;
-            existProduct.Description = product.Description;
-            existProduct.Price = product.Price;
-            existProduct.UpdatedAt = DateTime.Now;
+            var authorizatoinResult = await _authorizationService
+                .AuthorizeAsync(User, existProduct, CRUD.Update);
+            _logger.LogInformation($"result: {authorizatoinResult}");
 
-            var temp_product = _dbContext.Products.Attach(existProduct);
-            temp_product.State = EntityState.Modified;
+            if (authorizatoinResult.Succeeded)
+            {
+                existProduct.Name = product.Name;
+                existProduct.Description = product.Description;
+                existProduct.Price = product.Price;
+                existProduct.UpdatedAt = DateTime.Now;
 
-            await _dbContext.SaveChangesAsync();
+                var temp_product = _dbContext.Products.Attach(existProduct);
+                temp_product.State = EntityState.Modified;
 
-            //return NoContent();
-            return Ok(existProduct);
+                await _dbContext.SaveChangesAsync();
+
+                //return NoContent(); 
+                return Ok(existProduct);
+
+            } 
+            else 
+            {
+                return BadRequest(new { error = "you dont own this product"});
+            }
 
         }
 

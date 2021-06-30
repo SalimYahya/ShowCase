@@ -31,12 +31,26 @@ namespace ShowCase.Models
         }
 
 
+        /* 
+         *  Navaigation Property: 
+         *  -   Relation Type: Many-To-One
+         *  -   Target: Brand
+         *  
+         */
+
+        // Note: the ? in type int, is make Foreign_Key Nullable - For more details please refere to 
+        // https://www.tektutorialshub.com/entity-framework-core/ef-core-one-to-many-relationship/
+        public int? BrandId { get; set; }
+        public Brand Brand { get; set; }
+
+
         /*  
          *  Navaigation Property:
          *  -   Relation Type: Many-to-Many
          *  -   Pivot Table (Middle Table): InvoiceProduct Table
          */
         public virtual ICollection<InvoiceProduct> InvoiceProducts { get; set; }
+
 
         /* 
          *  Navaigation Property: Fully Defined Relationship

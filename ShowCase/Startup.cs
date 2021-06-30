@@ -18,6 +18,10 @@ using Microsoft.OpenApi.Models;
 using ShowCase.Configuration;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Repository;
+using ShowCase.Repository.Contracts;
+using ShowCase.Repository.Implementation;
+using ShowCase.Repository.Repository;
 using ShowCase.Security;
 using ShowCase.Security.ManageRoles;
 using ShowCase.Security.ManageRoles.CreateRoles;
@@ -52,6 +56,14 @@ namespace ShowCase
             services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
 
+            // DbRepos
+            //services.AddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
+
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+
+
             services.Configure<RequestLocalizationOptions>(opt => {
 
                 var supportedCultures = new List<CultureInfo> {
@@ -70,8 +82,40 @@ namespace ShowCase
             services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
 
             // Swagger
-            services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title="ShowCase", Version="v1" });
+            services.AddSwaggerGen(swagger =>
+            {
+                //This is to generate the Default UI of Swagger Documentation    
+                swagger.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Version = "v1",
+                    Title = "ASP.NET 5 Web API",
+                    Description = "Authentication and Authorization in ASP.NET 5 with JWT and Swagger"
+                });
+                // To Enable authorization using Swagger (JWT)    
+                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",
+                });
+                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            new string[] {}
+
+                    }
+                });
             });
 
             services.AddDbContextPool<AppDbContext>(
@@ -158,7 +202,7 @@ namespace ShowCase
             services.AddSingleton<IAuthorizationHandler, UserPersonalInformationHandler>();
             services.AddSingleton<IAuthorizationHandler, UserAddressInformationHandler>();
             services.AddSingleton<IAuthorizationHandler, UserPaymentMethodHandler>();
-            services.AddSingleton<IAuthorizationHandler, ConfirmOrderHandler>();
+            services.AddSingleton<IAuthorizationHandler, ConfirmOrderAuthorizationHandler>();
 
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();

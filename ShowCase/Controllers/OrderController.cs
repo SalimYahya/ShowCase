@@ -3,10 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Models.Specials;
 using ShowCase.Models.Temp;
+using ShowCase.Repository.Contracts;
+using ShowCase.Repository.Specifications;
 using ShowCase.Security;
 using ShowCase.ViewModel.Order;
 using System;
@@ -18,15 +22,22 @@ namespace ShowCase.Controllers
 {
     [Authorize]
     public class OrderController : Controller
-
     {
-        private readonly AppDbContext _dbContext;
+        private readonly ILogger<OrderController> _logger;
+        private readonly IUserRepository _userRepository;
+        private readonly IProductRepository _productRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;
 
-        public OrderController(AppDbContext dbContext, UserManager<ApplicationUser> userManager, IAuthorizationService authorizationService)
+        public OrderController(ILogger<OrderController> logger,
+            IUserRepository userRepository,
+            IProductRepository productRepository,
+            UserManager<ApplicationUser> userManager, 
+            IAuthorizationService authorizationService)
         {
-            _dbContext = dbContext;
+            _logger = logger;
+            _userRepository = userRepository;
+            _productRepository = productRepository;
             _userManager = userManager;
             _authorizationService = authorizationService;
         }
@@ -35,65 +46,54 @@ namespace ShowCase.Controllers
         public async Task<IActionResult> Index()
         {
             string userId = _userManager.GetUserId(HttpContext.User);
-            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            var isUserInAdminstrativeRole = User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Supervisor");
 
-            var invoiceList = await _dbContext.Invoices.Include(u => u.ApplicationUser).ToListAsync();
-            
-            if(User.IsInRole("Customer"))
+            if (User.IsInRole("Customer") && !isUserInAdminstrativeRole)
             {
-                var userInvoices = invoiceList.Where(u => u.ApplicationUserId == userId).ToList();
-                return View(userInvoices);
+                var userInvoiceList = await _userRepository.GetUserInvoiceListDescendingOrder(userId);
+                return View(userInvoiceList);
             }
 
+            var invoiceList = await _userRepository.GetInvoiceListDescendingOrder();
             return View(invoiceList);
         }
 
-
+        [Authorize(Roles = "SuperAdmin, Supervisor, Customer")]
         public async Task<IActionResult> Details(int? id)
         {
-            string user_id = _userManager.GetUserId(HttpContext.User);
-            ApplicationUser user = await _userManager.FindByIdAsync(user_id);
+            string userId = _userManager.GetUserId(HttpContext.User);
+            ApplicationUser user = await _userRepository.GetByIdAsync(userId);
+            Invoice invoice = await _userRepository.GetInvoiceByIdAsync(id);
 
-            Invoice invoice = _dbContext.Invoices.Find(id);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, invoice, CRUD.Read);
 
+            if (authorizationResult.Succeeded)
+            {
+                var productList = _userRepository.GetInvoiceProductInfo(invoice.Id);
+                OrderDetailsViewModel odvModel = new OrderDetailsViewModel
+                {
+                    ApplicationUser = user,
+                    ProductInfo = productList.Result,
+                    Invoice = invoice
+                };
 
-            var productList = _dbContext.InvoiceProduct
-                                        .Where(i => i.InvoiceId == invoice.Id)
-                                        .Select(p => new InvoiceProductInfo { 
-                                            Product = p.Product,
-                                            Qty= p.Qty, 
-                                            Invoice = p.Invoice
-                                        });
-            
-
-            OrderDetailsViewModel odvModel = new OrderDetailsViewModel { 
-                ApplicationUser = user,
-                ProductInfo = productList.ToList(),
-                Invoice = invoice
-            };
-
-
-            return View(odvModel);
+                return View(odvModel);
+            }
+            else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+            else { return new ChallengeResult(); }
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Customer")]
         [ValidateAntiForgeryToken]
         public async Task<JsonResult> OrderNow([FromBody] List<CartItem> shoppingCart)
         {
-
             string userId = _userManager.GetUserId(HttpContext.User);
-            //ApplicationUser user = await _userManager.FindByIdAsync(userId);
 
             List<Product> products = new List<Product>();
             foreach (var item in shoppingCart)
             {
-                var product = await _dbContext.Products
-                    .Include(u => u.ApplicationUser)
-                    .Where(p => p.Id == item.id)
-                    .FirstOrDefaultAsync();
-                
+                var product = await _productRepository.GetProductWithOwner(item.id);
                 if (product != null)
                 {
                     products.Add(product);
@@ -116,8 +116,8 @@ namespace ShowCase.Controllers
                 newInvoice.CreatedAt = DateTime.Now;
                 newInvoice.Vat = vat;
 
-                await _dbContext.Invoices.AddAsync(newInvoice);
-                await _dbContext.SaveChangesAsync();
+                await _userRepository.AddInvoiceAsync(newInvoice);
+                await _userRepository.SaveAsync();
 
                 int totalItem = 0;
                 double totalExcludeVat = 0.00;
@@ -139,8 +139,8 @@ namespace ShowCase.Controllers
                 }
 
 
-                await _dbContext.InvoiceProduct.AddRangeAsync(invoiceProductsList);
-                await _dbContext.SaveChangesAsync();
+                await _userRepository.AddRangeOfProductsToInvoiceAsync(invoiceProductsList);
+                await _userRepository.SaveAsync();
 
                 // Update Invoice table
                 totalIncludeVat = (vat * totalExcludeVat / 100) + totalExcludeVat;
@@ -149,10 +149,8 @@ namespace ShowCase.Controllers
                 newInvoice.TotalExcludeVat = Math.Round(totalExcludeVat, 2, MidpointRounding.AwayFromZero);
                 newInvoice.TotalIncludeVat = Math.Round(totalIncludeVat, 2, MidpointRounding.AwayFromZero);
 
-                var updatedInvoice = _dbContext.Invoices.Attach(newInvoice);
-                updatedInvoice.State = EntityState.Modified;
-
-                await _dbContext.SaveChangesAsync();
+                 _userRepository.UpdateInvoiceAsync(newInvoice);
+                await _userRepository.SaveAsync();
             }
             else 
             {
@@ -160,20 +158,16 @@ namespace ShowCase.Controllers
             }
 
 
-
-            var response = new
-            {
-                Success = true,
-                Message = authResultMessage, 
-                Redirect = "/Profile/UserOrders",
-                InvoiceId = newInvoice.Id
-            };
+            var response = new { 
+                    Success = true,
+                    Message = authResultMessage,
+                    Redirect = "/Profile/UserOrders",
+                    InvoiceId = newInvoice.Id
+                };
 
             var jsonResult = Json(response);
-
             return jsonResult;
         }
-
         
         [HttpPost]
         [Authorize(Roles = "Customer")]
@@ -181,104 +175,77 @@ namespace ShowCase.Controllers
         {
             int invoiceId = int.Parse(Invoice_Id);
             string userId = _userManager.GetUserId(HttpContext.User);
-            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            ApplicationUser user = await _userRepository.GetUserInformationAsync(userId);
+            Invoice invoice = await _userRepository.GetInvoiceByIdAsync(invoiceId);
 
-            
-            /*
+            string responseMessage = "";
+            string childNullId = "";
+            string redirectIfFailed = "";
             var SuccessStatus = false;
-            string message = "";
-            var InvoiceIsConfirmed = false;
-            */
+            dynamic jsonResponse;
+
+            if (user.Address == null)
+            {
+                responseMessage += "Add Address";
+                childNullId += "address";
+                redirectIfFailed += "/Profile/UserInformation";
+
+                jsonResponse = new {
+                    Success = SuccessStatus,
+                    Message = responseMessage,
+                    Invoice = invoice.IsConfirmed,
+                    ChildNullId = childNullId,
+                    Redirect = redirectIfFailed
+                };
+                return Json(jsonResponse);
+            }
 
             if (user.PaymentMethod == null)
             {
-               
+                responseMessage += "Add PaymetMethod";
+                childNullId += "payment-method";
+                redirectIfFailed += "/Profile/UserInformation";
+
+                jsonResponse = new {
+                    Success = SuccessStatus,
+                    Message = responseMessage,
+                    Invoice = invoice.IsConfirmed,
+                    ChildNullId = childNullId,
+                    Redirect = redirectIfFailed
+                };
+                return Json(jsonResponse);
             }
-            
-            // Get Invoice which invoiceId == id & belongs to the current user
-            Invoice invoice = await _dbContext.Invoices.SingleAsync(i => i.ApplicationUserId == userId && i.Id == invoiceId);
-            invoice.IsConfirmed = true;
-            
-            var inv = _dbContext.Invoices.Attach(invoice);
-            inv.State = EntityState.Modified;
-
-            await _dbContext.SaveChangesAsync();
 
 
-            var response = new
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, invoice, CRUD.Update);
+            if (authorizationResult.Succeeded)
             {
-                Success = true,
-                Message = "Order confirmed succefully",
-                Invoice = invoice.IsConfirmed
-            };
+                try
+                {
+                    invoice.IsConfirmed = true;
+                    _userRepository.UpdateInvoiceAsync(invoice);
+                    await _userRepository.SaveAsync();
 
-            var jsonResult = Json(response);
+                    responseMessage += "Order Confirmed";
+                    SuccessStatus = true;
+                }
+                catch (DbUpdateException ex)
+                {
+                    responseMessage += "Confirm Failed! Due to " + ex.InnerException.ToString();
+                }
 
-            return jsonResult;
+                jsonResponse = new
+                {
+                    Success = SuccessStatus,
+                    Message = responseMessage,
+                    Invoice = invoice.IsConfirmed,
+                    ChildNullId = childNullId
+                };
+
+                return Json(jsonResponse);
+            }
+            else if (User.Identity.IsAuthenticated) { return Json(new ForbidResult()); }
+            else { return Json(new ChallengeResult()); }
         }
     }
-
-
-    /*
-     *   Anothor Example to show Data
-     * ------------------------------------------
-     *   var response = new { 
-     *       Success = true, 
-     *       Message = "Item Added Succesfully", 
-     *       Product = new { 
-     *            product.Name,
-     *            product.Description,
-     *            product.Price
-     *         },  
-     *       CartCount = _dbContext.ShoppingCart.Count()
-     *    };
-     */
-
-
-    /*   Way# 1: EF Conding Related 
-     * -------------------------------------------
-     * IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
-     *                                           .Where(user => user.ApplicationUserID == userId)
-     *                                           .Select(product => product.Product);
-     */
-
-
-    /*
-     *   Way# 2: Similar to SQL 
-     * -------------------------------------------- 
-     * var modelList = ( from product in _dbContext.Products
-     *                   where product.ShoppingCarts.Any(user => user.ApplicationUserID == userId)
-     *                   select product ).ToList();
-     */
-
-
-
-    //  Usefull Query functions for Details Controller
-    /*--------------------------------------------------*
-
-
-   /*  
-    *  Way# 2: Similar to SQL 
-    * -------------------------------------------- 
-    *  var productList = (from product in _dbContext.Products
-    *                     where product.InvoiceProducts.Any(i => i.InvoiceId ==  invoice.Id)
-    *                     select product).ToList();
-    *
-    */
-
-    /*
-     * var productList = (from product in _dbContext.Products
-     *                   where product.InvoiceProducts.Any(i => i.InvoiceId == invoice.Id)
-     *                  select new InvoiceProductInfo {
-     *                      Product = product,
-     *                      Qty = product.InvoiceProducts.Where(p => p.ProductId == product.Id).Select(q=>q.Qty),
-     *                      Invoice = invoice
-     *                  }).ToList();
-     */
-
-
-    /*
-     * var invoice = _dbContext.Invoices.Where(i => i.ApplicationUserId == userId && i.Id == invoiceId);
-     */
-
 }

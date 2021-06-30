@@ -76,5 +76,10 @@ namespace ShowCase.Models
         */
         public virtual ICollection<Product> Products { get; set; }
 
+
+        public override string ToString()
+        {
+            return String.Format("Username: {0}, FirstName: {1}, LastName: {2}", this.Email, this.FirstName, this.LastName);
+        }
     }
 }

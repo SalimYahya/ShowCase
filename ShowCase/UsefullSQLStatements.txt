@@ -1,0 +1,60 @@
+﻿# OderController:-
+
+    /*
+     *  Json Response
+     * -----------------------------------------
+     *   Anothor Example to show Data
+     * ------------------------------------------
+     *   var response = new { 
+     *       Success = true, 
+     *       Message = "Item Added Succesfully", 
+     *       Product = new { 
+     *            product.Name,
+     *            product.Description,
+     *            product.Price
+     *         },  
+     *       CartCount = _dbContext.ShoppingCart.Count()
+     *    };
+     */
+
+
+    /*   Way# 1: EF Conding Related 
+     * -------------------------------------------
+     * IEnumerable<ShoppingCart> modelList = _dbContext.ShoppingCart
+     *                                           .Where(user => user.ApplicationUserID == userId)
+     *                                           .Select(product => product.Product);
+     */
+
+    /*
+     *   Way# 2: Similar to SQL 
+     * -------------------------------------------- 
+     * var modelList = ( from product in _dbContext.Products
+     *                   where product.ShoppingCarts.Any(user => user.ApplicationUserID == userId)
+     *                   select product ).ToList();
+     */
+
+
+   /*  
+    *  Way# 2: Similar to SQL 
+    * -------------------------------------------- 
+    *  var productList = (from product in _dbContext.Products
+    *                     where product.InvoiceProducts.Any(i => i.InvoiceId ==  invoice.Id)
+    *                     select product).ToList();
+    *
+    */
+
+
+    /*
+     * var productList = (from product in _dbContext.Products
+     *                   where product.InvoiceProducts.Any(i => i.InvoiceId == invoice.Id)
+     *                  select new InvoiceProductInfo {
+     *                      Product = product,
+     *                      Qty = product.InvoiceProducts.Where(p => p.ProductId == product.Id).Select(q=>q.Qty),
+     *                      Invoice = invoice
+     *                  }).ToList();
+     */
+
+
+     /*
+     * var invoice = _dbContext.Invoices.Where(i => i.ApplicationUserId == userId && i.Id == invoiceId);
+     */
