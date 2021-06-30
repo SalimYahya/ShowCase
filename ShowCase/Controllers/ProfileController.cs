@@ -5,7 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Models.Specials;
 using ShowCase.Models.Temp;
+using ShowCase.Repository.Contracts;
+using ShowCase.Repository.Specifications;
 using ShowCase.Security;
 using ShowCase.ViewModel.Order;
 using ShowCase.ViewModel.Profile;
@@ -21,27 +24,33 @@ namespace ShowCase.Controllers
     public class ProfileController : Controller
     {
         private readonly ILogger<ProfileController> _logger;
+
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AppDbContext _appDbContext;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IUserRepository _userRepository;
 
-        public ProfileController(ILogger<ProfileController> logger, UserManager<ApplicationUser> userManager, AppDbContext appDbContext, IAuthorizationService authorizationService)
+        public ProfileController(ILogger<ProfileController> logger,
+            UserManager<ApplicationUser> userManager, 
+            AppDbContext appDbContext, 
+            IAuthorizationService authorizationService,
+            IUserRepository userRepository)
         {
             _logger = logger;
             _userManager = userManager;
             _appDbContext = appDbContext;
             _authorizationService = authorizationService;
+            _userRepository = userRepository;
         }
 
 
-        public async Task<IActionResult> UserInformation()
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> UserInformation(string text = null)
         {
             string userId = _userManager.GetUserId(HttpContext.User);
-            
-            ApplicationUser user = await _userManager.FindByIdAsync(userId);
-            Address address = _appDbContext.Addresses.Find(user.Id);
-            PaymentMethod payment = _appDbContext.PaymentMethods.Find(user.Id);
-  
+            ApplicationUser user = await _userRepository.GetUserInformationAsync(userId);
+
             ProfileEditUserViewModel model = new ProfileEditUserViewModel
             {
                 User = user,
@@ -75,6 +84,7 @@ namespace ShowCase.Controllers
                     user.UpdatedAt = DateTime.Now;
 
                     await _userManager.UpdateAsync(user);
+                    
 
                     return RedirectToAction("UserInformation", "Profile");
                 }
@@ -214,19 +224,14 @@ namespace ShowCase.Controllers
         {
             string userId = _userManager.GetUserId(HttpContext.User);
             ApplicationUser user = await _userManager.FindByIdAsync(userId);
-
-            var invoiceList = await _appDbContext.Invoices
-                .Include(u => u.ApplicationUser)
-                .OrderByDescending(p => p.CreatedAt)
-                .ToListAsync();
-
             var orderDetailsViewModelList = new List<OrderDetailsViewModel>();
-
             var isUserInAdminstrativeRole = User.IsInRole("SuperAdmin") || User.IsInRole("Admin") || User.IsInRole("Supervisor");
-
+            //var spec = new InvoiceListByUserSpecification();
+            //var invoiceList = _invoiceRepository.FindWithSpecificationPattern(spec);
+        
             if (User.IsInRole("Customer") && !isUserInAdminstrativeRole)
             {
-                var userInvoiceList = invoiceList.Where(u=>u.ApplicationUserId == userId).ToList();
+                var userInvoiceList = await _userRepository.GetUserInvoiceListDescendingOrder(userId);
 
                 foreach (var invoice in userInvoiceList)
                 {
@@ -251,9 +256,7 @@ namespace ShowCase.Controllers
             }
 
 
-            //var invoiceList = _appDbContext.Invoices.Include(u => u.ApplicationUser).Where(i=> i.ApplicationUserId == userId).OrderByDescending(d => d.CreatedAt);
-            
-
+            var invoiceList = await _userRepository.GetInvoiceListDescendingOrder();
             foreach (var invoice in invoiceList)
             {
                 var productList = _appDbContext.InvoiceProduct

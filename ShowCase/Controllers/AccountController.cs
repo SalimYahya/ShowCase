@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using ShowCase.Models;
+using ShowCase.Repository.Contracts;
 using ShowCase.ViewModel.Account;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,17 @@ namespace ShowCase.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly RoleManager<IdentityRole> roleManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly ILogger<AccountController> _logger;
+        private readonly IUserRepository _userRepository;
+        private readonly IRoleRepository _roleRepository;
 
-        public AccountController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<ApplicationUser> signInManager)
+        public AccountController(ILogger<AccountController> logger, 
+            IUserRepository userRepository, 
+            IRoleRepository roleRepository)
         {
-            this.userManager = userManager;
-            this.roleManager = roleManager;
-            this.signInManager = signInManager;
+            _logger = logger;
+            _userRepository = userRepository;
+            _roleRepository = roleRepository;
         }
 
         [HttpGet]
@@ -45,15 +48,16 @@ namespace ShowCase.Controllers
                     Email = model.Email,
                 };
 
-                var registerationResult = await userManager.CreateAsync(user, model.Password);
+                var registerationResult = await _userRepository.AddUserAsync(user, model.Password);
+
                 if (registerationResult.Succeeded)
                 {
 
+                    _logger.LogInformation($"Result: {registerationResult.Succeeded}");
+                    
                     IEnumerable<string> roles = new string[] { "Customer","Seller" };
-
-                    await userManager.AddToRolesAsync(user, roles);
-
-                    await signInManager.SignInAsync(user, isPersistent: false);
+                    await _roleRepository.AddUserToRolesAsync(user, roles);
+                    await _userRepository.UserSignInAsync(user, false);
 
                     return RedirectToAction("index", "home");
                 }
@@ -82,7 +86,7 @@ namespace ShowCase.Controllers
         public async Task<IActionResult> Login(Login model, string returnUrl)
         {
             if (ModelState.IsValid) {
-                var loginResult = await signInManager.PasswordSignInAsync(
+                var loginResult = await _userRepository.UserPasswordSignInAsync(
                     model.Email,
                     model.Password,
                     model.RememberMe,
@@ -116,7 +120,9 @@ namespace ShowCase.Controllers
                 HttpContext.Session.Remove("CartCount");
             }
 
-            await signInManager.SignOutAsync();
+            //await signInManager.SignOutAsync();
+            await _userRepository.UserSignOutAsync();
+
             return RedirectToAction("index", "home");
         }
 
