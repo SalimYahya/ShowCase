@@ -115,7 +115,17 @@ Finish on {21/6/2021}:
 #- Refacor the whole project: 
 	1- Repository Pattern.
 	2- Seperate API into another project.
-			
+
+
+	#- Progress:
+		
+		1- AccountController: Done!!!
+		2- AdminstrationController:
+		3- HomeController: Partially Done. Note: Need to work on Repository pattern with Specification
+		4- OrderController: Done!!!
+		5- ProductController: Done!!!
+		6- ProfileController: Done!!!
+
 ------------------------------------------------------------
 This assigment was finished on ""
 ____________________________________________________________
