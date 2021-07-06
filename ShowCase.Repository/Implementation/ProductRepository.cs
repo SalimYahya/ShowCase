@@ -27,14 +27,12 @@ namespace ShowCase.Repository
                                     .Where(p => p.Id == id)
                                     .FirstOrDefaultAsync();
         }
-
         public async Task<IEnumerable<Product>> GetAllProductsOrderByDescendingAsync()
         {
             return await _appDbContext.Products
                                 .OrderByDescending(p => p.CreatedAt)
                                 .ToListAsync();
         }
-
         public async Task<IEnumerable<Product>> GetAllProductsWithOwnersOrderByDescendingAsync(string userId)
         {
             return await _appDbContext.Products
@@ -44,5 +42,12 @@ namespace ShowCase.Repository
                                 .ToListAsync();
         }
 
+        public async Task<List<Product>> GetAllProductsListWithOwnersOrderByDescendingAsync()
+        {
+            return  await _appDbContext.Products
+                            .Include(p => p.ApplicationUser)
+                            .OrderByDescending(p => p.CreatedAt)
+                            .ToListAsync();
+        }
     }
 }

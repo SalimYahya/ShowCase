@@ -87,6 +87,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Name</th>
+                                    <th scope="col">UserName</th>
                                     <th scope="col">Roles</th>
                                     <th scope="col">Claims</th>
                                     <th scope="col">Action</th>
@@ -98,7 +99,12 @@
                                     @foreach (var user in Model.userRolesAndClaims)
                                     {
                                         <tr>
-                                            <td class="align-middle">@user.applicationUser.UserName</td>
+                                            <td class="align-middle">
+                                                @user.applicationUser.FirstName @user.applicationUser.LastName
+                                            </td>
+                                            <td class="align-middle">
+                                                @user.applicationUser.UserName
+                                            </td>
 
                                             <!-- User Roles -->
                                             @if (user.Roles.Any())
@@ -123,6 +129,7 @@
                                                 </div>
                                             </td>
 
+                                            <!-- User Actions -->
                                             <td class="align-middle">
                                                 <div class="row justify-content-center">
                                                     <a class="btn btn-warning" asp-controller="Adminstration" asp-action="EditUser" asp-route-Id="@user.applicationUser.Id">

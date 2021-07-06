@@ -12,6 +12,10 @@ namespace ShowCase.Repository.Contracts
         Task<Product> GetProductWithOwner(int id);
         Task<IEnumerable<Product>> GetAllProductsOrderByDescendingAsync();
         Task<IEnumerable<Product>> GetAllProductsWithOwnersOrderByDescendingAsync(string userId);
+        
+        // Used in HomeController
+        Task<List<Product>> GetAllProductsListWithOwnersOrderByDescendingAsync();
+
 
         //
         // Summary:

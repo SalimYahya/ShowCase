@@ -24,7 +24,10 @@ namespace ShowCase.Repository.Contracts
         Task<IdentityResult> AddUserAsync(ApplicationUser user, string password);
         //Task EditUserAsync(ApplicationUser user, string password);
         //Task<IdentityResult> DeleteUserAsync(ApplicationUser user, string password);
-        
+
+
+        // Roles
+        IEnumerable<IdentityRole> GetAllRolesAsync();
         Task<IdentityResult> AddUserToRole(ApplicationUser user, string role);
         Task<IdentityResult> AddUserToRoles(ApplicationUser user, IEnumerable<string> roles);
         Task<IdentityResult> RemoveUserFromRole(ApplicationUser user, string role);
@@ -35,6 +38,10 @@ namespace ShowCase.Repository.Contracts
         Task<SignInResult> UserPasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure);
         Task UserSignOutAsync();
 
+        // Address
+        Task<Address> AddAddressAsync(Address address);
+        Task<Address> GetUserAddressAsync(string userId);
+        public void UpdateUserAddress(Address address);
 
         // Invoice
         Task<Invoice> GetInvoiceByIdAsync(int? id);

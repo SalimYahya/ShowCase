@@ -16,19 +16,26 @@ namespace ShowCase.Repository.Implementation
 
         private readonly AppDbContext _appDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
         public UserRepository(AppDbContext appDbContext,
             UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager,
             SignInManager<ApplicationUser> signInManager)
             : base(appDbContext)
         {
             _appDbContext = appDbContext;
             _userManager = userManager;
+            _roleManager = roleManager;
             _signInManager = signInManager;
         }
 
 
+        public async Task<IdentityResult> AddUserAsync(ApplicationUser user, string password)
+        {
+            return await _userManager.CreateAsync(user, password);
+        }
         public async Task<ApplicationUser> GetUserInformationAsync(string userId)
         {
             return await _appDbContext.ApplicationUsers
@@ -37,9 +44,29 @@ namespace ShowCase.Repository.Implementation
                                .Include(u => u.PaymentMethod)
                                .FirstOrDefaultAsync();
         }
-        public async Task<IdentityResult> AddUserAsync(ApplicationUser user, string password)
+
+        // Address
+        public async Task<Address> AddAddressAsync(Address address)
+        { 
+            await _appDbContext.Addresses.AddAsync(address);
+            return address;
+        }
+        public async Task<Address> GetUserAddressAsync(string userId)
         {
-            return await _userManager.CreateAsync(user, password);
+            return await _appDbContext.Addresses
+                                .Where(u => u.Id == userId)
+                                .FirstOrDefaultAsync();
+        }
+        public void UpdateUserAddress(Address address)
+        {
+            _appDbContext.Set<Address>().Attach(address);
+            _appDbContext.Entry(address).State = EntityState.Modified;
+        }
+
+        // Roles
+        public IEnumerable<IdentityRole> GetAllRolesAsync()
+        {
+            return _roleManager.Roles;
         }
         public async Task<IdentityResult> AddUserToRole(ApplicationUser user, string role)
         {

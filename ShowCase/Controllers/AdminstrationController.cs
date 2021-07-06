@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ShowCase.Models;
 using ShowCase.Models.Temp;
+using ShowCase.Repository.Contracts;
+using ShowCase.Security;
 using ShowCase.ViewModel.Admin;
 using ShowCase.ViewModel.Role;
 using System;
@@ -16,11 +18,15 @@ namespace ShowCase.Controllers
     [Authorize(Roles = "Super Admin, Admin, Supervisor")]
     public class AdminstrationController : Controller
     {
+        private readonly IAuthorizationService _authorizationService;
+        private readonly IUserRepository _userRepository;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public AdminstrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
+        public AdminstrationController(IAuthorizationService authorizationService, IUserRepository userRepository,RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager)
         {
+            _authorizationService = authorizationService;
+            _userRepository = userRepository;
             this.roleManager = roleManager;
             this.userManager = userManager;
         }
@@ -39,8 +45,7 @@ namespace ShowCase.Controllers
                 userRolesAndClaims.Add(new UserRolesAndClaims { 
                     applicationUser = user,
                     Roles = userRoles.ToList(),
-                    Claims = userClaims.Select(c => c.Type + " : " + c.Value).ToList()
-
+                    Claims = userClaims.Where(c => c.Value == "true").Select(c => c.Type + " : " + c.Value).ToList()
                 });
             }
 
@@ -53,16 +58,21 @@ namespace ShowCase.Controllers
             return View(model);
         }
 
+
         public IActionResult RolesList()
         {
-            IEnumerable<IdentityRole> roles = roleManager.Roles;
+            IEnumerable<IdentityRole> roles = _userRepository.GetAllRolesAsync();
             return View(roles);
         }
 
-        public IActionResult UsersList()
+        public async Task<IActionResult> UsersListAsync()
         {
-            IEnumerable<ApplicationUser> users = userManager.Users;
-            return View(users);
+            IEnumerable<ApplicationUser> users = await _userRepository.GetAllAsync();
+
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, users, CRUD.Read);
+            if (authorizationResult.Succeeded) { return View(users); }
+            else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
+            else { return new ChallengeResult(); }
         }
 
         [HttpGet]

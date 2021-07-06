@@ -77,15 +77,15 @@ namespace ShowCase.Controllers
                 var authorizationResult = await _authorizationService.AuthorizeAsync(User, model.User, CRUD.Update);
                 if (authorizationResult.Succeeded)
                 {
-                    ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
+                    ApplicationUser user = await _userRepository.GetByIdAsync(model.User.Id);
 
                     user.FirstName = model.User.FirstName;
                     user.LastName = model.User.LastName;
                     user.UpdatedAt = DateTime.Now;
 
-                    await _userManager.UpdateAsync(user);
+                    _userRepository.Update(user);
+                    await _userRepository.SaveAsync();
                     
-
                     return RedirectToAction("UserInformation", "Profile");
                 }
                 else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
@@ -101,34 +101,29 @@ namespace ShowCase.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationUser user = await _userManager.FindByIdAsync(model.User.Id);
-                Address address = _appDbContext.Addresses.Find(model.User.Id);
+                ApplicationUser user = await _userRepository.GetUserInformationAsync(model.User.Id);
+                //Address address = await _userRepository.GetUserAddressAsync(model.User.Id);
 
-                if (address != null)
+                if (user.Address != null)
                 {
-                    address.District = model.User.Address.District;
-                    address.Street = model.User.Address.Street;
-                    address.City = model.User.Address.City;
-                    address.ZipCode = model.User.Address.ZipCode;
-                    address.POBox = model.User.Address.POBox;
+                    user.Address.District = model.User.Address.District;
+                    user.Address.Street = model.User.Address.Street;
+                    user.Address.City = model.User.Address.City;
+                    user.Address.ZipCode = model.User.Address.ZipCode;
+                    user.Address.POBox = model.User.Address.POBox;
 
                     var authResult = await _authorizationService.AuthorizeAsync(User, user.Address, CRUD.Update);
                     if (authResult.Succeeded)
                     {
-                        var tmp_address = _appDbContext.Addresses.Attach(address);
-                        tmp_address.State = EntityState.Modified;
-
-
-                        await _appDbContext.SaveChangesAsync();
-                        _logger.LogInformation($"EditOrCreateUserAddress, Address: {tmp_address.ToString()} Updated");
-
+                        _userRepository.UpdateUserAddress(user.Address);
+                        await _userRepository.SaveAsync();
                     }
                     else if (User.Identity.IsAuthenticated) { return new ForbidResult(); }
                     else { return new ChallengeResult(); }
                 }
                 else
                 {
-                   Address new_address = new Address
+                   Address address = new Address
                    {
                        Id = model.User.Id,
                        District = model.User.Address.District,
@@ -138,14 +133,14 @@ namespace ShowCase.Controllers
                        POBox = model.User.Address.POBox
                     };
 
-                    var authResult = await _authorizationService.AuthorizeAsync(User, new_address, CRUD.Create);
+                    var authResult = await _authorizationService.AuthorizeAsync(User, address, CRUD.Create);
 
                     if (authResult.Succeeded)
                     {
-                        _appDbContext.Addresses.Add(new_address);
-                        await _appDbContext.SaveChangesAsync();
+                        await _userRepository.AddAddressAsync(address);
+                        await _userRepository.SaveAsync();
 
-                        _logger.LogInformation($"EditOrCreateUserAddress, Address: {new_address.ToString()} Cretaed");
+                        _logger.LogInformation($"EditOrCreateUserAddress, Address: {address.ToString()} Cretaed");
                     }
                     else if (User.Identity.IsAuthenticated){ return new ForbidResult(); }
                     else { return new ChallengeResult(); }

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
+using ShowCase.Repository.Contracts;
 
 namespace ShowCase.Controllers
 {
@@ -21,12 +22,14 @@ namespace ShowCase.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IProductRepository _productRespository;
         private readonly AppDbContext _dbContext;
         private readonly IHtmlLocalizer<HomeController> _localizer;
 
-        public HomeController(ILogger<HomeController> logger, AppDbContext dbContext)
+        public HomeController(ILogger<HomeController> logger, IProductRepository productRespository ,AppDbContext dbContext)
         {
             _logger = logger;
+            _productRespository = productRespository;
             _dbContext = dbContext;
         }
 
@@ -50,7 +53,7 @@ namespace ShowCase.Controllers
 
             return pagesSizes;
         }
-        public IActionResult Index(string SearchText = "", int page = 1, int pageSize = 30)
+        public async Task<IActionResult> IndexAsync(string SearchText = "", int page = 1, int pageSize = 30)
         {
             _logger.LogInformation($"Total Products available {_dbContext.Products.Count()}");
 
@@ -76,13 +79,7 @@ namespace ShowCase.Controllers
             {
                 //_dbContext.ChangeTracker.AutoDetectChangesEnabled = false;
                 var stopWatchList = Stopwatch.StartNew();
-
-                products = _dbContext.Products
-                    .Include(u => u.ApplicationUser)
-                    .OrderByDescending(p => p.CreatedAt)
-                    .Take(1000)
-                    .ToList();
-
+                products = await _productRespository.GetAllProductsListWithOwnersOrderByDescendingAsync();
                 stopWatchList.Stop();
                 _logger.LogInformation($"1- Fethcing All Records using (Include) in, {stopWatchList.Elapsed}");
                 //_dbContext.ChangeTracker.AutoDetectChangesEnabled = true;

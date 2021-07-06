@@ -27,6 +27,7 @@ using ShowCase.Security.ManageRoles;
 using ShowCase.Security.ManageRoles.CreateRoles;
 using ShowCase.Security.ManageRoles.DeleteRoles;
 using ShowCase.Security.ManageRoles.EditRoles;
+using ShowCase.Security.ManageRoles.ReadRoles;
 using ShowCase.Security.Operations;
 using ShowCase.Security.Operations.ProductOperations;
 using ShowCase.Security.Operations.UserInformation;
@@ -177,6 +178,9 @@ namespace ShowCase
                 options.AddPolicy("CreateRolePolicy",
                     policy => policy.AddRequirements(new CreateRoleRequirement()));
 
+                options.AddPolicy("ReadRolePolicy",
+                    policy => policy.AddRequirements(new ReadRoleRequirement()));
+
                 options.AddPolicy("EditRolePolicy",
                     policy => policy.AddRequirements(new EditRolesRequirement()));
 
@@ -199,6 +203,7 @@ namespace ShowCase
             services.AddSingleton<IAuthorizationHandler, OrderAuthorizationHandler>();
 
             // UserInformation - PersonalInformation.
+            services.AddSingleton<IAuthorizationHandler, UserListHandler>();
             services.AddSingleton<IAuthorizationHandler, UserPersonalInformationHandler>();
             services.AddSingleton<IAuthorizationHandler, UserAddressInformationHandler>();
             services.AddSingleton<IAuthorizationHandler, UserPaymentMethodHandler>();
