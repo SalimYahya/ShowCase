@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ShowCase.Models;
@@ -17,14 +18,17 @@ namespace ShowCase.Controllers
         private readonly ILogger<AccountController> _logger;
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public AccountController(ILogger<AccountController> logger, 
             IUserRepository userRepository, 
-            IRoleRepository roleRepository)
+            IRoleRepository roleRepository,
+            UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
             _userRepository = userRepository;
             _roleRepository = roleRepository;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -52,14 +56,22 @@ namespace ShowCase.Controllers
 
                 if (registerationResult.Succeeded)
                 {
+                    
+                    var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var link = Url.Action("ConfirmEmail", 
+                                          "Account",
+                                          new { userId = user.Id, token = token},
+                                          Request.Scheme);
 
-                    _logger.LogInformation($"Result: {registerationResult.Succeeded}");
+                    //_logger.LogInformation($"Link: {link}");
+                    //_logger.LogInformation($"Result: {registerationResult.Succeeded}");
                     
                     IEnumerable<string> roles = new string[] { "Customer","Seller" };
                     await _roleRepository.AddUserToRolesAsync(user, roles);
-                    await _userRepository.UserSignInAsync(user, false);
+                   
+                    ViewData["link"] = link;
+                    return View();
 
-                    return RedirectToAction("index", "home");
                 }
 
                 // Catch Errors
@@ -72,6 +84,30 @@ namespace ShowCase.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (userId == null || token == null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                _logger.LogInformation($"userId - {userId}, is Invalid");
+                return RedirectToAction("Index", "Home");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return View();
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
 
         [HttpGet]
         [AllowAnonymous]

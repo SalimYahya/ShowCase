@@ -34,6 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\ShowCase.Data\ShowCase.Data.csproj" />
     <ProjectReference Include="..\ShowCase.Repository\ShowCase.Repository.csproj" />
+    <ProjectReference Include="..\ShowCase.Security\ShowCase.Security.csproj" />
   </ItemGroup>
 
 </Project>

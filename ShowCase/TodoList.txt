@@ -120,7 +120,7 @@ Finish on {21/6/2021}:
 	#- Progress:
 		
 		1- AccountController: Done!!!
-		2- AdminstrationController:
+		2- AdminstrationController: Dont!!!
 		3- HomeController: Partially Done. Note: Need to work on Repository pattern with Specification
 		4- OrderController: Done!!!
 		5- ProductController: Done!!!

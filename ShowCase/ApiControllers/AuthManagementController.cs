@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using ShowCase.Configuration;
@@ -22,13 +23,16 @@ namespace ShowCase.ApiControllers
     [AllowAnonymous]
     public class AuthManagementController : ControllerBase
     {
+        private readonly ILogger<AuthManagementController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly JwtConfig _jwtConfig;
 
         public AuthManagementController(
+            ILogger<AuthManagementController> logger,
             UserManager<ApplicationUser> userManager,
             IOptionsMonitor<JwtConfig> optionMonitor)
         {
+            _logger = logger;
             _userManager = userManager;
             _jwtConfig = optionMonitor.CurrentValue;
         }
@@ -67,7 +71,7 @@ namespace ShowCase.ApiControllers
                      * await userManager.AddToRolesAsync(user, roles);
                      */
 
-                    var jwtToken = GenerateJwtToken(newUser);
+                    var jwtToken = await GenerateJwtTokenAsync(newUser);
                     return Ok(new UserRigistrationResponse() {
                         Success = true,
                         Token = jwtToken
@@ -124,7 +128,7 @@ namespace ShowCase.ApiControllers
                     });
                 }
 
-                var jwtToken = GenerateJwtToken(existingUser);
+                var jwtToken = await GenerateJwtTokenAsync(existingUser);
 
                 return Ok(new UserRigistrationResponse() { 
                     Success = true,
@@ -142,19 +146,30 @@ namespace ShowCase.ApiControllers
             });
         }
 
-        private string GenerateJwtToken(ApplicationUser user)
+        private async Task<string> GenerateJwtTokenAsync(ApplicationUser user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
 
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim("Id", user.Id),
+                new Claim("Name",user.UserName),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var claimss = await _userManager.GetClaimsAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] {
-                    new Claim("Id", user.Id),
-                    new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(6),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };

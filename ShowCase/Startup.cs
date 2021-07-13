@@ -52,19 +52,10 @@ namespace ShowCase
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Localization
+            #region Localization
             services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
             services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
-
-            // DbRepos
-            //services.AddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
-
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IRoleRepository, RoleRepository>();
-
-
             services.Configure<RequestLocalizationOptions>(opt => {
 
                 var supportedCultures = new List<CultureInfo> {
@@ -76,13 +67,17 @@ namespace ShowCase
                 opt.SupportedCultures = supportedCultures;
                 opt.SupportedUICultures = supportedCultures;
             });
+            #endregion
+
+            #region DatabaseRepos
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            #endregion
 
             services.AddControllersWithViews();
 
-            // Configure Jwt - Secret Key
-            services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
-
-            // Swagger
+            #region Swagger
             services.AddSwaggerGen(swagger =>
             {
                 //This is to generate the Default UI of Swagger Documentation    
@@ -123,8 +118,12 @@ namespace ShowCase
                 options => options.UseSqlServer(
                     Configuration.GetConnectionString("DBConnection")).EnableSensitiveDataLogging()
             );
+            #endregion
 
-            // Configure Jwt - Authentication
+            #region Configure Jwt - Authentication
+            // Configure Jwt - Secret Key
+            services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
+
             services.AddAuthentication(options => {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -146,9 +145,12 @@ namespace ShowCase
 
             });
 
-            
+            #endregion
+
+            #region Identity
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                    .AddEntityFrameworkStores<AppDbContext>();
+                    .AddEntityFrameworkStores<AppDbContext>()
+                    .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(
                 options => {
@@ -157,22 +159,27 @@ namespace ShowCase
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
                     options.Password.RequireLowercase = false;
+                    options.SignIn.RequireConfirmedEmail = true;
             });
 
+            #endregion
 
-
-            // Add Mvc to Apply Authorization Globally
+            #region Add Mvc to Apply Authorization Globally
             services.AddMvc(options => {
                 var policy = new AuthorizationPolicyBuilder()
                                  .RequireAuthenticatedUser()
                                  .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
+            #endregion
 
+            #region Cookies
             services.ConfigureApplicationCookie(options => {
                 options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Adminstration/AccessDenied");
             });
+            #endregion
 
+            #region Authorization
             services.AddAuthorization(options => {
                
                 options.AddPolicy("CreateRolePolicy",
@@ -194,7 +201,6 @@ namespace ShowCase
                     policy => policy.AddRequirements(new OperationAuthorizationRequirement()));
             });
 
-            
             services.AddSingleton<IAuthorizationHandler, CanCreateRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanEditRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
@@ -212,7 +218,7 @@ namespace ShowCase
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
-
+            #endregion
 
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

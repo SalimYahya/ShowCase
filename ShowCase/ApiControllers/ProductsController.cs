@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using ShowCase.Data;
 using ShowCase.Extensions;
 using ShowCase.Models;
+using ShowCase.Repository.Contracts;
 using ShowCase.Security;
 using System;
 using System.Collections.Generic;
@@ -23,13 +24,19 @@ namespace ShowCase.ApiControllers
     public class ProductsController : ControllerBase
     {
         private readonly ILogger<ProductsController> _logger;
+        private readonly IProductRepository _productRepository;
         private readonly AppDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IAuthorizationService _authorizationService;
 
-        public ProductsController(ILogger<ProductsController> logger, AppDbContext dbContext, UserManager<ApplicationUser> userManager, IAuthorizationService authorizationService)
+        public ProductsController(ILogger<ProductsController> logger,
+            IProductRepository productRepository,
+            AppDbContext dbContext, 
+            UserManager<ApplicationUser> userManager, 
+            IAuthorizationService authorizationService)
         {
             _logger = logger;
+            _productRepository = productRepository;
             _dbContext = dbContext;
             _userManager = userManager;
             _authorizationService = authorizationService;
@@ -40,11 +47,22 @@ namespace ShowCase.ApiControllers
         public async Task<IActionResult> Get()
         {
             string userId = HttpContext.GetUserId();
-            _logger.LogInformation($"UserId: {userId} --- {HttpContext.User.Claims.Single(x => x.Type == "Id")}");
-            _logger.LogInformation($"{HttpContext.User.Claims.Single(x=> x.Type == "Id")}");
-            _logger.LogInformation($"User: {User}");
 
-            var products = await _dbContext.Products.ToListAsync();
+            //_logger.LogInformation($"UserId: {userId} --- {HttpContext.User.Claims.Single(x => x.Type == "Id")}");
+            //_logger.LogInformation($"{HttpContext.User.Claims.Single(x=> x.Type == "Id")}");
+            //_logger.LogInformation($"User: {User}");
+
+            //var products = await _dbContext.Products.ToListAsync();
+            var products = await _dbContext.Products
+                .Include(p => p.ApplicationUser)
+                .Select(p => new { 
+                    p.Id, 
+                    p.Name, 
+                    p.Description, 
+                    p.Price,  
+                    p.ApplicationUser.UserName
+                }).ToListAsync();
+
             return Ok(products);
         }
 

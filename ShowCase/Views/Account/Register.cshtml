@@ -61,6 +61,13 @@
                                 <a class="small mr-auto" href="forgot-password.html">Forgot Password?</a>
                                 <a class="small ml-auto" href="register.html">Already have an account? Login!</a>
                             </div>
+                           
+                            @if (ViewData["link"] != null)
+                            {
+                                <div class="row d-flex my-2">
+                                    <a class="btn btn-success btn-block text-white" href="@ViewData["link"]">Confirm Email</a>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -68,6 +75,7 @@
             </div>
         </div>
     </div>
+
 </div>
 
 @section Scripts{
