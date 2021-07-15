@@ -134,6 +134,7 @@ namespace ShowCaseAPI.Controllers
             List<Claim> tokenClaims = new List<Claim>
             {
                 new Claim("Id", user.Id),
+                new Claim(ClaimTypes.Name, user.Email),
                 new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())

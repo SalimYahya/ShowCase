@@ -21,32 +21,19 @@ namespace ShowCase.Security.Operations
 
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement, ApplicationUser resource)
         {
-            //_logger.LogInformation($"context.User.Identity.Name: {context.User.Identity.Name}");
-            //_logger.LogInformation($"context.User.Name: {context.User.Claims.Single(x => x.Type =="Name").Value}");
-            //_logger.LogInformation($"context.User.Claims: {context.User.Claims}");
-
             var isUserInAdminstrativeRole = context.User.IsInRole("SuperAdmin") || context.User.IsInRole("Admin") || context.User.IsInRole("Supervisor");
-            string userId = context.User.Claims.Single(x => x.Type == "Id").Value;
 
             // Operation: Read
             if (requirement.Name == "Read")
             {
                 _logger.LogInformation($"requirement.Name: Read");
-
+                
                 bool isInformationBelongsToUser = context.User.Identity.Name == resource.UserName;
                 if (isInformationBelongsToUser || isUserInAdminstrativeRole)
                 {
                     context.Succeed(requirement);
                     return Task.CompletedTask;
                 }
-
-                isInformationBelongsToUser = userId == resource.Id;
-                if (isInformationBelongsToUser || isUserInAdminstrativeRole)
-                {
-                    context.Succeed(requirement);
-                    return Task.CompletedTask;
-                }
-
             }
 
             // Operation: Update (Edit)
@@ -61,12 +48,6 @@ namespace ShowCase.Security.Operations
                     return Task.CompletedTask;
                 }
 
-                isInformationBelongsToUser = userId == resource.Id;
-                if (isInformationBelongsToUser || isUserInAdminstrativeRole)
-                {
-                    context.Succeed(requirement);
-                    return Task.CompletedTask;
-                }
             }
 
             // Operation: Delete
@@ -80,16 +61,15 @@ namespace ShowCase.Security.Operations
                     context.Succeed(requirement);
                     return Task.CompletedTask;
                 }
-
-                isInformationBelongsToUser = userId == resource.Id;
-                if (isInformationBelongsToUser || isUserInAdminstrativeRole)
-                {
-                    context.Succeed(requirement);
-                    return Task.CompletedTask;
-                }
             }
 
             return Task.CompletedTask;
         }
     }
 }
+
+
+//_logger.LogInformation($"context.User.Identity.Name: {context.User.Identity.Name}");
+//_logger.LogInformation($"context.User.Name: {context.User.Claims.Single(x => x.Type =="Name").Value}");
+//_logger.LogInformation($"context.User.Claims: {context.User.Claims}");
+//string userId = context.User.Claims.Single(x => x.Type == "Id").Value;

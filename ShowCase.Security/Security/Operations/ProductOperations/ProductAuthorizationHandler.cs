@@ -24,9 +24,6 @@ namespace ShowCase.Security.Operations.ProductOperations
                                                         Product resource)
         {
 
-            _logger.LogInformation($"context.User.Identity.Name: {context.User.Identity.Name}");
-            _logger.LogInformation($"context.User.Claims: {context.User.Claims}");
-
             // Operation.Create
             var isUserCanCreate = context.User.HasClaim(claim => claim.Type == "Create Product" && claim.Value == "true");
             if (requirement.Name == "Create")
@@ -35,21 +32,15 @@ namespace ShowCase.Security.Operations.ProductOperations
 
                 if (isUserCanCreate)
                 {
-                    _logger.LogInformation($"isUserCanCreatee: {isUserCanCreate}");
                     context.Succeed(requirement);
                     return Task.CompletedTask;
                 }
             }
 
 
-
             // Operation.Update
-            _logger.LogInformation($"resource.ApplicationUser.UserName: {resource.ApplicationUser.UserName}");
-
-            var isProductBelongsToUser = (context.User.IsInRole("Seller")) && (context.User.Identity.Name == resource.ApplicationUser.UserName);
+            var isProductBelongsToUser = context.User.Identity.Name == resource.ApplicationUser.UserName;
             var isUserCanUpdateProduct = context.User.HasClaim(claim => claim.Type == "Edit Product" && claim.Value == "true");
-            _logger.LogInformation($"isProductBelongsToUser: {isProductBelongsToUser}");
-            _logger.LogInformation($"isUserCanUpdateProduct: {isUserCanUpdateProduct}");
             if (requirement.Name == "Update")
             {
                 _logger.LogInformation($"requirement.Name: Update");
@@ -62,15 +53,12 @@ namespace ShowCase.Security.Operations.ProductOperations
             }
 
 
-
             // Operation.Delete
             var isUserSuperAdminOrSupervisor = context.User.IsInRole("SuperAdmin") || context.User.IsInRole("Supervisor");
             var isUserCanDeleteProduct =  context.User.HasClaim(claim => claim.Type == "Delete Product" && claim.Value == "true");
             if (requirement.Name == "Delete")
             {
                 _logger.LogInformation($"requirement.Name: Delete");
-                _logger.LogInformation($"isProductBelongsToUser: {isProductBelongsToUser}");
-                _logger.LogInformation($"isUserCanDeleteProduct: {isUserCanDeleteProduct}");
 
                 if ( isProductBelongsToUser && isUserCanDeleteProduct)
                 {
@@ -79,7 +67,6 @@ namespace ShowCase.Security.Operations.ProductOperations
                 }
                 else if (isUserSuperAdminOrSupervisor)
                 {
-                    _logger.LogInformation($"isUserSuperAdminOrSupervisor: {isUserSuperAdminOrSupervisor}");
                     context.Succeed(requirement);
                     return Task.CompletedTask;
                 }
@@ -89,3 +76,12 @@ namespace ShowCase.Security.Operations.ProductOperations
         }
     }
 }
+
+
+//_logger.LogInformation($"context.User.Identity.Name: {context.User.Identity.Name}");
+//_logger.LogInformation($"context.User.Claims: {context.User.Claims}");
+//_logger.LogInformation($"isUserCanCreatee: {isUserCanCreate}");
+//_logger.LogInformation($"resource.ApplicationUser.UserName: {resource.ApplicationUser.UserName}");
+//_logger.LogInformation($"isProductBelongsToUser: {isProductBelongsToUser}");
+//_logger.LogInformation($"isUserCanUpdateProduct: {isUserCanUpdateProduct}");
+//_logger.LogInformation($"isUserSuperAdminOrSupervisor: {isUserSuperAdminOrSupervisor}");
