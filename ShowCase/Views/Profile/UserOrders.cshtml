@@ -9,6 +9,8 @@
         </div>
         
         <div class="col-lg-10 col-md-9 p-2 ml-auto">
+            <h4>Total Orders: @Model.Count()</h4>
+
             @if (Model.Any())
             {
 
@@ -40,8 +42,8 @@
                                 }
                             </div>
 
-                            <div class="row clickable-row" style="position:relative;" 
-                                 data-toggle="collapse" data-target="#collapseDetails_@(invoice_id)" 
+                            <div class="row clickable-row" style="position:relative;"
+                                 data-toggle="collapse" data-target="#collapseDetails_@(invoice_id)"
                                  aria-expanded="true" aria-controls="collapseDetails_@(invoice_id)"
                                  id="item_@(invoice_id)">
 
@@ -60,10 +62,9 @@
 
                             </div>
                             <!-- Collapse: Order Detaials -->
-                            <div class="row mt-3 collapse" id="collapseDetails_@(invoice_id)" 
-                                 aria-labelledby="item_@(invoice_id)" 
-                                 data-parent="#accordion"
-                                 >
+                            <div class="row mt-3 collapse" id="collapseDetails_@(invoice_id)"
+                                 aria-labelledby="item_@(invoice_id)"
+                                 data-parent="#accordion">
 
                                 <div class="col-12">
 

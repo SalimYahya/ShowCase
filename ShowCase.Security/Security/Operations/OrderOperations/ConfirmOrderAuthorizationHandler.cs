@@ -31,7 +31,7 @@ namespace ShowCase.Security.Operations
             // Operation: Update ==> Confirm Order
             if (requirement.Name == "Update")
             {
-                _logger.LogInformation($"requirement.Name: Read");
+                _logger.LogInformation($"requirement.Name: Update");
                 if (isOrderBelongsToUser)
                 {
                     context.Succeed(requirement);
