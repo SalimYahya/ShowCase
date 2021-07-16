@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -15,7 +14,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ShowCase.Configuration;
 using ShowCase.Data;
 using ShowCase.Models;
 using ShowCase.Repository;
@@ -52,19 +50,10 @@ namespace ShowCase
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // Localization
+            #region Localization
             services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
             services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
                 .AddDataAnnotationsLocalization();
-
-            // DbRepos
-            //services.AddScoped(typeof(IRepositoryBase<,>), typeof(RepositoryBase<,>));
-
-            services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped<IRoleRepository, RoleRepository>();
-
-
             services.Configure<RequestLocalizationOptions>(opt => {
 
                 var supportedCultures = new List<CultureInfo> {
@@ -76,79 +65,27 @@ namespace ShowCase
                 opt.SupportedCultures = supportedCultures;
                 opt.SupportedUICultures = supportedCultures;
             });
+            #endregion
+
+            #region DatabaseRepos
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
+            #endregion
 
             services.AddControllersWithViews();
-
-            // Configure Jwt - Secret Key
-            services.Configure<JwtConfig>(Configuration.GetSection("JwtConfig"));
-
-            // Swagger
-            services.AddSwaggerGen(swagger =>
-            {
-                //This is to generate the Default UI of Swagger Documentation    
-                swagger.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Version = "v1",
-                    Title = "ASP.NET 5 Web API",
-                    Description = "Authentication and Authorization in ASP.NET 5 with JWT and Swagger"
-                });
-                // To Enable authorization using Swagger (JWT)    
-                swagger.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
-                {
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer",
-                    BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "Enter 'Bearer' [space] and then your valid token in the text input below.\r\n\r\nExample: \"Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"",
-                });
-                swagger.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                          new OpenApiSecurityScheme
-                            {
-                                Reference = new OpenApiReference
-                                {
-                                    Type = ReferenceType.SecurityScheme,
-                                    Id = "Bearer"
-                                }
-                            },
-                            new string[] {}
-
-                    }
-                });
-            });
 
             services.AddDbContextPool<AppDbContext>(
                 options => options.UseSqlServer(
                     Configuration.GetConnectionString("DBConnection")).EnableSensitiveDataLogging()
             );
 
-            // Configure Jwt - Authentication
-            services.AddAuthentication(options => {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(jwt => {
+           
 
-                var key = Encoding.ASCII.GetBytes(Configuration["JwtConfig:Secret"]);
-
-                jwt.SaveToken = true;
-
-                jwt.TokenValidationParameters = new TokenValidationParameters {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    RequireExpirationTime = false
-                };
-
-            });
-
-            
+            #region Identity
             services.AddIdentity<ApplicationUser, IdentityRole>()
-                    .AddEntityFrameworkStores<AppDbContext>();
+                    .AddEntityFrameworkStores<AppDbContext>()
+                    .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(
                 options => {
@@ -157,22 +94,27 @@ namespace ShowCase
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
                     options.Password.RequireLowercase = false;
+                    options.SignIn.RequireConfirmedEmail = true;
             });
 
+            #endregion
 
-
-            // Add Mvc to Apply Authorization Globally
+            #region Add Mvc to Apply Authorization Globally
             services.AddMvc(options => {
                 var policy = new AuthorizationPolicyBuilder()
                                  .RequireAuthenticatedUser()
                                  .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });
+            #endregion
 
+            #region Cookies
             services.ConfigureApplicationCookie(options => {
                 options.AccessDeniedPath = new Microsoft.AspNetCore.Http.PathString("/Adminstration/AccessDenied");
             });
+            #endregion
 
+            #region Authorization
             services.AddAuthorization(options => {
                
                 options.AddPolicy("CreateRolePolicy",
@@ -194,7 +136,6 @@ namespace ShowCase
                     policy => policy.AddRequirements(new OperationAuthorizationRequirement()));
             });
 
-            
             services.AddSingleton<IAuthorizationHandler, CanCreateRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanEditRolesHandler>();
             services.AddSingleton<IAuthorizationHandler, CanDeleteRolesHandler>();
@@ -212,7 +153,7 @@ namespace ShowCase
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
-
+            #endregion
 
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -233,8 +174,6 @@ namespace ShowCase
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json","My API Version 1"));
             }
             else
             {

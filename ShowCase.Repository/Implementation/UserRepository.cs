@@ -7,6 +7,7 @@ using ShowCase.Repository.Contracts;
 using ShowCase.Repository.Repository;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ShowCase.Repository.Implementation
@@ -44,6 +45,10 @@ namespace ShowCase.Repository.Implementation
                                .Include(u => u.PaymentMethod)
                                .FirstOrDefaultAsync();
         }
+        public async Task<ApplicationUser> GetUserByEmail(string email) 
+        {
+            return await _userManager.FindByEmailAsync(email);
+        }
 
         // Address
         public async Task<Address> AddAddressAsync(Address address)
@@ -63,10 +68,38 @@ namespace ShowCase.Repository.Implementation
             _appDbContext.Entry(address).State = EntityState.Modified;
         }
 
+        // Paymentmethod
+        public async Task<PaymentMethod> AddPaymentMethodAsync(PaymentMethod paymentMethod)
+        {
+            await _appDbContext.PaymentMethods.AddAsync(paymentMethod);
+            return paymentMethod;
+        }
+
+        public async Task<PaymentMethod> GetUserPaymentmethodAsync(string userId)
+        {
+            return await _appDbContext.PaymentMethods
+                .Where(u => u.Id == userId)
+                .FirstOrDefaultAsync();
+        }
+
+        public void UpdateUserPaymentmethod(PaymentMethod paymentMethod)
+        {
+            _appDbContext.Set<PaymentMethod>().Attach(paymentMethod);
+            _appDbContext.Entry(paymentMethod).State = EntityState.Modified;
+        }
+
         // Roles
         public IEnumerable<IdentityRole> GetAllRolesAsync()
         {
             return _roleManager.Roles;
+        }
+        public async Task<List<string>> GetUserRolesAsync(ApplicationUser user) 
+        {
+            return (List<string>) await _userManager.GetRolesAsync(user);
+        }
+        public async Task<List<Claim>> GetUserClaimsAsync(ApplicationUser user) 
+        {
+            return (List<Claim>) await _userManager.GetClaimsAsync(user);
         }
         public async Task<IdentityResult> AddUserToRole(ApplicationUser user, string role)
         {
@@ -83,6 +116,10 @@ namespace ShowCase.Repository.Implementation
         public Task<IdentityResult> RemoveUserFromRoles(ApplicationUser user, IEnumerable<string> roles)
         {
             return _userManager.RemoveFromRolesAsync(user, roles);
+        }
+        public async Task<bool> CheckUserPasswordAsync(ApplicationUser user, string password)
+        {
+            return await _userManager.CheckPasswordAsync(user, password);
         }
         public async Task<SignInResult> UserPasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
         {

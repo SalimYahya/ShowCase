@@ -39,6 +39,11 @@ namespace ShowCase.Controllers
             _logger.LogInformation($"UserId: {userId}");
             _logger.LogInformation($"User: {User}");
 
+            ApplicationUser user = await _userManager.FindByIdAsync(userId);
+            var roles = await _userManager.GetRolesAsync(user);
+            
+            _logger.LogInformation($"Roles: {roles.ToList()}");
+
             if (User.IsInRole("SuperAdmin"))
             {
                 IEnumerable<Product> adminModelList = await _productRepository.GetAllProductsOrderByDescendingAsync();

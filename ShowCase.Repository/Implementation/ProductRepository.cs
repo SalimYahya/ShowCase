@@ -44,7 +44,7 @@ namespace ShowCase.Repository
 
         public async Task<List<Product>> GetAllProductsListWithOwnersOrderByDescendingAsync()
         {
-            return  await _appDbContext.Products
+            return await _appDbContext.Products
                             .Include(p => p.ApplicationUser)
                             .OrderByDescending(p => p.CreatedAt)
                             .ToListAsync();
