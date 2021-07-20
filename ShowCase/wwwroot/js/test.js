@@ -229,6 +229,7 @@ function redirecTo(url, id) {
     window.location.href = url + "/" + id;
 }
 
+// OrderNow
 function Order() {
     $('#confirmOrderSpinner').show();
 
@@ -272,7 +273,6 @@ function Order() {
         console.log("Empty");
     }
 }
-
 
 // Confirm Order
 $('.confirm-order').click(function () {
