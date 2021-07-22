@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Mvc.Localization;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Http;
 using ShowCase.Repository.Contracts;
+using Hangfire;
 
 namespace ShowCase.Controllers
 {
@@ -36,6 +37,8 @@ namespace ShowCase.Controllers
 
         private List<SelectListItem> GetPageSizes(int selectedPagesSize = 10)
         {
+            //BackgroundJob.Enqueue(() => Console.WriteLine("Getting Started with HangFire!"));
+
             var pagesSizes = new List<SelectListItem>();
 
             if (selectedPagesSize == 5)

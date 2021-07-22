@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Hangfire;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
 using ShowCase.Models;
 using ShowCase.Repository.Contracts;
 using ShowCase.ViewModel.Account;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
 using System.Threading.Tasks;
 
 namespace ShowCase.Controllers
@@ -130,6 +134,8 @@ namespace ShowCase.Controllers
 
                 if (loginResult.Succeeded) {
 
+                    BackgroundJob.Enqueue(() => LoginNotification(model.Email));
+
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) {
 
                         return Redirect(returnUrl);
@@ -144,6 +150,24 @@ namespace ShowCase.Controllers
             }
 
             return View(model);
+        }
+
+        [AutomaticRetry(Attempts = 10)]
+        public static void LoginNotification(string email) 
+        {
+            SmtpClient smtpClient = new SmtpClient("mail.ShowCase.com", 25);
+            smtpClient.DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory;
+            smtpClient.PickupDirectoryLocation = @"C:\Email";
+
+            MailMessage message = new MailMessage();
+            message.From = new MailAddress("admin@Showcase", "ShowCase.com");
+            message.To.Add(new MailAddress(email));
+            message.Body = "Login Notification";
+
+
+
+            smtpClient.Send(message);
+            Console.WriteLine($"Email was sent to {email}");
         }
 
 
@@ -161,6 +185,5 @@ namespace ShowCase.Controllers
 
             return RedirectToAction("index", "home");
         }
-
     }
 }
