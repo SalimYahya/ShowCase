@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using ShowCase.Data;
 using ShowCase.Models;
 using ShowCase.Security;
+using ShowCaseAPI.DTO.Order;
 using ShowCaseAPI.Extensions;
 using System;
 using System.Collections.Generic;
@@ -44,6 +45,7 @@ namespace ShowCaseAPI.Controllers
             string userId = HttpContext.GetUserId();
             var invoiceList = await _appDbContext.Invoices
                                 .Include(i => i.ApplicationUser)
+                                .OrderByDescending(i => i.CreatedAt)
                                 .Select(i => new {
                                     i.ApplicationUserId,
                                     i.ApplicationUser.Email,
@@ -77,6 +79,7 @@ namespace ShowCaseAPI.Controllers
             var invoiceList = await _appDbContext.Invoices
                                 .Include(i => i.ApplicationUser)
                                 .Where(i => i.ApplicationUserId == userId)
+                                .OrderByDescending(i => i.CreatedAt)
                                 .Select(i => new {
                                     i.Id,
                                     i.CreatedAt,
@@ -144,8 +147,54 @@ namespace ShowCaseAPI.Controllers
 
         // POST api/<OrdersController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> Post([FromBody] List<CreateOrder> shoppingCart)
         {
+            // Check with User Policy that can create Order/Invoice 
+
+            // 1- Create new Invoice
+            int vat = 15;
+            Invoice newInvoice = new Invoice();
+
+            newInvoice.ApplicationUserId = HttpContext.GetUserId();
+            newInvoice.CreatedAt = DateTime.Now;
+            newInvoice.Vat = vat;
+
+            await _appDbContext.Invoices.AddAsync(newInvoice);
+            await _appDbContext.SaveChangesAsync();
+
+            // 2- Get Products from Shoppingcart & attach them to the invoice
+            List<InvoiceProduct> invoiceProductsList = new List<InvoiceProduct>();
+            int totalItem = 0;
+            double totalExcludeVat = 0.00;
+            double totalIncludeVat = 0.00;
+
+            foreach (var item in shoppingCart) 
+            {
+                totalItem += item.count;
+                totalExcludeVat += item.price;
+
+                invoiceProductsList.Add(new InvoiceProduct { 
+                    InvoiceId = newInvoice.Id,
+                    ProductId = item.id,
+                    Qty = item.count
+                });
+            }
+
+            await _appDbContext.InvoiceProduct.AddRangeAsync(invoiceProductsList);
+            await _appDbContext.SaveChangesAsync();
+
+            // Update Invoice table
+            totalIncludeVat = (vat * totalExcludeVat / 100) + totalExcludeVat;
+            newInvoice.TotalItems = totalItem;
+            newInvoice.TotalExcludeVat = Math.Round(totalExcludeVat, 2, MidpointRounding.AwayFromZero);
+            newInvoice.TotalIncludeVat = Math.Round(totalIncludeVat, 2, MidpointRounding.AwayFromZero);
+
+            var invoiceModel = _appDbContext.Invoices.Attach(newInvoice);
+            invoiceModel.State = EntityState.Modified;
+            await _appDbContext.SaveChangesAsync();
+
+            return Ok(new { Status = "Ok", Invoice = newInvoice, List = invoiceProductsList.Select(ip => new { ip.ProductId , ip.Qty}) });
         }
 
         // PUT api/<OrdersController>/5
@@ -190,8 +239,47 @@ namespace ShowCaseAPI.Controllers
 
         // DELETE api/<OrdersController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
+            Invoice invoice = await _appDbContext.Invoices
+                                            .Include(i => i.ApplicationUser)
+                                            .Where(i => i.Id == id)
+                                            .FirstOrDefaultAsync();
+
+            if (invoice != null)
+            {
+                var authorizationResult = await _authorizationService
+                                                .AuthorizeAsync(User, invoice, CRUD.Update);
+
+                if (authorizationResult.Succeeded)
+                {
+                    if (!invoice.IsConfirmed)
+                    {
+                        _appDbContext.Invoices.Remove(invoice);
+                        await _appDbContext.SaveChangesAsync();
+
+                        dynamic jsonResponse = new
+                        {
+                            Invoice = new
+                            {
+                                invoice.Id,
+                                invoice.CreatedAt,
+                                invoice.TotalIncludeVat,
+                                invoice.TotalItems,
+                                invoice.IsConfirmed
+                            }
+                        };
+
+                        return Ok(jsonResponse);
+                    }
+
+                    return BadRequest($"Invoice with id ({invoice.Id}) Cannot be deleted.");
+                }
+                else if (User.Identity.IsAuthenticated) { return BadRequest("Forbiden"); }
+                else { return BadRequest("You are no Logged in"); }
+            }
+
+            return BadRequest("Not Found !!!");
         }
     }
 }

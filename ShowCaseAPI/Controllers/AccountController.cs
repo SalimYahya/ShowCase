@@ -21,14 +21,14 @@ namespace ShowCaseAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthManagementController : ControllerBase
+    public class AccountController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
-        private readonly ILogger<AuthManagementController> _logger;
+        private readonly ILogger<AccountController> _logger;
         private readonly JwtConfig _jwtConfig;
-
-        public AuthManagementController(
-            ILogger<AuthManagementController> logger,
+        
+        public AccountController(
+            ILogger<AccountController> logger,
             IUserRepository userRepository,
             IOptionsMonitor<JwtConfig> optionsMonitor)
         {

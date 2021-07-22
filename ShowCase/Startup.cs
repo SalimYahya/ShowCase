@@ -1,3 +1,5 @@
+using Hangfire;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -50,6 +52,8 @@ namespace ShowCase
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllersWithViews();
+
             #region Localization
             services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
             services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
@@ -67,20 +71,18 @@ namespace ShowCase
             });
             #endregion
 
+            #region Database Configuration
+            services.AddDbContextPool<AppDbContext>(
+                options => options.UseSqlServer(
+                    Configuration.GetConnectionString("DBConnection")).EnableSensitiveDataLogging()
+            );
+            #endregion
+
             #region DatabaseRepos
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRoleRepository, RoleRepository>();
             #endregion
-
-            services.AddControllersWithViews();
-
-            services.AddDbContextPool<AppDbContext>(
-                options => options.UseSqlServer(
-                    Configuration.GetConnectionString("DBConnection")).EnableSensitiveDataLogging()
-            );
-
-           
 
             #region Identity
             services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -155,6 +157,25 @@ namespace ShowCase
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
             #endregion
 
+
+            #region Hangfire Configuration
+            services.AddHangfire(
+                configuration => configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(Configuration.GetConnectionString("HangfireDBConnection"), new SqlServerStorageOptions 
+                { 
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.Zero,
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                })
+            );
+
+            services.AddHangfireServer();
+            #endregion
+
             services.AddControllersWithViews().AddNewtonsoftJson(options =>
                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
@@ -217,11 +238,17 @@ namespace ShowCase
              *  app.UseRequestLocalization(localizationOptions);
              */
 
+            #region Adding Hangfire Dashboard Ui
+            app.UseHangfireDashboard();
+            #endregion
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapHangfireDashboard();
             });
 
             UsersRolesDummyData.Initilize(appDbContext, userManager, roleManager).Wait();
