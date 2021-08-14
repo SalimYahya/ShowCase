@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Providers;
 using ShowCase.Repository;
 using ShowCase.Repository.Contracts;
 using ShowCase.Repository.Implementation;
@@ -54,6 +55,10 @@ namespace ShowCase
         {
             services.AddControllersWithViews();
 
+            services.Configure<MailSettings>(Configuration.GetSection("mailSettings"));
+
+            services.AddScoped<ITemplateHelper, TemplateHelper>();
+            services.AddScoped<IMailHelper, MailHelper>();
             #region Localization
             services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
             services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
@@ -156,7 +161,6 @@ namespace ShowCase
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
             #endregion
-
 
             #region Hangfire Configuration
             services.AddHangfire(

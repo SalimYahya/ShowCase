@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
+using ShowCase.Data;
 using ShowCase.Models;
+using ShowCase.Providers;
 using ShowCase.Repository.Contracts;
 using ShowCase.ViewModel.Account;
 using System;
@@ -20,18 +21,27 @@ namespace ShowCase.Controllers
     public class AccountController : Controller
     {
         private readonly ILogger<AccountController> _logger;
+        private readonly IMailHelper _mailHelper;
+        private readonly ITemplateHelper _helper;
         private readonly IUserRepository _userRepository;
         private readonly IRoleRepository _roleRepository;
+        private readonly AppDbContext _appDbContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AccountController(ILogger<AccountController> logger, 
+        public AccountController(ILogger<AccountController> logger,
+            IMailHelper mailHelper,
+            ITemplateHelper helper,
             IUserRepository userRepository, 
             IRoleRepository roleRepository,
+            AppDbContext appDbContext,
             UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
+            _mailHelper = mailHelper;
+            _helper = helper;
             _userRepository = userRepository;
             _roleRepository = roleRepository;
+            _appDbContext = appDbContext;
             _userManager = userManager;
         }
 
@@ -66,14 +76,13 @@ namespace ShowCase.Controllers
                                           "Account",
                                           new { userId = user.Id, token = token},
                                           Request.Scheme);
-
-                    //_logger.LogInformation($"Link: {link}");
-                    //_logger.LogInformation($"Result: {registerationResult.Succeeded}");
                     
                     IEnumerable<string> roles = new string[] { "Customer","Seller" };
                     await _roleRepository.AddUserToRolesAsync(user, roles);
-                   
-                    ViewData["link"] = link;
+                    BackgroundJob.Enqueue(() => AccountActivationNotificationAsync(model.Email, link));
+
+                    ViewData["Notification"] = "Please Check your email to confirm activation";
+                    
                     return View();
 
                 }
@@ -86,6 +95,26 @@ namespace ShowCase.Controllers
             }
             
             return View(model);
+        }
+
+        [AutomaticRetry(Attempts = 20)]
+        public async Task AccountActivationNotificationAsync(string email, string link)
+        {
+
+            var notification = new EmailBase
+            {
+                To = email,
+                From = "admin@showcase.com",
+                Subject = "Account Activation",
+                Text = link
+            };
+
+            var response = await _helper.GetTemplateHtmlAsStringAsync(
+                "Emails/EmailAccountActivation",
+                notification
+            );
+
+           await _mailHelper.SendEmailAsync(email, "test", response);
         }
 
         [HttpGet]
@@ -134,8 +163,6 @@ namespace ShowCase.Controllers
 
                 if (loginResult.Succeeded) {
 
-                    BackgroundJob.Enqueue(() => LoginNotification(model.Email));
-
                     if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl)) {
 
                         return Redirect(returnUrl);
@@ -145,6 +172,13 @@ namespace ShowCase.Controllers
                     }
                 }
 
+                // Login Attempt Error
+                var usernameExist = _appDbContext.ApplicationUsers.Count(u => u.Email == model.Email);
+                if (usernameExist > 0)
+                {
+                    BackgroundJob.Enqueue(( ) => LoginNotificationAsync(model.Email));
+                }
+                
                 ModelState.AddModelError(string.Empty, "Invalid Username/Password");
                 
             }
@@ -152,22 +186,23 @@ namespace ShowCase.Controllers
             return View(model);
         }
 
-        [AutomaticRetry(Attempts = 10)]
-        public static void LoginNotification(string email) 
+        [AutomaticRetry(Attempts = 20)]
+        public async Task LoginNotificationAsync(string email) 
         {
-            SmtpClient smtpClient = new SmtpClient("mail.ShowCase.com", 25);
-            smtpClient.DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory;
-            smtpClient.PickupDirectoryLocation = @"C:\Email";
 
-            MailMessage message = new MailMessage();
-            message.From = new MailAddress("admin@Showcase", "ShowCase.com");
-            message.To.Add(new MailAddress(email));
-            message.Body = "Login Notification";
+            var notification = new EmailBase { 
+                To = email,
+                From = "admin@showcase.com",
+                Subject = "Failed Login Attempt",
+                Text = "Our system encounter Failed Login attempt by your username."
+            };
 
+            var response = await _helper.GetTemplateHtmlAsStringAsync(
+                "Emails/LoginNotificaiton",
+                notification
+            );
 
-
-            smtpClient.Send(message);
-            Console.WriteLine($"Email was sent to {email}");
+            await _mailHelper.SendEmailAsync(email, "test", response);
         }
 
 
@@ -187,3 +222,18 @@ namespace ShowCase.Controllers
         }
     }
 }
+
+
+
+//SmtpClient smtpClient = new SmtpClient("mail.ShowCase.com", 25);
+//smtpClient.DeliveryMethod = SmtpDeliveryMethod.SpecifiedPickupDirectory;
+//smtpClient.PickupDirectoryLocation = @"C:\Email";
+
+//MailMessage message = new MailMessage();
+//message.From = new MailAddress("admin@Showcase", "ShowCase.com");
+//message.To.Add(new MailAddress(email));
+//message.Body = "Login Notification";
+
+
+
+//smtpClient.Send(message);
