@@ -62,10 +62,10 @@
                                 <a class="small ml-auto" href="register.html">Already have an account? Login!</a>
                             </div>
                            
-                            @if (ViewData["link"] != null)
+                            @if (ViewData["Notification"] != null)
                             {
                                 <div class="row d-flex my-2">
-                                    <a class="btn btn-success btn-block text-white" href="@ViewData["link"]">Confirm Email</a>
+                                    <p class="text-success">@ViewData["Notification"]</p>
                                 </div>
                             }
                         </div>
