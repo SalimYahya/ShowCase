@@ -17,8 +17,6 @@ namespace CrossPlatformApp.ViewModels
         public ObservableCollection<Product> Products { get; }
         public Command LoadProductsCommand { get; }
 
-        IProductService _productService = DependencyService.Get<IProductService>();
-
         public ProductsViewModel()
         {
             Title = "Browse Products";
@@ -32,18 +30,6 @@ namespace CrossPlatformApp.ViewModels
             IsBusy = true;
         }
 
-        public HttpClientHandler GetInsecureHandler()
-        {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                if (cert.Issuer.Equals("CN=localhost"))
-                    return true;
-                return errors == System.Net.Security.SslPolicyErrors.None;
-            };
-            return handler;
-        }
-
         async Task ExecuteLoadProductsCommand()
         {
             Debug.WriteLine("ExecuteLoadProductsCommand");
@@ -52,22 +38,8 @@ namespace CrossPlatformApp.ViewModels
 
             try
             {
-
-                //string url = "https://10.0.2.2:5001/api/Products";
-
-                //Debug.WriteLine("Calling Rest");
-                //HttpClientHandler insecureHandler = GetInsecureHandler();
-                //HttpClient client = new HttpClient(insecureHandler);
-
-                //var json = await client.GetStringAsync(url);
-                //Debug.WriteLine("Json", json.ToString());
-
-                //var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
-                //Debug.WriteLine("Products", products.ToString());
-
-
                 Products.Clear();
-                var products = await ProductDataStore.GetProductsAsync();
+                var products = await _productService.GetProductsAsync();
                 Debug.WriteLine(products.ToString());
 
                 foreach (var product in products)

@@ -31,42 +31,12 @@ namespace CrossPlatformApp.ViewModels
             AddItemCommand = new Command(OnAddItem);
         }
 
-
-        public HttpClientHandler GetInsecureHandler()
-        {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                if (cert.Issuer.Equals("CN=localhost"))
-                    return true;
-                return errors == System.Net.Security.SslPolicyErrors.None;
-            };
-            return handler;
-        }
-
         async Task ExecuteLoadItemsCommand()
         {
             IsBusy = true;
 
             try
             {
-                //string url = "https://10.0.2.2:5001/api/Products";
-
-                //Debug.WriteLine("Calling Rest");
-                //HttpClientHandler insecureHandler = GetInsecureHandler();
-                //HttpClient client = new HttpClient(insecureHandler);
-
-                //var json = await client.GetStringAsync(url);
-                //Debug.WriteLine("Json", json.ToString());
-
-                //var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
-                //Debug.WriteLine("Products", products.ToString());
-
-
-                //HttpResponseMessage responseMessage = await client.GetAsync(url);
-                //Debug.WriteLine("HttpResponseMessage", responseMessage.Content);
-
-
                 Items.Clear();
                 var items = await DataStore.GetItemsAsync(true);
                 foreach (var item in items)

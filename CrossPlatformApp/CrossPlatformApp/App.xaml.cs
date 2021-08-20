@@ -1,4 +1,5 @@
 ﻿using CrossPlatformApp.Services;
+using CrossPlatformApp.Services.Contacts;
 using CrossPlatformApp.Views;
 using System;
 using Xamarin.Forms;
@@ -15,6 +16,7 @@ namespace CrossPlatformApp
 
             DependencyService.Register<MockDataStore>();
             DependencyService.Register<IProductService, ProductService>();
+            DependencyService.Register<IUserService, UserService>();
 
             MainPage = new AppShell();
         }

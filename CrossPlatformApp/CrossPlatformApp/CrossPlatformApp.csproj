@@ -12,7 +12,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\Template\ProductsCardViewTemplate.xaml.cs">
+      <DependentUpon>ProductsCardViewTemplate.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Update="Views\ProductsPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Template\ProductsCardViewTemplate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

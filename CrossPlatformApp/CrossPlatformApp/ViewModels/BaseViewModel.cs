@@ -1,5 +1,6 @@
 ﻿using CrossPlatformApp.Models;
 using CrossPlatformApp.Services;
+using CrossPlatformApp.Services.Contacts;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,7 +11,8 @@ namespace CrossPlatformApp.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        public IProductService ProductDataStore => DependencyService.Get<IProductService>();
+        public IProductService _productService => DependencyService.Get<IProductService>();
+        public IUserService _userService => DependencyService.Get<IUserService>();
         public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>();
 
         bool isBusy = false;
