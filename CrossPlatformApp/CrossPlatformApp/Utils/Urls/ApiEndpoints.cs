@@ -17,6 +17,7 @@ namespace CrossPlatformApp.Utils.Urls
 
         public static class Products 
         {
+            public const string GetProduct = BaseUrl + "Products/";
             public const string GetAllProducts = BaseUrl + "Products"; 
         }
         #endregion

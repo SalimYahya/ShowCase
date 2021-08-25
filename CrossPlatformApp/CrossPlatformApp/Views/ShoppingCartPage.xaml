@@ -1,0 +1,140 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="CrossPlatformApp.Views.ShoppingCartPage"
+             xmlns:local="clr-namespace:CrossPlatformApp.ViewModels" 
+             xmlns:model="clr-namespace:CrossPlatformApp.DTO.Special"
+             NavigationPage.HasNavigationBar="False"
+             Title="{Binding Title}"
+             BackgroundColor="White">
+
+    <RefreshView x:DataType="local:ShoppingCartPageViewModel"
+                 Command="{Binding LoadProductsInShoppinCartCommand}"
+                 IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+        <CollectionView x:Name="ProductsListView"
+                        ItemsSource="{Binding Products}"
+                        SelectedItem="None">
+
+            <CollectionView.Header>
+                <Grid BackgroundColor="LightGray">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Label Grid.RowSpan="2" 
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"
+                           Margin="10"
+                           Text="Products List"
+                           FontSize="Large"
+                           FontAttributes="Bold" />
+
+                    <StackLayout Margin="0,10,0,0" Grid.Row="0" Grid.Column="1"  Orientation="Horizontal"
+                                 HorizontalOptions="Start" VerticalOptions="End"
+                                 Padding="0">
+                        <Label HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="End"
+                               Text="Total Products: "
+                               FontSize="Small"
+                               FontAttributes="Bold" />
+                        <Label Margin="0"
+                               Text="12"
+                               FontSize="Small"
+                               FontAttributes="Bold" />
+                    </StackLayout>
+                    <StackLayout Margin="0,0,0,10" Grid.Row="1" Grid.Column="1"  Orientation="Horizontal"
+                                 HorizontalOptions="Start" VerticalOptions="Start"
+                                 Padding="0">
+                        <Label Margin="0"
+                               Text="Total Amount:"
+                               FontSize="Small"
+                               FontAttributes="Bold" />
+                        <Label Margin="0"
+                               Text="1500$"
+                               FontSize="Small"
+                               FontAttributes="Bold" />
+                    </StackLayout>
+                </Grid>
+            </CollectionView.Header>
+            <CollectionView.Footer>
+                <StackLayout BackgroundColor="LightGray">
+                    <Button Text="Confirm Order" />
+                </StackLayout>
+            </CollectionView.Footer>
+            
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,1,0,1" Padding="10" x:DataType="model:ProductInCartInfo">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="50"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Frame Grid.RowSpan="2" Grid.ColumnSpan="3"
+                               IsClippedToBounds="True"
+                               HasShadow="True"
+                               Padding="0"
+                               CornerRadius="5"
+                               BackgroundColor="White"
+                               BorderColor="LightBlue"/>
+
+                        <Image Grid.RowSpan="2" 
+                               Source="https://m1.jeans-industry.fr/201863-thickbox/jeans-bleu-delave-taille-haute.jpg"
+                               Aspect="AspectFill"
+                               Margin="10"
+                               WidthRequest="70"/>
+
+                        
+                        <!-- Product Infor: Name, Qty, Price -->
+                        <StackLayout Padding="10" Grid.RowSpan="2" Grid.Column="1"
+                                     Orientation="Vertical"
+                                     HorizontalOptions="Start"
+                                     VerticalOptions="Start">
+
+                            <Label FontAttributes="Bold" 
+                                    FontSize="16" 
+                                    HorizontalTextAlignment="Center"
+                                    VerticalTextAlignment="Center"
+                                    Text="{Binding ProductName}"/>
+
+                            <Label Margin="10,0,10,0" 
+                                    FontSize="16" 
+                                    HorizontalTextAlignment="End"
+                                    VerticalTextAlignment="Center"
+                                    Text="{Binding ProductPrice, StringFormat='{0:C2}'}"/>
+
+                            <StackLayout Padding="10,0,10,0" Orientation="Horizontal" 
+                                         HorizontalOptions="Start" 
+                                         VerticalOptions="Center">
+                                <Label Text="Qty:" 
+                                       VerticalTextAlignment="Center"/>
+                                <Label Text="{Binding ProductQty}"/>
+                            </StackLayout>
+                        </StackLayout>
+                        
+                        <!-- Product Infor: Name, Qty, Price -->
+                        <Grid Padding="10" Grid.RowSpan="2" Grid.Column="2"
+                              HorizontalOptions="End"
+                              VerticalOptions="Center">
+                            <BoxView BackgroundColor="Red"/>
+                            <Label Padding="10"
+                                   Text="Delete"
+                                   TextColor="White"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"/>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </RefreshView>
+</ContentPage>
