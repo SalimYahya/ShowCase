@@ -6,6 +6,7 @@
              xmlns:model="clr-namespace:CrossPlatformApp.DTO.Special"
              NavigationPage.HasNavigationBar="False"
              Title="{Binding Title}"
+             x:Name="ShoppingCart"
              BackgroundColor="White">
 
     <RefreshView x:DataType="local:ShoppingCartPageViewModel"
@@ -41,7 +42,7 @@
                                FontSize="Small"
                                FontAttributes="Bold" />
                         <Label Margin="0"
-                               Text="12"
+                               Text="{Binding Source={x:Reference ShoppingCart}, Path=BindingContext.ProductsCount}"
                                FontSize="Small"
                                FontAttributes="Bold" />
                     </StackLayout>
@@ -51,26 +52,28 @@
                         <Label Margin="0"
                                Text="Total Amount:"
                                FontSize="Small"
-                               FontAttributes="Bold" />
+                               FontAttributes="Bold" 
+                               HorizontalTextAlignment="Start"/>
                         <Label Margin="0"
-                               Text="1500$"
+                               Text="{Binding Source={x:Reference ShoppingCart}, Path=BindingContext.TotalAmount, StringFormat='{0:C2}'}"
                                FontSize="Small"
+                               HorizontalTextAlignment="End"
                                FontAttributes="Bold" />
                     </StackLayout>
                 </Grid>
             </CollectionView.Header>
             <CollectionView.Footer>
-                <StackLayout BackgroundColor="LightGray">
-                    <Button Text="Confirm Order" />
+                <StackLayout BackgroundColor="LightGray" Margin="10" Padding="10">
+                    <Button Text="Confirm Order" x:DataType="local:ShoppingCartPageViewModel" Command="{Binding ConfirmOrederCommand}" />
                 </StackLayout>
             </CollectionView.Footer>
             
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="0,1,0,1" Padding="10" x:DataType="model:ProductInCartInfo">
+                    <Grid x:Name="ProductList" Margin="0,1,0,1" Padding="10" x:DataType="model:ProductInCartInfo">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="50"/>
-                            <RowDefinition Height="50"/>
+                            <RowDefinition Height="70"/>
+                            <RowDefinition Height="70"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="auto"/>
@@ -93,30 +96,48 @@
                                WidthRequest="70"/>
 
                         
-                        <!-- Product Infor: Name, Qty, Price -->
+                        <!-- Product Infor: Name, Qty, Price.TotalPrice -->
                         <StackLayout Padding="10" Grid.RowSpan="2" Grid.Column="1"
                                      Orientation="Vertical"
+                                     Margin="10"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Start">
 
                             <Label FontAttributes="Bold" 
-                                    FontSize="16" 
-                                    HorizontalTextAlignment="Center"
+                                    FontSize="Subtitle"
+                                    HorizontalTextAlignment="Start"
                                     VerticalTextAlignment="Center"
                                     Text="{Binding ProductName}"/>
 
-                            <Label Margin="10,0,10,0" 
-                                    FontSize="16" 
-                                    HorizontalTextAlignment="End"
-                                    VerticalTextAlignment="Center"
-                                    Text="{Binding ProductPrice, StringFormat='{0:C2}'}"/>
-
-                            <StackLayout Padding="10,0,10,0" Orientation="Horizontal" 
+                            <StackLayout Orientation="Horizontal" 
                                          HorizontalOptions="Start" 
                                          VerticalOptions="Center">
-                                <Label Text="Qty:" 
+                                <Label FontSize="Small"
+                                       Text="Price:" 
                                        VerticalTextAlignment="Center"/>
-                                <Label Text="{Binding ProductQty}"/>
+                                <Label FontSize="Small"
+                                       Text="{Binding ProductPrice, StringFormat='{0:C2}'}"/>
+                            </StackLayout>
+
+                            <StackLayout Orientation="Horizontal" 
+                                         HorizontalOptions="Start" 
+                                         VerticalOptions="Center">
+                                <Label FontSize="Small"
+                                       Text="Qty:" 
+                                       VerticalTextAlignment="Center"/>
+                                <Label FontSize="Small"
+                                       Text="{Binding ProductQty}"/>
+                            </StackLayout>
+                            
+                            <StackLayout Orientation="Horizontal" 
+                                         HorizontalOptions="Start" 
+                                         VerticalOptions="Center">
+                                <Label FontSize="Small"
+                                       Text="Total:" 
+                                       VerticalTextAlignment="Center"/>
+                                <Label FontSize="Small"
+                                       FontAttributes="Bold"
+                                       Text="{Binding TotalPrice, StringFormat='{0:C2}'}"/>
                             </StackLayout>
                         </StackLayout>
                         
@@ -124,13 +145,10 @@
                         <Grid Padding="10" Grid.RowSpan="2" Grid.Column="2"
                               HorizontalOptions="End"
                               VerticalOptions="Center">
-                            <BoxView BackgroundColor="Red"/>
-                            <Label Padding="10"
-                                   Text="Delete"
-                                   TextColor="White"
-                                   FontAttributes="Bold"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"/>
+                            <Button Text="Delete" BackgroundColor="Red"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type local:ShoppingCartPageViewModel}},
+                                    Path=DeleteProductFromCartCommand}"
+                                    CommandParameter="{Binding .}"/>
                         </Grid>
                     </Grid>
                 </DataTemplate>

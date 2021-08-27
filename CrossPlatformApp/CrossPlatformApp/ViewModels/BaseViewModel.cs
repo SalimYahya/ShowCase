@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Xamarin.Essentials;
 using Xamarin.Forms;
 
@@ -17,18 +18,19 @@ namespace CrossPlatformApp.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged
     {
-        private int _productsCount;
-
+        private const string TAG = nameof(BaseViewModel);
         public IProductService _productService => DependencyService.Get<IProductService>();
         public IUserService _userService => DependencyService.Get<IUserService>();
         public IDataStore<Item> DataStore => DependencyService.Get<IDataStore<Item>>();
-
         public Command GoToCartCommand { get; private set; }
 
         public BaseViewModel()
         {
-            SubscribeToEvent();
+            // Initilize ProductsCount(_productsCount) & TotalAmount (_totalAmount)
             Initialize();
+
+            SubscribeToAddProductFromCartEvent();
+            SubscribeToDeleteProductFromCartEvent();
             GoToCartCommand = new Command(NavigateToCartAsync);
         }
 
@@ -78,36 +80,70 @@ namespace CrossPlatformApp.ViewModels
         }
         #endregion
 
-        private void SubscribeToEvent() 
+        private async void SubscribeToAddProductFromCartEvent() 
         {
             Debug.WriteLine("Checking Preferense: Preferences - ShoppingCartProducts");
             if(Preferences.ContainsKey("ShoppingCartProducts"))
                 Debug.WriteLine($"IsContain: {Preferences.ContainsKey("ShoppingCartProducts")}");
 
 
-            MessagingCenter.Unsubscribe<string, ProductInCartInfo>("UpdateShoppingCart", "Add Product");
-            MessagingCenter.Subscribe<string, ProductInCartInfo>("UpdateShoppingCart", "Add Product", (sender, args) => {
-
-                List<ProductInCartInfo> productsList = new List<ProductInCartInfo>();
-                var jsonProductList = Preferences.Get("ShoppingCartProducts", null);
-                if (!string.IsNullOrEmpty(jsonProductList))
+            await Task.Run(()=> {
+                MessagingCenter.Unsubscribe<string, ProductInCartInfo>("UpdateShoppingCart", "Add Product");
+                MessagingCenter.Subscribe<string, ProductInCartInfo>("UpdateShoppingCart", "Add Product", (sender, args) =>
                 {
-                    productsList = JsonConvert.DeserializeObject<List<ProductInCartInfo>>(Preferences.Get("ShoppingCartProducts", null));
-                }
+                    List<ProductInCartInfo> productsList = new List<ProductInCartInfo>();
+                    var jsonProductList = Preferences.Get("ShoppingCartProducts", null);
+                    if (!string.IsNullOrEmpty(jsonProductList))
+                    {
+                        productsList = JsonConvert.DeserializeObject<List<ProductInCartInfo>>(Preferences.Get("ShoppingCartProducts", null));
+                    }
 
-                productsList.Add(args);
-                Preferences.Set("ShoppingCartProducts", JsonConvert.SerializeObject(productsList));
+                    productsList.Add(args);
+                    TotalAmount += args.TotalPrice;
+                    Preferences.Set("ShoppingCartProducts", JsonConvert.SerializeObject(productsList));
 
-                #region To be removed in the future
-                Debug.WriteLine($"{nameof(this.GetShoppingCartProductsList)} - productList:");
-                foreach (var product in productsList)
+                    #region To be removed in the future
+                    Debug.WriteLine($"{nameof(this.GetShoppingCartProductsList)} - productList:");
+                    foreach (var product in productsList)
+                    {
+                        Debug.WriteLine($"{product.ToString()}");
+                    }
+
+                    ProductsCount = productsList.Count();
+                    Debug.WriteLine($"{nameof(this.GetShoppingCartProductsList)} - Total Products in Cart: {ProductsCount}");
+                    #endregion
+                });
+            });
+        }
+
+        private async void SubscribeToDeleteProductFromCartEvent()
+        {
+            await Task.Run(()=> {
+                MessagingCenter.Unsubscribe<string, ProductInCartInfo>("UpdateShoppingCart", "Delete Product");
+                MessagingCenter.Subscribe<string, ProductInCartInfo>("UpdateShoppingCart", "Delete Product", (sender, args) =>
                 {
-                    Debug.WriteLine($"{product.ToString()}");
-                }
+                    List<ProductInCartInfo> productsList = new List<ProductInCartInfo>();
+                    var jsonProductList = Preferences.Get("ShoppingCartProducts", null);
+                    if (!string.IsNullOrEmpty(jsonProductList))
+                    {
+                        productsList = JsonConvert.DeserializeObject<List<ProductInCartInfo>>(jsonProductList);
+                        foreach (var product in productsList)
+                        {
+                            if (product.ProductId == args.ProductId && product.ProductQty == args.ProductQty)
+                            {
+                                Debug.WriteLine("product == args");
 
-                ProductsCount = productsList.Count();
-                Debug.WriteLine($"{nameof(this.GetShoppingCartProductsList)} - Total Products in Cart: {ProductsCount}");
-                #endregion
+                                TotalAmount -= product.TotalPrice;
+                                productsList.Remove(product); 
+                                break;
+                            }
+                        }
+
+                        ProductsCount = productsList.Count();
+                        Debug.WriteLine($"ProductsCount: {ProductsCount}");
+                        Preferences.Set("ShoppingCartProducts", JsonConvert.SerializeObject(productsList));
+                    }
+                });
             });
         }
 
@@ -122,16 +158,39 @@ namespace CrossPlatformApp.ViewModels
             return new List<ProductInCartInfo>();
         }
 
-        public virtual void Initialize() 
+
+        private double _totalAmount;
+        public double TotalAmount 
         {
-            var productsList = GetShoppingCartProductsList();
-            ProductsCount = productsList.Count();
+            get => _totalAmount;
+            set => SetProperty(ref _totalAmount, value);
         }
 
+        private int _productsCount;
         public int ProductsCount
         {
             get { return _productsCount; }
             set { SetProperty(ref _productsCount, value); }
+        }
+
+        public virtual void Initialize()
+        {
+            var productsList = GetShoppingCartProductsList();
+            int productCount = productsList.Count();
+
+            if (productCount > 0)
+            {
+                ProductsCount = productCount;
+
+                double amount = 0;
+                foreach (var product in productsList)
+                {
+                    amount += product.TotalPrice;
+                }
+
+                TotalAmount = amount;
+                Debug.WriteLine($"{TAG} - TotalAmount: {TotalAmount} <> {_totalAmount}");
+            }
         }
 
     }

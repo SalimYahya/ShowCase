@@ -21,7 +21,6 @@ namespace CrossPlatformApp.ViewModels
         private double _price;
         private string _username;
         private int _quantity;
-
         private Product _productModel;
 
         public Command IncreaseQuantityCommand { get; set; }
@@ -31,45 +30,52 @@ namespace CrossPlatformApp.ViewModels
         public ProductDetailViewModel() : base()
         {
             Title = "Product Details";
-            IncreaseQuantityCommand = new Command(()=> IncreaseQuantity());
-            DecreaseQuantityCommand = new Command(() => DecreaseQuantity());
-            AddToCartCommand = new Command(()=> AddProductToShoppingCart());
-
-            base.Initialize();
+            IncreaseQuantityCommand = new Command(IncreaseQuantity);
+            DecreaseQuantityCommand = new Command(DecreaseQuantity);
+            AddToCartCommand = new Command(AddProductToShoppingCart);
         }
 
-        private void AddProductToShoppingCart()
+        private async void AddProductToShoppingCart()
         {
-            if (Quantity > 0)
-            {
-                ProductInCartInfo productInfo = new ProductInCartInfo 
+           await Task.Run(()=> {
+
+                if (Quantity > 0)
                 {
-                    ProductId = Id,
-                    ProductName = Name,
-                    ProductPrice = Price,
-                    ProductQty = Quantity
-                };
+                    ProductInCartInfo productInfo = new ProductInCartInfo
+                    {
+                        ProductId = Id,
+                        ProductName = Name,
+                        ProductPrice = Price,
+                        ProductQty = Quantity,
+                        TotalPrice = (Price * Quantity)
+                    };
+                   Debug.WriteLine($"{TAG} - AddProductToShoppingCart: TotalPrice {productInfo.TotalPrice}");
 
-                Debug.WriteLine($"{TAG} - AddProductToShoppingCart: Adding {productInfo.ToString()}"); 
-                MessagingCenter.Send("UpdateShoppingCart", "Add Product", productInfo);
-            }
-            else
-                Debug.WriteLine($"{TAG} - AddProductToShoppingCart: You need to increase Qty");
+                   Debug.WriteLine($"{TAG} - AddProductToShoppingCart: Adding {productInfo.ToString()}");
+                    MessagingCenter.Send("UpdateShoppingCart", "Add Product", productInfo);
+                }
+                else
+                    Debug.WriteLine($"{TAG} - AddProductToShoppingCart: You need to increase Qty");
+            });
 
         }
 
-        private void DecreaseQuantity()
+        private async void DecreaseQuantity()
         {
-            if (Quantity >= 1)
-                Quantity--;
+            await Task.Run(()=> {
+                if (Quantity >= 1)
+                    Quantity--;
 
-            Debug.WriteLine($"{TAG} - Quantity: {Quantity}");
+                Debug.WriteLine($"{TAG} - Quantity: {Quantity}");
+            });
         }
 
-        private void IncreaseQuantity()
+        private async void IncreaseQuantity()
         {
-            Quantity++;
-            Debug.WriteLine($"{TAG} - Quantity: {Quantity}");
+            await Task.Run(()=> {
+                Quantity++;
+                Debug.WriteLine($"{TAG} - Quantity: {Quantity}");
+            });
         }
 
         private int productId;
@@ -106,7 +112,6 @@ namespace CrossPlatformApp.ViewModels
         public double Price { get => _price; set => SetProperty(ref _price, value); }
         public string Username { get => _username; set => SetProperty(ref _username, value); }
         public int Quantity { get => _quantity; set=> SetProperty(ref _quantity, value); }
-
         public Product Product 
         {
             get { return _productModel; }
