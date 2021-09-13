@@ -50,7 +50,8 @@ namespace ShowCaseAPI.Controllers
             var stopWatch = Stopwatch.StartNew();
             var productList = await _appDbContext.Products
                 .Include(p => p.ApplicationUser)
-                .Select(p => new { p.Id, p.Name, p.Description, p.Price, p.ApplicationUser.UserName })
+                .Include(p => p.Brand)
+                .Select(p => new { p.Id, p.Name, p.Description, p.Price, p.ApplicationUser.UserName, p.BrandId })
                 .Take(50)
                 .ToListAsync();
 

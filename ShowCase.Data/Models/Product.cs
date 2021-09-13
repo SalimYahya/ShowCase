@@ -38,7 +38,7 @@ namespace ShowCase.Models
          *  
          */
 
-        // Note: the ? in type int, is make Foreign_Key Nullable - For more details please refere to 
+        // Note: the ? in type int, is to make Foreign_Key Nullable - For more details please refere to 
         // https://www.tektutorialshub.com/entity-framework-core/ef-core-one-to-many-relationship/
         public int? BrandId { get; set; }
         public Brand Brand { get; set; }
