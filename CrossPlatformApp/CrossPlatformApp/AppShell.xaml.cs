@@ -13,6 +13,10 @@ namespace CrossPlatformApp
             InitializeComponent();
             Routing.RegisterRoute(nameof(ItemDetailPage), typeof(ItemDetailPage));
             Routing.RegisterRoute(nameof(NewItemPage), typeof(NewItemPage));
+
+            // My Routes
+            Routing.RegisterRoute(nameof(ProductDetailPage), typeof(ProductDetailPage));
+            Routing.RegisterRoute(nameof(ShoppingCartPage), typeof(ShoppingCartPage));
         }
 
         private async void OnMenuItemClicked(object sender, EventArgs e)

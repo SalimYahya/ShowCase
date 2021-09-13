@@ -24,9 +24,19 @@ namespace CrossPlatformApp.Services
                        );
         }
 
-        public async Task<IEnumerable<Product>> GetProductsAsync(bool forceRefresh = false)
+        public async Task<Product> GetProductAsync(int productId)
         {
-            Debug.WriteLine(TAG, $"Member: {nameof(ProductService.GetProductsAsync)}, Api: {ApiEndpoints.Products.GetAllProducts}");
+            Debug.WriteLine($"{TAG}: {nameof(ProductService.GetProductAsync)}, Api: {ApiEndpoints.Products.GetProduct+productId}");
+
+            var json = await _httpClinet.GetStringAsync(ApiEndpoints.Products.GetProduct + productId);
+            Product product = JsonConvert.DeserializeObject<Product>(json);
+
+            return product;
+        }
+
+        public async Task<IEnumerable<Product>> GetProductsListAsync(bool forceRefresh = false)
+        {
+            Debug.WriteLine(TAG, $"Member: {nameof(ProductService.GetProductsListAsync)}, Api: {ApiEndpoints.Products.GetAllProducts}");
 
             var json = await _httpClinet.GetStringAsync(ApiEndpoints.Products.GetAllProducts);
             var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);

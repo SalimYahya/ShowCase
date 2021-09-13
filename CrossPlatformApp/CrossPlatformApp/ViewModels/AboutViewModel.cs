@@ -9,6 +9,9 @@ namespace CrossPlatformApp.ViewModels
     {
         public AboutViewModel()
         {
+            // For Develpomnet Purposes - Always Clear Exsited Preferences
+            //Preferences.Clear();
+
             Title = "About";
             OpenWebCommand = new Command(async () => await Browser.OpenAsync("https://aka.ms/xamarin-quickstart"));
         }

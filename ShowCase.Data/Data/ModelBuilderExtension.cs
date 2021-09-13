@@ -13,7 +13,6 @@ namespace ShowCase.Data
 
         public static void Seed(this ModelBuilder modelBuilder)
         {
-
             // Seed Product Table
             Random random = new Random();
 
@@ -24,7 +23,8 @@ namespace ShowCase.Data
                     Id = i,
                     Name = "Item " + Convert.ToString(i),
                     Description = "Lorem Ipsum is simply dummy text",
-                    Price = Math.Round(RandomPriceGenerator(random, 50, 1000), 2, MidpointRounding.AwayFromZero),
+                    Price = Math.Round(RandomPriceGenerator(random, 50, 1000), 2, MidpointRounding.AwayFromZero)
+                    //BrandId = random.Next(1,7)
                 });
             }
 

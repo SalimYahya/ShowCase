@@ -1,5 +1,6 @@
 ﻿using CrossPlatformApp.Models;
 using CrossPlatformApp.Services;
+using CrossPlatformApp.Views;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,20 +15,26 @@ namespace CrossPlatformApp.ViewModels
 {
     public class ProductsViewModel : BaseViewModel
     {
+        private const string TAG = nameof(ProductsViewModel);
+        private Product _selectedProduct;
+
         public ObservableCollection<Product> Products { get; }
         public Command LoadProductsCommand { get; }
+        public Command ProductTapped { get; }
 
         public ProductsViewModel()
         {
-            Title = "Browse Products";
+            Title = "Products";
             Products = new ObservableCollection<Product>();
-
+            
             LoadProductsCommand = new Command(async () => await ExecuteLoadProductsCommand());
+            ProductTapped = new Command<Product>(OnProductSelected);
         }
 
         public void OnAppearing()
         {
             IsBusy = true;
+            SelectedProduct = null;
         }
 
         async Task ExecuteLoadProductsCommand()
@@ -39,7 +46,7 @@ namespace CrossPlatformApp.ViewModels
             try
             {
                 Products.Clear();
-                var products = await _productService.GetProductsAsync();
+                var products = await _productService.GetProductsListAsync();
                 Debug.WriteLine(products.ToString());
 
                 foreach (var product in products)
@@ -57,6 +64,30 @@ namespace CrossPlatformApp.ViewModels
             {
                 IsBusy = false;
             }
+        }
+
+        public Product SelectedProduct
+        {
+            get => _selectedProduct;
+            set
+            {
+                SetProperty(ref _selectedProduct, value);
+                OnProductSelected(value);
+            }
+        }
+
+         async void OnProductSelected(Product product)
+        {
+            if (product == null)
+                return;
+
+            Debug.Write($"{TAG} - Product: {product.ToString()}");
+            await Shell.Current.GoToAsync($"{nameof(ProductDetailPage)}?{nameof(ProductDetailViewModel.ProductId)}={product.Id}");
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
         }
     }
 }

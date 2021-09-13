@@ -8,6 +8,7 @@ namespace CrossPlatformApp.Services
 {
     public interface IProductService
     {
-        Task<IEnumerable<Product>> GetProductsAsync(bool forceRefresh = false);
+        Task<Product> GetProductAsync(int productId);
+        Task<IEnumerable<Product>> GetProductsListAsync(bool forceRefresh = false);
     }
 }
