@@ -4,29 +4,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
 namespace CrossPlatformApp.Views
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class LoginPage : ContentPage
+    public partial class ShoppingCartPage : ContentPage
     {
-        LoginViewModel _loginViewModel;
+        ShoppingCartPageViewModel _shoppingCartPageViewModel;
 
-        public LoginPage()
+        public ShoppingCartPage()
         {
             InitializeComponent();
-            this.BindingContext = _loginViewModel = new LoginViewModel();
-
-            Username.Completed += (object sender, EventArgs e) => { Passowrd.Focus(); };
-            Passowrd.Completed += (object sender, EventArgs e) => { _loginViewModel.LoginCommand.Execute(null); };
+            BindingContext = _shoppingCartPageViewModel = new ShoppingCartPageViewModel();
         }
 
         protected override void OnAppearing()
         {
             base.OnAppearing();
-            _loginViewModel.OnAppearing();
+            _shoppingCartPageViewModel.OnAppearing();
         }
     }
 }

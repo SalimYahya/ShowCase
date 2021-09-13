@@ -1,4 +1,6 @@
 ﻿using CrossPlatformApp.Models;
+using CrossPlatformApp.Utils;
+using CrossPlatformApp.Utils.Urls;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,49 +13,54 @@ namespace CrossPlatformApp.Services
 {
     public class ProductService : IProductService
     {
-        public HttpClientHandler GetInsecureHandler()
+        public const string TAG = nameof(ProductService);
+        HttpClient _httpClinet;
+
+        public ProductService()
         {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                if (cert.Issuer.Equals("CN=localhost"))
-                    return true;
-                return errors == System.Net.Security.SslPolicyErrors.None;
-            };
-            return handler;
+            _httpClinet = new HttpClient(HttpHandler
+                           .GetInstance()
+                           .GetInsecureHandler()
+                       );
         }
-        public async Task<IEnumerable<Product>> GetProductsAsync(bool forceRefresh = false)
+
+        public async Task<Product> GetProductAsync(int productId)
         {
-            string url = "https://10.0.2.2:5001/api/Products";
+            Debug.WriteLine($"{TAG}: {nameof(ProductService.GetProductAsync)}, Api: {ApiEndpoints.Products.GetProduct+productId}");
 
-            Debug.WriteLine("Calling Rest");
-            HttpClientHandler insecureHandler = GetInsecureHandler();
-            HttpClient client = new HttpClient(insecureHandler);
+            var json = await _httpClinet.GetStringAsync(ApiEndpoints.Products.GetProduct + productId);
+            Product product = JsonConvert.DeserializeObject<Product>(json);
 
-            var json = await client.GetStringAsync(url);
-            Debug.WriteLine("Json", json.ToString());
+            return product;
+        }
 
+        public async Task<IEnumerable<Product>> GetProductsListAsync(bool forceRefresh = false)
+        {
+            Debug.WriteLine(TAG, $"Member: {nameof(ProductService.GetProductsListAsync)}, Api: {ApiEndpoints.Products.GetAllProducts}");
+
+            var json = await _httpClinet.GetStringAsync(ApiEndpoints.Products.GetAllProducts);
             var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
-
-            //Debug.WriteLine("Products", products.ToString());
-            //List<Product> products = new List<Product>
-            //{
-            //    new Product { Id = 1, Name = "First item", Description = "This is an item description." },
-            //    new Product { Id = 2, Name = "Second item", Description = "This is an item description." },
-            //    new Product { Id = 3, Name = "Third item", Description = "This is an item description." },
-            //    new Product { Id = 4, Name = "Fourth item", Description = "This is an item description." },
-            //    new Product { Id = 5, Name = "Fifth item", Description = "This is an item description." },
-            //    new Product { Id = 6, Name = "Sixth item", Description = "This is an item description." }
-            //};
-
-            //HttpClient client = new HttpClient {BaseAddress = new Uri("http://10.0.2.2:500") };
-
-            //var json = await client.GetStringAsync("api/products");
-            //var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
-            //Debug.WriteLine(products.ToString());
 
             return products;
         }
     }
 }
+
+
+//Debug.WriteLine("Products", products.ToString());
+//List<Product> products = new List<Product>
+//{
+//    new Product { Id = 1, Name = "First item", Description = "This is an item description." },
+//    new Product { Id = 2, Name = "Second item", Description = "This is an item description." },
+//    new Product { Id = 3, Name = "Third item", Description = "This is an item description." },
+//    new Product { Id = 4, Name = "Fourth item", Description = "This is an item description." },
+//    new Product { Id = 5, Name = "Fifth item", Description = "This is an item description." },
+//    new Product { Id = 6, Name = "Sixth item", Description = "This is an item description." }
+//};
+
+//HttpClient client = new HttpClient {BaseAddress = new Uri("http://10.0.2.2:500") };
+
+//var json = await client.GetStringAsync("api/products");
+//var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
+//Debug.WriteLine(products.ToString());
 

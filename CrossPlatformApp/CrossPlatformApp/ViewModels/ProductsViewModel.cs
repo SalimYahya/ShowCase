@@ -1,5 +1,6 @@
 ﻿using CrossPlatformApp.Models;
 using CrossPlatformApp.Services;
+using CrossPlatformApp.Views;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -14,34 +15,26 @@ namespace CrossPlatformApp.ViewModels
 {
     public class ProductsViewModel : BaseViewModel
     {
+        private const string TAG = nameof(ProductsViewModel);
+        private Product _selectedProduct;
+
         public ObservableCollection<Product> Products { get; }
         public Command LoadProductsCommand { get; }
-
-        IProductService _productService = DependencyService.Get<IProductService>();
+        public Command ProductTapped { get; }
 
         public ProductsViewModel()
         {
-            Title = "Browse Products";
+            Title = "Products";
             Products = new ObservableCollection<Product>();
-
+            
             LoadProductsCommand = new Command(async () => await ExecuteLoadProductsCommand());
+            ProductTapped = new Command<Product>(OnProductSelected);
         }
 
         public void OnAppearing()
         {
             IsBusy = true;
-        }
-
-        public HttpClientHandler GetInsecureHandler()
-        {
-            HttpClientHandler handler = new HttpClientHandler();
-            handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
-            {
-                if (cert.Issuer.Equals("CN=localhost"))
-                    return true;
-                return errors == System.Net.Security.SslPolicyErrors.None;
-            };
-            return handler;
+            SelectedProduct = null;
         }
 
         async Task ExecuteLoadProductsCommand()
@@ -52,22 +45,8 @@ namespace CrossPlatformApp.ViewModels
 
             try
             {
-
-                //string url = "https://10.0.2.2:5001/api/Products";
-
-                //Debug.WriteLine("Calling Rest");
-                //HttpClientHandler insecureHandler = GetInsecureHandler();
-                //HttpClient client = new HttpClient(insecureHandler);
-
-                //var json = await client.GetStringAsync(url);
-                //Debug.WriteLine("Json", json.ToString());
-
-                //var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
-                //Debug.WriteLine("Products", products.ToString());
-
-
                 Products.Clear();
-                var products = await ProductDataStore.GetProductsAsync();
+                var products = await _productService.GetProductsListAsync();
                 Debug.WriteLine(products.ToString());
 
                 foreach (var product in products)
@@ -85,6 +64,30 @@ namespace CrossPlatformApp.ViewModels
             {
                 IsBusy = false;
             }
+        }
+
+        public Product SelectedProduct
+        {
+            get => _selectedProduct;
+            set
+            {
+                SetProperty(ref _selectedProduct, value);
+                OnProductSelected(value);
+            }
+        }
+
+         async void OnProductSelected(Product product)
+        {
+            if (product == null)
+                return;
+
+            Debug.Write($"{TAG} - Product: {product.ToString()}");
+            await Shell.Current.GoToAsync($"{nameof(ProductDetailPage)}?{nameof(ProductDetailViewModel.ProductId)}={product.Id}");
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
         }
     }
 }

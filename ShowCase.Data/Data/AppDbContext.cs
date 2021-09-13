@@ -25,7 +25,8 @@ namespace ShowCase.Data
         public DbSet<Sold> Solds { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<InvoiceProduct> InvoiceProduct { get; set; }
-        
+        public DbSet<Brand> Brands { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -77,7 +78,18 @@ namespace ShowCase.Data
             modelBuilder
                 .Entity<ProductSold>()
                 .HasKey(ps => new { ps.ProductId, ps.SoldId });
+
+            // Configure Brand-Products Relation
+            // of One-To-Many
+            modelBuilder
+                .Entity<Product>()
+                .HasOne(b => b.Brand)
+                .WithMany(p => p.Products);
         }
 
+        public Task FindAsync(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

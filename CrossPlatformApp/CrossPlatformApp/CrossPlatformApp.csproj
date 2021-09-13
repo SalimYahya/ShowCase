@@ -12,7 +12,31 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Views\ShoppingCartPage.xaml.cs">
+      <DependentUpon>ShoppingCartPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\CartControl\CartHeader.xaml.cs">
+      <DependentUpon>CartHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\Template\ProductsCardViewTemplate.xaml.cs">
+      <DependentUpon>ProductsCardViewTemplate.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Views\CartControl\CartHeader.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\ShoppingCartPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\ProductDetailPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Views\ProductsPage.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Views\Template\ProductsCardViewTemplate.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>
